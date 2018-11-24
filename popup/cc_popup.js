@@ -1,6 +1,5 @@
+
 function Swatch (x, y, id, radius, hue, saturation, lightness) {
-	var lighter = lightness + 15;
-	var darker = lightness - 15;
 	this.x = x;
 	this.y = y;
 	this.id = id;
@@ -10,9 +9,37 @@ function Swatch (x, y, id, radius, hue, saturation, lightness) {
 	this.saturation = saturation;
 	this.lightness = lightness;
 	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	this.darker = `hsl(${hue}, ${saturation}%, ${darker}%)`;
-	this.lighter = `hsl(${hue}, ${saturation}%, ${lighter}%)`;
+}
+
+function update_swatch (swatch, hue, saturation, lightness) {
+	swatch.hue = hue;
+	swatch.saturation = saturation;
+	swatch.lightness = lightness;
+	swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+};
+
+function ChosenColor (hue, saturation, lightness, chosen_id) {
+	this.hue = hue;
+	this.saturation = saturation;
+	this.lightness = lightness;
+	this.chosen_id = chosen_id;
+
+	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 15}%)`;
+	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 15}%)`;
 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+}
+
+function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
+	col.hue = hue;
+	col.saturation = saturation;
+	col.lightness = lightness;
+	col.chosen_id = chosen_id;
+
+	col.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 15}%)`;
+	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 15}%)`;
+	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;	
 }
 
 function CC_URL(url, type)  {
@@ -22,7 +49,7 @@ function CC_URL(url, type)  {
 
 var hover_id = null;
 
-var settings = {};
+var state = {};
 var cc_type = null;
 
 var lightness_slider = document.getElementById("lightness");
@@ -30,17 +57,16 @@ var lightness_output = document.getElementById("lightness-value");
 
 lightness_slider.oninput = function() {
 	lightness_output.innerHTML = `${this.value}%`;
-	settings.lightness = parseInt(this.value);
+	state.lightness = parseInt(this.value);
 	
-	// save_settings();
 	draw_canvas();
 }
 
-// var active_btn = null;
 var active_btn_color = "#9B9EE3";
 var inactive_btn_color = "#eeeeee";
 
 var active_tab = null;
+
 var cc_page_btn = document.getElementById("cc-page");
 var cc_subdomain_btn = document.getElementById("cc-subdomain");
 var cc_domain_btn = document.getElementById("cc-domain");
@@ -54,7 +80,6 @@ var back_swatch = document.getElementById("back_swatch");
 var link_swatch = document.getElementById("link_swatch");
 
 cc_page_btn.onclick = function() {
-	console.log("-----------------------before cc_type ", cc_type);
 	cc_type = "page";
 	set_active_cc_button();
 	check_urls();
@@ -74,53 +99,43 @@ cc_domain_btn.onclick = function() {
 };
 
 fore_swatch.onclick = function() {
-	settings.active_btn = "fore";
-	set_active_color_button();
-	set_active_swatch();
-	save_settings();
+	state.active_btn = "fore";
+	state.lightness = state.fg.lightness;
+	update_color_buttons();
 };
 back_swatch.onclick = function() {
-	settings.active_btn = "back";
-	set_active_color_button();
-	set_active_swatch();
-	save_settings();
+	state.active_btn = "back";
+	state.lightness = state.bg.lightness;
+	update_color_buttons();
 };
 link_swatch.onclick = function() {
-	settings.active_btn = "link";
-	set_active_color_button();
-	set_active_swatch();
-	save_settings();
+	state.active_btn = "link";
+	state.lightness = state.li.lightness;
+	update_color_buttons();
 };
-
 fore.onclick = function() {
-	settings.active_btn = "fore";
-	lightness_slider.value = settings.fg.lightness;
-	settings.lightness = settings.fg.lightness;
-	lightness_output.innerHTML = `${settings.lightness}%`;
-	draw_canvas();
-	set_active_color_button();
-	set_active_swatch();
-	save_settings();
+	state.active_btn = "fore";
+	state.lightness = state.fg.lightness;
+	update_color_buttons();
 }
 back.onclick = function() {
-	settings.active_btn = "back";
-	lightness_slider.value = settings.bg.lightness;
-	settings.lightness = settings.bg.lightness;
-	lightness_output.innerHTML = `${settings.lightness}%`;
-	draw_canvas();
-	set_active_color_button();
-	set_active_swatch();
-	save_settings();
+	state.active_btn = "back";
+	state.lightness = state.bg.lightness;
+	update_color_buttons();
 }
 link.onclick = function() {
-	settings.active_btn = "link";
-	lightness_slider.value = settings.li.lightness;
-	settings.lightness = settings.li.lightness;
-	lightness_output.innerHTML = `${settings.lightness}%`;
+	state.active_btn = "link";
+	state.lightness = state.li.lightness;
+	update_color_buttons();
+}
+
+function update_color_buttons() {
+	lightness_slider.value = state.lightness;
+	lightness_output.innerHTML = `${state.lightness}%`;
 	draw_canvas();
 	set_active_color_button();
 	set_active_swatch();
-	save_settings();
+	save_state();
 }
 
 function set_active_color_button() {
@@ -128,7 +143,7 @@ function set_active_color_button() {
 	back.classList.remove("active-btn");
 	link.classList.remove("active-btn");
 
-	document.getElementById(settings.active_btn).classList.add("active-btn");
+	document.getElementById(state.active_btn).classList.add("active-btn");
 }
 
 function set_active_cc_button() {
@@ -146,7 +161,7 @@ function set_active_swatch() {
 	back_swatch.classList.remove("active-swatch");
 	link_swatch.classList.remove("active-swatch");
 
-	document.getElementById(`${settings.active_btn}_swatch`).classList.add("active-swatch");
+	document.getElementById(`${state.active_btn}_swatch`).classList.add("active-swatch");
 }
 
 var canvas = document.querySelector("canvas");
@@ -176,7 +191,7 @@ let stroke_hover_width = 5;
 let zero_sat_offset_x = origin_x - canvas.width * 0.40;
 let zero_sat_offset_y = origin_y + canvas.width * 0.3;
 
-let zero_sat_text_offset_y = zero_sat_offset_y - 25;
+let zero_sat_text_offset_y = zero_sat_offset_y - 30;
 let sat_radius = big_radius * 0.5;
 
 var swatches = {};
@@ -195,32 +210,27 @@ function draw_canvas() {
 
 	ctx.beginPath();
 	ctx.arc(zero_sat_offset_x, zero_sat_offset_y, sat_radius, 0, 2 * Math.PI, true);
-	ctx.fillStyle = `hsl(0, 0%, ${settings.lightness}%)`;
+	ctx.fillStyle = `hsl(0, 0%, ${state.lightness}%)`;
 	ctx.fill();
 	ctx.strokeStyle = stroke_color;
 	hover_id === "zero" ? ctx.lineWidth = stroke_hover_width : ctx.lineWidth = 1;
 
-	if (settings.active_btn === "fore") {
-		if (settings.fg.id === "zero") {
+	if (
+		(state.active_btn === "fore" && state.fg.chosen_id === "zero") ||
+		(state.active_btn === "back" && state.bg.chosen_id === "zero") ||
+		(state.active_btn === "link" && state.li.chosen_id === "zero")) {
 			ctx.strokeStyle = "#000000";
 			ctx.lineWidth = stroke_hover_width;
-		}
-	}
-	else if (settings.active_btn === "back") {
-		if (settings.bg.id === "zero") {
-			ctx.strokeStyle = "#000000";
-			ctx.lineWidth = stroke_hover_width;						
-		}
-	}
-	else if (settings.active_btn === "link") {
-		if (settings.li.id === "zero") {
-			ctx.strokeStyle = "#000000";
-			ctx.lineWidth = stroke_hover_width;							
-		}
+			ctx.setLineDash([5, 2]);
 	}
 	ctx.stroke();
-	swatches["zero"] = new Swatch(zero_sat_offset_x, zero_sat_offset_y, "zero", sat_radius, 0, 0, settings.lightness);
+	ctx.setLineDash([0]);
 
+	if (swatches["zero"]) {
+		update_swatch(swatches["zero"], 0, 0, state.lightness);
+	} else {
+		swatches["zero"] = new Swatch(zero_sat_offset_x, zero_sat_offset_y, "zero", sat_radius, 0, 0, state.lightness);
+	}
 
 	for (var j = 0; j < rings; j++) {
 		let adjusted_num_swatches = num_swatches + (j * steps);
@@ -237,41 +247,43 @@ function draw_canvas() {
 			ctx.beginPath();
 			ctx.ellipse(x, y, little_radius, little_radius * 1.5, to_rad(hue - 45), 0, 2 * Math.PI, false);
 			// ctx.arc(x, y, little_radius, 0, 2 * Math.PI, false);
-			ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${settings.lightness}%)`;
+			ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${state.lightness}%)`;
 			ctx.fill();
 			
-			// this pattern has 73 elements including the zero sat
-			swatches[id] = new Swatch(x, y, id, little_radius, hue, saturation, settings.lightness);
-			// if (swatches.length < 73) {
-			// 	swatches.push(new Swatch(x, y, id, little_radius, hue, saturation, settings.lightness));
-			// }
-			// console.log("is it true ", settings.fg.id === id);
-			// 
-			// 
+			if (swatches[id]) {
+				update_swatch(swatches[id], hue, saturation, state.lightness);
+			} else {
+				swatches[id] = new Swatch(x, y, id, little_radius, hue, saturation, state.lightness);
+			}
+
 			ctx.strokeStyle = stroke_color;
 			hover_id === id ? ctx.lineWidth = stroke_hover_width : ctx.lineWidth = 1;
 
-			if (settings.active_btn === "fore") {
-				if (settings.fg.id === id) {
+			if (	(state.active_btn === "fore" && state.fg.chosen_id === id) ||
+				  	(state.active_btn === "back" && state.bg.chosen_id === id) ||
+				  	(state.active_btn === "link" && state.li.chosen_id === id)	) {
 					ctx.strokeStyle = "#000000";
 					ctx.lineWidth = stroke_hover_width;
-				}
+					ctx.setLineDash([5, 2]);
 			}
-			else if (settings.active_btn === "back") {
-				if (settings.bg.id === id) {
-					ctx.strokeStyle = "#000000";
-					ctx.lineWidth = stroke_hover_width;						
-				}
-			}
-			else if (settings.active_btn === "link") {
-				if (settings.li.id === id) {
-					ctx.strokeStyle = "#000000";
-					ctx.lineWidth = stroke_hover_width;							
-				}
-			}
-
 			ctx.stroke();
+			ctx.setLineDash([0]);
 		}
+	}
+	if (hover_id) {
+		ctx.beginPath();
+		ctx.arc(origin_x, origin_y, big_radius, 0, 2 * Math.PI, false);
+		ctx.fillStyle = swatches[hover_id].hsl;
+		ctx.fill();
+		ctx.closePath();
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = stroke_color;
+		ctx.stroke();
+
+		ctx.fillStyle = "black";
+		ctx.textAlign = "center";
+		ctx.font = '16pt Helvetica';
+		ctx.fillText(`${hover_id}`, origin_x, origin_y); 
 	}
 }
 
@@ -296,19 +308,23 @@ function check_collision(swatches, x, y) {
 canvas.onclick = function(e) {
 	var swatch = check_collision(swatches, e.offsetX, e.offsetY);
 	if (swatch) {
-		switch(settings.active_btn) {
-			case "fore": settings.fg = swatch; fore_swatch.style.background = settings.fg.hsl; break;
-			case "back": settings.bg = swatch; back_swatch.style.background = settings.bg.hsl; break;
-			case "link": settings.li = swatch; link_swatch.style.background = settings.li.hsl; break;
+		switch(state.active_btn) {
+			case "fore": update_chosen_color(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); fore_swatch.style.background = state.fg.hsl; break;
+			case "back": update_chosen_color(state.bg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); back_swatch.style.background = state.bg.hsl; break;
+			case "link": update_chosen_color(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); link_swatch.style.background = state.li.hsl; break;
 			default: break;
 		}
+
 		save_and_commit();
+		draw_canvas();
 	}
 };
 
 canvas.onmouseout = function() {
-	hover_id = "nothing";
+	hover_id = null;
+	draw_canvas();
 }
+
 canvas.onmousemove = function(e) {
 
 	var swatch = check_collision(swatches, e.offsetX, e.offsetY);
@@ -318,14 +334,6 @@ canvas.onmousemove = function(e) {
 
 			draw_canvas();
 			
-			ctx.beginPath();
-			ctx.arc(origin_x, origin_y, big_radius, 0, 2 * Math.PI, false);
-			ctx.fillStyle = swatch.hsl;
-			ctx.fill();
-			ctx.closePath();
-			ctx.lineWidth = 1;
-			ctx.strokeStyle = stroke_color;
-			ctx.stroke();
 			canvas.style.cursor = 'pointer';
 	} else {
 			canvas.style.cursor = 'default';
@@ -334,7 +342,7 @@ canvas.onmousemove = function(e) {
 
 async function save_and_commit() {
 	// await get_active_tab();
-	await save_settings();
+	await save_state();
 	send_message();
 }
 
@@ -359,7 +367,7 @@ function send_message() {
 	// .catch(console.error.bind(console));
 
 	browser.tabs.sendMessage(active_tab.id, {
-		settings: settings
+		state: state
 	});
 }
 
@@ -369,69 +377,63 @@ async function check_urls() {
 
 	// always add individual pages
 	if (cc_type === "page") {
-		settings.urls.push(new CC_URL(active_tab.url, cc_type));
+		state.urls.push(new CC_URL(active_tab.url, cc_type));
 	}
 
 	let bFoundMatch = false;
-	for (let i = 0; i < settings.urls.length; i++) {
-		let url = settings.urls[i].url;
+	for (let i = 0; i < state.urls.length; i++) {
+		let url = state.urls[i].url;
 		// see if tab url domain is already in our list
 		if (compare_urls(url, active_tab.url, "domain")) {
 			// if we're already tracking this domain, then just change its type
-			settings.urls[i].type = cc_type;
+			state.urls[i].type = cc_type;
 			bFoundMatch = true;
 		}
 	}
 
 	// if no match was found, this is a new url
 	if (!bFoundMatch) {
-		settings.urls.push(new CC_URL(active_tab.url, cc_type));
+		state.urls.push(new CC_URL(active_tab.url, cc_type));
 	}
 }
 
-async function save_settings() {
+async function save_state() {
 	browser.storage.local.set({
-		settings: settings
+		state: state
 	});
 }
-async function init(storage) {
-	// console.log("popup settings: ", storage.settings);
-	if (storage.settings) {
-		settings = storage.settings;
-	} else {
-		settings.fg = new Swatch(0, 0, "1-2", 0, 0, 0, 80);
-		settings.bg = new Swatch(0, 0, "0-3", 0, 0, 0, 25);
-		settings.li = new Swatch(0, 0, "2-11", 0, 68, 80, 80);
-		settings.active_btn = "fore";
-		settings.urls = [];
-		settings.lightness = 70;
-		settings.domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
-	}
-	console.log("from init", settings.fg.id);
-	
-	fore_swatch.style.background = settings.fg.hsl;
-	back_swatch.style.background = settings.bg.hsl;
-	link_swatch.style.background = settings.li.hsl;
-	
-	lightness_slider.value = settings.lightness;
-	lightness_output.innerHTML = `${settings.lightness}%`;
 
+async function init(storage) {
+	if (storage.state) {
+		state = storage.state;
+	} else {
+		state.fg = new ChosenColor(0,  0, 79,  "2-5");
+		state.bg = new ChosenColor(0,  0, 25,  "zero");
+		state.li = new ChosenColor(68, 80, 80, "1-5");
+		state.active_btn = "fore";
+		state.urls = [];
+		state.lightness = state.fg.lightness;
+		state.domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
+	}
+	
+	fore_swatch.style.background = state.fg.hsl;
+	back_swatch.style.background = state.bg.hsl;
+	link_swatch.style.background = state.li.hsl;
+	
+	
 	await get_active_tab();
 	
-	for (let i = 0; i < settings.urls.length; i++) {
-		let url = settings.urls[i].url;
-		let type = settings.urls[i].type;
+	for (let i = 0; i < state.urls.length; i++) {
+		let url = state.urls[i].url;
+		let type = state.urls[i].type;
 		if (compare_urls(url, active_tab.url, type)) {
 			cc_type = type;
 		}
 	}
-
-	draw_canvas();
-
-	set_active_color_button();
-	set_active_swatch();
+	
+	update_color_buttons();
 	set_active_cc_button();
-	// console.log(settings);
+	// console.log(state);
 }
 
 function compare_urls(aa, bb, type) {
@@ -444,16 +446,16 @@ function compare_urls(aa, bb, type) {
 		case "domain": {
 			// console.log(a.hostname);
 			// console.log(b.hostname);
-			// console.log(settings.domain_re.exec(a.hostname));
-			// console.log(settings.domain_re.exec(b.hostname));
-			if (settings.domain_re.exec(a.hostname)[0] === settings.domain_re.exec(b.hostname)[0]) return true;
+			// console.log(state.domain_re.exec(a.hostname));
+			// console.log(state.domain_re.exec(b.hostname));
+			if (state.domain_re.exec(a.hostname)[0] === state.domain_re.exec(b.hostname)[0]) return true;
 		} break;
 		default: return false;
 	}
 }
 
-function get_settings() {
-	var getting = browser.storage.local.get("settings");
+function get_state() {
+	var getting = browser.storage.local.get("state");
 	getting.then(init, on_error);
 
   function on_error(error) {
@@ -461,4 +463,4 @@ function get_settings() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", get_settings);
+document.addEventListener("DOMContentLoaded", get_state);

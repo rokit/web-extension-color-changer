@@ -10,50 +10,50 @@ var anchor_color = `#9BC2E3`;
 var anchor_bg_color = `#000000`;
 var font_color = `#CCCCCC`;
 
-var settings = {};
+var state = {};
 
 function revert() {
 	window.location.reload(true); 
 }
 
-function change_colors(fg, bg, li) {
-	document.body.style.background = bg.hsl;
+function change_colors(state) {
+	document.body.style.background = state.bg.hsl;
 	
 	var all = document.getElementsByTagName("*");
 	for (var i = 0; i < all.length; i++) {
-		all[i].style.background = bg.hsl;
-		all[i].style.color = fg.hsl;
-		all[i].style.borderColor = bg.hsl;
+		all[i].style.background = state.bg.hsl;
+		all[i].style.color = state.fg.hsl;
+		all[i].style.borderColor = state.bg.hsl;
 	}
 	
 	var blocks = document.querySelectorAll('section, header, footer, nav');
 	for (var i = 0; i < blocks.length; i++) {
-		blocks[i].style.background = bg.darker;
+		blocks[i].style.background = state.bg.hsl_darker;
 	}
 
 	var buttons = document.querySelectorAll('button');
 	for (var i = 0; i < buttons.length; i++) {
-		buttons[i].style.background = bg.lighter;
-		buttons[i].style.color = li.hsl;
+		buttons[i].style.background = state.bg.hsl_lighter;
+		buttons[i].style.color = state.li.hsl;
 	}
 
 	var inputs = document.querySelectorAll('input, textarea, pre, code, code span');
 	for (var i = 0; i < inputs.length; i++) {
-		inputs[i].style.background = bg.lighter;
+		inputs[i].style.background = state.bg.hsl_lighter;
 	}
 
 	var anchors = document.querySelectorAll('a');
 	for (var i = 0; i < anchors.length; i++) {
-		// anchors[i].style.background = bg.hsl;
-		anchors[i].style.color = li.hsl;
+		// anchors[i].style.background = state.bg.hsl;
+		anchors[i].style.color = state.li.hsl;
 		anchors[i].onmouseover = function() {
-			this.style.color = li.lighter;
+			this.style.color = state.li.hsl_lighter;
 		}
 		anchors[i].onmouseout = function() {
-			this.style.color = li.hsl;
+			this.style.color = state.li.hsl;
 		}
 		anchors[i].onclick = function() {
-			this.style.color = li.darker;
+			this.style.color = state.li.hsl_darker;
 		}
 	}
 
@@ -62,32 +62,32 @@ function change_colors(fg, bg, li) {
 
 function notify(msg){
 	// console.log(msg);
-	if (msg.settings) {
-		change_colors(msg.settings.fg, msg.settings.bg, msg.settings.li);
+	if (msg.state) {
+		change_colors(msg.state);
 	}
 	if (msg.test) {
 		// console.log(msg.test);
 	}
 }
 
-async function init(result) {
+async function init(storage) {
 
-	if (result.settings) {
-		settings = result.settings;
+	if (storage.state) {
+		state = storage.state;
 	} else {
 		return;
 	}
 
-	// console.log(settings);
-	for (let i = 0; i < settings.urls.length; i++) {
-		let url = settings.urls[i].url;
-		let type = settings.urls[i].type;
+	// console.log(state);
+	for (let i = 0; i < state.urls.length; i++) {
+		let url = state.urls[i].url;
+		let type = state.urls[i].type;
 		if (compare_urls(url, location.href, type)) {
 			// console.log("changing colors: ");
 			// console.log(url);
 			// console.log(location.href);
 			// console.log(type);
-			change_colors(settings.fg, settings.bg, settings.li);
+			change_colors(state.fg, state.bg, state.li);
 			return;
 		}
 	}
@@ -113,7 +113,7 @@ function compare_urls(aa, bb, type) {
 			}
 		} break;
 		case "domain": {
-			if (settings.domain_re.exec(a.hostname)[0] === settings.domain_re.exec(b.hostname)[0]) {
+			if (state.domain_re.exec(a.hostname)[0] === state.domain_re.exec(b.hostname)[0]) {
 				return true;
 			}
 		} break;
@@ -130,15 +130,15 @@ function first_run() {
 		return;
 	}
 
-	// browser.storage.local.clear();
-
-	var getting = browser.storage.local.get("settings");
+	
+	var getting = browser.storage.local.get("state");
 	getting.then(init, on_init_error);
-
+	
 	window.hasRun = true;
 	browser.runtime.onMessage.addListener(notify);
 }
 
+browser.storage.local.clear();
 // first_run();
 
 setTimeout(first_run, 1000);
