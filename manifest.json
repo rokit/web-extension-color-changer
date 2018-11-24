@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+  "name": "Color Changer",
+  "version": "1.0",
+	"description": "Simple extension that changes website colors to your liking.",
+
+  "icons": {
+    "48": "icons/icon.svg"
+	},
+  "content_scripts": [
+    {
+			"run_at": "document_idle",
+      "matches": ["<all_urls>"],
+			"js": ["cc.js"]
+    }
+	],
+	"permissions": ["storage", "tabs", "activeTab"],
+	"applications": {
+    "gecko": {
+      "id": "addon@colorchanger.com"
+    }
+  },
+  "browser_action": {
+		"browser_style": true,
+    "default_popup": "popup/cc_popup.html",
+    "default_icon": {
+      "16": "icons/icon.svg"
+    }
+  }
+}
+

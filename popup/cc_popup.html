@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="cc_popup.css"/>
+  </head>
+
+<body>
+	<div id="content">
+		<div id="scope">
+			<button id="cc-page">Page</button>
+			<button id="cc-subdomain">Subdomain</button>
+			<button id="cc-domain">Domain</button>
+		</div>
+	
+		<canvas></canvas>
+
+		<div class="slidecontainer">
+			<input type="range" min="0" max="100" value="50" class="slider" id="lightness"><div id="lightness-value">50%</div>
+		</div>
+		
+		<section id="colors">
+			<button id="fore">Text Color</button><div id="fore_swatch"></div>
+			<button id="back">Background Color</button><div id="back_swatch"></div>
+			<button id="link">Link Color</button><div id="link_swatch"></div>
+		</section>
+
+		<section id="footer">
+			
+		</section>
+	</div>
+  <script src="cc_popup.js"></script>
+</body>
+
+</html>
