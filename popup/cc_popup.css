@@ -1,23 +1,25 @@
+button::-moz-focus-inner {
+  border: 0;
+}
+
 * {
 	margin: 0px;
 	padding: 0px;
 }
 body {
-	width: 400px;
+	overflow: hidden;
 }
 #content {
+	padding: 5px;
+	width: 410px;
 	overflow: hidden;
-	display: grid;
-	grid-template-rows: auto auto auto auto;
-	grid-template-columns: auto;
-	background: #ffffff;
+	/* margin-bottom: 10px; */
 }
-
 #scope {
 	display: grid;
 	grid-template:
-		[row1-start] "cc-page cc-subdomain cc-domain" auto [row1-end]
-		/ 1fr 1fr 1fr;	
+		[row1-start] "cc-subdomain" auto [row1-end]
+		/ 1fr;	
 }
 
 #cc-page {
@@ -66,32 +68,39 @@ canvas {
 #link_swatch {
 	grid-area: link_swatch;
 }
+.swatch:hover {
+	cursor: pointer;
+}
 
 button {
   width: 100%;
-  padding: 10px;
-  font-size: 1.5em;
+  padding: 8px;
+  font-size: 1.6rem;
   text-align: center;
 	cursor: pointer;
 	border: none;
-	background-color: #dddddd;
+	background-color: #ccc;
+	border: 2px solid white;
 }
 
 button:hover {
-  background-color: rgb(139, 142, 202);
+	background-color: #ddd;
+}
+button:active {
+	background-color: #eee;
+	border: 2px solid #333;
 }
 
 .active-btn {
-	background-color: #9B9EE3;
+	background-color: #eee;
+	border: 2px solid #333;
+
 }
 .active-swatch {
 	border: 3px solid #888888;
 }
-button:active {
-  background-color: #9B9EE3;
-}
 
-.slidecontainer {
+.slide-container {
 	display: flex;
 	width: 100%;
 	margin: 10px;
@@ -138,4 +147,52 @@ button:active {
 	background: #cccccc;
 	border-radius: 10000%;
 	cursor: pointer;
+}
+
+footer {
+	position: relative;
+	background-color: #bbb;
+	color: #ccc;
+	bottom: 5px;
+	height: 100px;
+
+	transition: bottom 200ms;
+}
+footer:hover {
+	bottom: 80px;
+}
+
+#divider {
+	height: 10px;
+}
+
+#thumb {
+	position: relative;
+	background-color: white;
+	top:  -10px;
+	left: -10px;
+	width:  20px;
+	height: 20px;
+	transform: rotate(45deg);
+}
+
+footer section {
+	display: grid;
+	grid-template-areas:"donate clear-storage";
+	grid-template-rows: 1fr 1fr;
+	grid-template-columns: 1fr;
+}
+
+#donate {
+	margin: 10px;
+	font-size: 1.6rem;
+	color: #222;
+	grid-area: donate;
+}
+
+#clear-storage {
+	margin-top: 10px;
+	margin-right: 10px;
+	grid-area: clear-storage;
+	justify-self: right;
 }

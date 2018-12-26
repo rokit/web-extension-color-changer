@@ -41,19 +41,12 @@ function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
 	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
 	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
-	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;	
+	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
-function CC_URL(url, type)  {
-	this.url = url;
-	this.type = type;
-}
-
-var domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
 var hover_id = null;
 
 var state = {};
-var cc_type = null;
 
 var lightness_slider = document.getElementById("lightness");
 var lightness_output = document.getElementById("lightness-value");
@@ -70,9 +63,8 @@ var inactive_btn_color = "#eeeeee";
 
 var active_tab = null;
 
-var cc_page_btn = document.getElementById("cc-page");
 var cc_subdomain_btn = document.getElementById("cc-subdomain");
-var cc_domain_btn = document.getElementById("cc-domain");
+var clear_btn = document.getElementById("clear-storage");
 
 var fore = document.getElementById("fore");
 var back = document.getElementById("back");
@@ -82,57 +74,27 @@ var fore_swatch = document.getElementById("fore_swatch");
 var back_swatch = document.getElementById("back_swatch");
 var link_swatch = document.getElementById("link_swatch");
 
-cc_page_btn.onclick = async function() {
-	if (cc_type === "page") {
-		cc_type = null;
-		await remove_url("page");
-	} else {
-		cc_type = "page";
-		add_url();
-	}
-	set_active_cc_button();
-	await save_and_commit();
-
-	if (cc_type == null) {
-		browser.tabs.reload(
-			active_tab.id
-		)
-	}
-};
 cc_subdomain_btn.onclick = async function() {
-	if (cc_type === "subdomain") {
-		cc_type = null;
-		await remove_url("subdomain");
-	} else {
-		cc_type = "subdomain";
-		add_url();
-	}
-	set_active_cc_button();
-	await save_and_commit();
-
-	if (cc_type == null) {
+	if (contains_url() > -1) {
+		await remove_url();
+		set_button_active(false);
 		browser.tabs.reload(
 			active_tab.id
 		)
-	}
-};
-cc_domain_btn.onclick = async function() {
-	if (cc_type === "domain") {
-		cc_type = null;
-		await remove_url("domain");
 	} else {
-		cc_type = "domain";
-		add_url();
-	}
-	set_active_cc_button();
-	await save_and_commit();
-
-	if (cc_type == null) {
-		browser.tabs.reload(
-			active_tab.id
-		)
+		await add_url();
+		set_button_active(true);
+		send_message();
 	}
 };
+
+clear_btn.onclick = function() {
+	browser.storage.local.clear();
+	// init_state();
+	browser.tabs.reload(
+		active_tab.id
+	)
+}
 
 fore_swatch.onclick = function() {
 	state.active_btn = "fore";
@@ -179,6 +141,14 @@ function update_color_buttons() {
 	set_active_swatch();
 }
 
+function set_button_active(bActive) {
+	if (bActive) {
+		cc_subdomain_btn.classList.add("active-btn");
+	} else {
+		cc_subdomain_btn.classList.remove("active-btn");
+	}
+}
+
 function set_active_color_button() {
 	fore.classList.remove("active-btn");
 	back.classList.remove("active-btn");
@@ -187,15 +157,7 @@ function set_active_color_button() {
 	document.getElementById(state.active_btn).classList.add("active-btn");
 }
 
-function set_active_cc_button() {
-	cc_page_btn.classList.remove("active-btn");
-	cc_subdomain_btn.classList.remove("active-btn");
-	cc_domain_btn.classList.remove("active-btn");
 
-	if (cc_type) {
-		document.getElementById(`cc-${cc_type}`).classList.add("active-btn");
-	}
-}
 
 function set_active_swatch() {
 	fore_swatch.classList.remove("active-swatch");
@@ -207,20 +169,21 @@ function set_active_swatch() {
 
 var canvas = document.querySelector("canvas");
 var ctx = canvas.getContext("2d");
-var base_width = document.querySelector("canvas").offsetHeight;
 canvas.width = document.querySelector("canvas").offsetWidth;
-canvas.height = base_width;
+canvas.height = document.querySelector("canvas").offsetHeight;
+var canvas_height = document.querySelector("canvas").offsetHeight;
 
 var origin_x = canvas.width / 2;
 var origin_y = canvas.height / 2;
 
-var big_radius = base_width / 6;
-var little_radius = base_width / 30;
+var big_radius = canvas_height / 6;
+var little_radius = canvas_height / 30;
+var ellipse_length = 1.5;
 var big_line = 3;
 var little_line = 1;
 
-var gap = base_width / 14;
-var little_gap = base_width / 30;
+var gap = canvas_height / 14;
+var little_gap = canvas_height / 30;
 var num_swatches = 16;
 var steps = num_swatches / 2;
 var rings = 3;
@@ -286,7 +249,7 @@ function draw_canvas() {
 			let = id = `${j}-${i}`;
 			
 			ctx.beginPath();
-			ctx.ellipse(x, y, little_radius, little_radius * 1.5, to_rad(hue - 45), 0, 2 * Math.PI, false);
+			ctx.ellipse(x, y, little_radius, little_radius * ellipse_length, to_rad(hue - 45), 0, 2 * Math.PI, false);
 			// ctx.arc(x, y, little_radius, 0, 2 * Math.PI, false);
 			ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${state.lightness}%)`;
 			ctx.fill();
@@ -321,10 +284,10 @@ function draw_canvas() {
 		ctx.strokeStyle = stroke_color;
 		ctx.stroke();
 
-		ctx.fillStyle = "black";
-		ctx.textAlign = "center";
-		ctx.font = '16pt Helvetica';
-		ctx.fillText(`${hover_id}`, origin_x, origin_y); 
+		// ctx.fillStyle = "black";
+		// ctx.textAlign = "center";
+		// ctx.font = '16pt Helvetica';
+		// ctx.fillText(`${hover_id}`, origin_x, origin_y); 
 	}
 }
 
@@ -382,7 +345,6 @@ canvas.onmousemove = function(e) {
 };
 
 async function save_and_commit() {
-	// await get_active_tab();
 	await save_state();
 	send_message();
 }
@@ -403,10 +365,6 @@ async function get_active_tab() {
 }
 
 function send_message() {
-	// browser.tabs.insertCSS(active_tab.id, {
-	// file: "/cc.css",});
-	// .catch(console.error.bind(console));
-
 	browser.tabs.sendMessage(active_tab.id, {
 		state: state
 	});
@@ -419,42 +377,37 @@ async function add_url() {
 	if (!active_tab) return;
 	if (!active_tab.url) return;
 
-	// remove hashes from url
-
-	// always add individual pages
-	if (cc_type === "page") {
-		state.urls.push(new CC_URL(active_tab.url, cc_type));
-	}
-
-	let bFoundMatch = false;
 	for (let i = 0; i < state.urls.length; i++) {
-		let url = state.urls[i].url;
-		// see if tab url domain is already in our list
-		if (compare_urls(url, active_tab.url, "domain")) {
-			// if we're already tracking this domain, then just change its type
-			state.urls[i].type = cc_type;
-			bFoundMatch = true;
+		if (compare_url(state.urls[i], active_tab.url)) {
+			// url already added
+			return;
 		}
 	}
 
 	// if no match was found, this is a new url
-	if (!bFoundMatch) {
-		state.urls.push(new CC_URL(active_tab.url, cc_type));
-	}
+	state.urls.push(active_tab.url);
+	save_state();
 }
 
-async function remove_url(type) {
+async function remove_url() {
 	if (!active_tab) return;
 	if (!active_tab.url) return;
 
+	let i = contains_url();
+	if (i > -1) {
+		state.urls.splice(i, 1);
+		save_state();
+	}
+}
+
+// check if tab url is already in our list
+function contains_url() {
 	for (let i = 0; i < state.urls.length; i++) {
-		let url = state.urls[i].url;
-		// see if tab url domain is already in our list
-		if (compare_urls(url, active_tab.url, type)) {
-			// if we're already tracking this domain, then just change its type
-			state.urls.splice(i, 1);
+		if (compare_url(state.urls[i], active_tab.url)) {
+			return i;
 		}
 	}
+	return -1;
 }
 
 async function save_state() {
@@ -463,17 +416,20 @@ async function save_state() {
 	});
 }
 
+function init_state() {
+	state.fg = new ChosenColor(0,  0, 80,  "zero");
+	state.bg = new ChosenColor(0,  0, 25,  "zero");
+	state.li = new ChosenColor(68, 80, 80, "2-6");
+	state.active_btn = "fore";
+	state.urls = [];
+	state.lightness = state.fg.lightness;
+}
+
 async function init(storage) {
 	if (storage.state) {
 		state = storage.state;
 	} else {
-		state.fg = new ChosenColor(0,  0, 80,  "zero");
-		state.bg = new ChosenColor(0,  0, 25,  "zero");
-		state.li = new ChosenColor(68, 80, 80, "2-6");
-		state.active_btn = "fore";
-		state.urls = [];
-		state.lightness = state.fg.lightness;
-		// state.domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
+		init_state();
 	}
 	
 	fore_swatch.style.background = state.fg.hsl;
@@ -482,35 +438,22 @@ async function init(storage) {
 	
 	await get_active_tab();
 	
-	for (let i = 0; i < state.urls.length; i++) {
-		let url = state.urls[i].url;
-		let type = state.urls[i].type;
-		if (compare_urls(url, active_tab.url, type)) {
-			cc_type = type;
-		}
+	if (contains_url() > -1) {
+		set_button_active(true);
+		// send_message();
 	}
-	
-	set_active_cc_button();
+
 	update_color_buttons();
 	// console.log(state);
 }
 
-function compare_urls(aa, bb, type) {
+function compare_url(aa, bb) {
 	let a = new URL(aa);
 	let b = new URL(bb);
-
-	switch(type) {
-		case "page": if (a.href === b.href) return true; break;
-		case "subdomain": if (a.hostname === b.hostname) return true; break;
-		case "domain": {
-			// console.log(a.hostname);
-			// console.log(b.hostname);
-			// console.log(state.domain_re.exec(a.hostname));
-			// console.log(state.domain_re.exec(b.hostname));
-			if (domain_re.exec(a.hostname)[0] === domain_re.exec(b.hostname)[0]) return true;
-		} break;
-		default: return false;
+	if (a.hostname === b.hostname) {
+		return true;
 	}
+	return false;
 }
 
 function get_state() {
