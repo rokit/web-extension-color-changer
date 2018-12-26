@@ -144,8 +144,10 @@ function update_color_buttons() {
 function set_button_active(bActive) {
 	if (bActive) {
 		cc_subdomain_btn.classList.add("active-btn");
+		cc_subdomain_btn.innerHTML = "Change Colors 🗸"
 	} else {
 		cc_subdomain_btn.classList.remove("active-btn");
+		cc_subdomain_btn.innerHTML = "Change Colors"
 	}
 }
 
