@@ -25,8 +25,9 @@ function ChosenColor (hue, saturation, lightness, chosen_id) {
 	this.chosen_id = chosen_id;
 
 	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 15}%)`;
-	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 15}%)`;
+	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
+	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
@@ -37,8 +38,9 @@ function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 	col.chosen_id = chosen_id;
 
 	col.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 15}%)`;
-	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 15}%)`;
+	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
+	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
 	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;	
 }
 
@@ -47,6 +49,7 @@ function CC_URL(url, type)  {
 	this.type = type;
 }
 
+var domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
 var hover_id = null;
 
 var state = {};
@@ -79,54 +82,93 @@ var fore_swatch = document.getElementById("fore_swatch");
 var back_swatch = document.getElementById("back_swatch");
 var link_swatch = document.getElementById("link_swatch");
 
-cc_page_btn.onclick = function() {
-	cc_type = "page";
+cc_page_btn.onclick = async function() {
+	if (cc_type === "page") {
+		cc_type = null;
+		await remove_url("page");
+	} else {
+		cc_type = "page";
+		add_url();
+	}
 	set_active_cc_button();
-	check_urls();
-	save_and_commit();
+	await save_and_commit();
+
+	if (cc_type == null) {
+		browser.tabs.reload(
+			active_tab.id
+		)
+	}
 };
-cc_subdomain_btn.onclick = function() {
-	cc_type = "subdomain";
+cc_subdomain_btn.onclick = async function() {
+	if (cc_type === "subdomain") {
+		cc_type = null;
+		await remove_url("subdomain");
+	} else {
+		cc_type = "subdomain";
+		add_url();
+	}
 	set_active_cc_button();
-	check_urls();
-	save_and_commit();
+	await save_and_commit();
+
+	if (cc_type == null) {
+		browser.tabs.reload(
+			active_tab.id
+		)
+	}
 };
-cc_domain_btn.onclick = function() {
-	cc_type = "domain";
+cc_domain_btn.onclick = async function() {
+	if (cc_type === "domain") {
+		cc_type = null;
+		await remove_url("domain");
+	} else {
+		cc_type = "domain";
+		add_url();
+	}
 	set_active_cc_button();
-	check_urls();
-	save_and_commit();
+	await save_and_commit();
+
+	if (cc_type == null) {
+		browser.tabs.reload(
+			active_tab.id
+		)
+	}
 };
 
 fore_swatch.onclick = function() {
 	state.active_btn = "fore";
 	state.lightness = state.fg.lightness;
 	update_color_buttons();
+	save_state();
 };
 back_swatch.onclick = function() {
 	state.active_btn = "back";
 	state.lightness = state.bg.lightness;
 	update_color_buttons();
+	save_state();
 };
 link_swatch.onclick = function() {
 	state.active_btn = "link";
 	state.lightness = state.li.lightness;
 	update_color_buttons();
+	save_state();
 };
 fore.onclick = function() {
 	state.active_btn = "fore";
 	state.lightness = state.fg.lightness;
 	update_color_buttons();
+	save_state();
 }
 back.onclick = function() {
 	state.active_btn = "back";
 	state.lightness = state.bg.lightness;
 	update_color_buttons();
+	save_state();
 }
 link.onclick = function() {
 	state.active_btn = "link";
 	state.lightness = state.li.lightness;
 	update_color_buttons();
+	save_state();
 }
 
 function update_color_buttons() {
@@ -135,7 +177,6 @@ function update_color_buttons() {
 	draw_canvas();
 	set_active_color_button();
 	set_active_swatch();
-	save_state();
 }
 
 function set_active_color_button() {
@@ -363,17 +404,22 @@ async function get_active_tab() {
 
 function send_message() {
 	// browser.tabs.insertCSS(active_tab.id, {
-	// file: "/cc.css",})
+	// file: "/cc.css",});
 	// .catch(console.error.bind(console));
 
 	browser.tabs.sendMessage(active_tab.id, {
 		state: state
 	});
+	// browser.tabs.reload(
+	// 	active_tab.id
+	// )
 }
 
-async function check_urls() {
+async function add_url() {
 	if (!active_tab) return;
 	if (!active_tab.url) return;
+
+	// remove hashes from url
 
 	// always add individual pages
 	if (cc_type === "page") {
@@ -397,6 +443,20 @@ async function check_urls() {
 	}
 }
 
+async function remove_url(type) {
+	if (!active_tab) return;
+	if (!active_tab.url) return;
+
+	for (let i = 0; i < state.urls.length; i++) {
+		let url = state.urls[i].url;
+		// see if tab url domain is already in our list
+		if (compare_urls(url, active_tab.url, type)) {
+			// if we're already tracking this domain, then just change its type
+			state.urls.splice(i, 1);
+		}
+	}
+}
+
 async function save_state() {
 	browser.storage.local.set({
 		state: state
@@ -407,19 +467,18 @@ async function init(storage) {
 	if (storage.state) {
 		state = storage.state;
 	} else {
-		state.fg = new ChosenColor(0,  0, 79,  "2-5");
+		state.fg = new ChosenColor(0,  0, 80,  "zero");
 		state.bg = new ChosenColor(0,  0, 25,  "zero");
-		state.li = new ChosenColor(68, 80, 80, "1-5");
+		state.li = new ChosenColor(68, 80, 80, "2-6");
 		state.active_btn = "fore";
 		state.urls = [];
 		state.lightness = state.fg.lightness;
-		state.domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
+		// state.domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
 	}
 	
 	fore_swatch.style.background = state.fg.hsl;
 	back_swatch.style.background = state.bg.hsl;
 	link_swatch.style.background = state.li.hsl;
-	
 	
 	await get_active_tab();
 	
@@ -431,8 +490,8 @@ async function init(storage) {
 		}
 	}
 	
-	update_color_buttons();
 	set_active_cc_button();
+	update_color_buttons();
 	// console.log(state);
 }
 
@@ -448,7 +507,7 @@ function compare_urls(aa, bb, type) {
 			// console.log(b.hostname);
 			// console.log(state.domain_re.exec(a.hostname));
 			// console.log(state.domain_re.exec(b.hostname));
-			if (state.domain_re.exec(a.hostname)[0] === state.domain_re.exec(b.hostname)[0]) return true;
+			if (domain_re.exec(a.hostname)[0] === domain_re.exec(b.hostname)[0]) return true;
 		} break;
 		default: return false;
 	}

@@ -1,72 +1,80 @@
-
-var bIsChanged = false;
-
-var bg_alpha = `33`;
-var bg_color = `#333333`;
-var input_bg_color = `#444444`;
-var zero_alpha = `00`;
-var full_alpha = `FF`;
-var anchor_color = `#9BC2E3`;
-var anchor_bg_color = `#000000`;
-var font_color = `#CCCCCC`;
-
+var domain_re = /[a-zA-Z0-9]{1,61}\.[a-zA-Z]{2,}$/;
 var state = {};
 
-function revert() {
-	window.location.reload(true); 
-}
+function change_colors() {
+	let styles =
+	`
+		* {
+			background: ${state.bg.hsl} !important;
+			color: ${state.fg.hsl} !important;
+		}
+		
+		a, a * {
+			color: ${state.li.hsl} !important;
+		}
+	`;
 
-function change_colors(state) {
-	document.body.style.background = state.bg.hsl;
+	console.log("whoa");
+	let ccl = document.getElementById("color-changer-link");
+	if (ccl) {
+		ccl.setAttribute('href', 'data:text/css;charset=UTF-8,' + encodeURIComponent(styles));
+	} else {
+		ccl = this.document.createElement('link');
+		ccl.setAttribute('rel', 'stylesheet');
+		ccl.setAttribute('type', 'text/css');
+		ccl.setAttribute('id', 'color-changer-link-' + new Date().getMilliseconds());
+		ccl.setAttribute('href', 'data:text/css;charset=UTF-8,' + encodeURIComponent(styles));
+		document.head.appendChild(ccl);
+	}
+	ccl.href = ccl.href + "?id=" + new Date().getMilliseconds();
+
+	// document.body.style.background = state.bg.hsl;
 	
-	var all = document.getElementsByTagName("*");
-	for (var i = 0; i < all.length; i++) {
-		all[i].style.background = state.bg.hsl;
-		all[i].style.color = state.fg.hsl;
-		all[i].style.borderColor = state.bg.hsl;
-	}
+	// var all = document.getElementsByTagName("*");
+	// for (var i = 0; i < all.length; i++) {
+	// 	if (all[i].tagName !== "IMG") {
+	// 		all[i].style.background = state.bg.hsl;
+	// 		all[i].style.color = state.fg.hsl;
+	// 		all[i].style.borderColor = state.bg.hsl;
+	// 	}
+	// }
 	
-	var blocks = document.querySelectorAll('section, header, footer, nav');
-	for (var i = 0; i < blocks.length; i++) {
-		blocks[i].style.background = state.bg.hsl_darker;
-	}
+	// var blocks = document.querySelectorAll('section, header, footer, nav');
+	// for (var i = 0; i < blocks.length; i++) {
+	// 	blocks[i].style.background = state.bg.hsl_darker;
+	// }
 
-	var buttons = document.querySelectorAll('button');
-	for (var i = 0; i < buttons.length; i++) {
-		buttons[i].style.background = state.bg.hsl_lighter;
-		buttons[i].style.color = state.li.hsl;
-	}
+	// var buttons = document.querySelectorAll('button');
+	// for (var i = 0; i < buttons.length; i++) {
+	// 	buttons[i].style.background = state.bg.hsl_lighter;
+	// 	buttons[i].style.color = state.li.hsl;
+	// }
 
-	var inputs = document.querySelectorAll('input, textarea, pre, code, code span');
-	for (var i = 0; i < inputs.length; i++) {
-		inputs[i].style.background = state.bg.hsl_lighter;
-	}
+	// var inputs = document.querySelectorAll('input, textarea, pre, code, code span');
+	// for (var i = 0; i < inputs.length; i++) {
+	// 	inputs[i].style.background = state.bg.hsl_lighter;
+	// }
 
-	var anchors = document.querySelectorAll('a');
-	for (var i = 0; i < anchors.length; i++) {
-		// anchors[i].style.background = state.bg.hsl;
-		anchors[i].style.color = state.li.hsl;
-		anchors[i].onmouseover = function() {
-			this.style.color = state.li.hsl_lighter;
-		}
-		anchors[i].onmouseout = function() {
-			this.style.color = state.li.hsl;
-		}
-		anchors[i].onclick = function() {
-			this.style.color = state.li.hsl_darker;
-		}
-	}
-
-	bIsChanged = true;
+	// var anchors = document.querySelectorAll('a, a *');
+	// for (var i = 0; i < anchors.length; i++) {
+	// 	// anchors[i].style.background = state.bg.hsl;
+	// 	anchors[i].style.color = state.li.hsl;
+	// 	anchors[i].onmouseover = function() {
+	// 		this.style.color = state.li.hsl_shift;
+	// 	}
+	// 	anchors[i].onmouseout = function() {
+	// 		this.style.color = state.li.hsl;
+	// 	}
+	// 	anchors[i].onclick = function() {
+	// 		this.style.color = state.li.hsl_darker;
+	// 	}
+	// }
 }
 
 function notify(msg){
-	// console.log(msg);
+	console.log("notify msg");
 	if (msg.state) {
 		change_colors(msg.state);
-	}
-	if (msg.test) {
-		// console.log(msg.test);
 	}
 }
 
@@ -83,26 +91,18 @@ async function init(storage) {
 		let url = state.urls[i].url;
 		let type = state.urls[i].type;
 		if (compare_urls(url, location.href, type)) {
-			// console.log("changing colors: ");
-			// console.log(url);
-			// console.log(location.href);
-			// console.log(type);
-			change_colors(state.fg, state.bg, state.li);
+			change_colors();
 			return;
 		}
 	}
 }
 
 function compare_urls(aa, bb, type) {
-	// console.log(aa);
-	// console.log(bb);
 	let a = new URL(aa);
 	let b = new URL(bb);
 
 	switch(type) {
 		case "page": {
-			// console.log(a.href);
-			// console.log(b.href);		
 			if (a.href === b.href) {
 				return true;
 			}
@@ -113,7 +113,7 @@ function compare_urls(aa, bb, type) {
 			}
 		} break;
 		case "domain": {
-			if (state.domain_re.exec(a.hostname)[0] === state.domain_re.exec(b.hostname)[0]) {
+			if (domain_re.exec(a.hostname)[0] === domain_re.exec(b.hostname)[0]) {
 				return true;
 			}
 		} break;
@@ -138,7 +138,7 @@ function first_run() {
 	browser.runtime.onMessage.addListener(notify);
 }
 
-browser.storage.local.clear();
-// first_run();
+// browser.storage.local.clear();
+first_run();
 
-setTimeout(first_run, 1000);
+// var interval = setInterval(change_colors, 1000);
