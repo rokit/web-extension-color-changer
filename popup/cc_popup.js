@@ -286,6 +286,7 @@ function draw_canvas() {
 		ctx.strokeStyle = stroke_color;
 		ctx.stroke();
 
+		// shows swatch id in center
 		// ctx.fillStyle = "black";
 		// ctx.textAlign = "center";
 		// ctx.font = '16pt Helvetica';

@@ -59,7 +59,6 @@ async function init(storage) {
 		return;
 	}
 
-	// console.log(state);
 	for (let i = 0; i < state.urls.length; i++) {
 		let url = state.urls[i];
 		if (compare_urls(url, location.href)) {
