@@ -53,14 +53,9 @@ function notify(msg){
 	}
 }
 
-async function init(storage) {
+async function init() {
 
-	if (storage.state) {
-		state = storage.state;
-	} else {
-		return;
-	}
-
+	console.log("init called");
 	for (let i = 0; i < state.urls.length; i++) {
 		let url = state.urls[i];
 		if (compare_urls(url, location.href)) {
@@ -82,21 +77,24 @@ function compare_urls(aa, bb) {
 	return false;
 }
 
-function on_init_error(error) {
-	console.log(`Error: ${error}`);
-}
-
 function first_run() {
 	if (window.hasRun) {
 		return;
 	}
-
 	
-	var getting = browser.storage.local.get("state");
-	getting.then(init, on_init_error);
+	chrome.storage.local.get('state', function(result) {
+		console.log("get state");
+		console.log(result.state.lightness);
+		if (result.state.lightness) {
+			state = result.state;
+			init();
+		} else {
+			return;
+		}
+	});
 	
 	window.hasRun = true;
-	browser.runtime.onMessage.addListener(notify);
+	chrome.runtime.onMessage.addListener(notify);
 }
 
 first_run();

@@ -79,7 +79,7 @@ cc_subdomain_btn.onclick = async function() {
 	if (contains_url() > -1) {
 		await remove_url();
 		set_button_active(false);
-		browser.tabs.reload(
+		chrome.tabs.reload(
 			active_tab.id
 		)
 	} else {
@@ -94,9 +94,9 @@ cc_temp_btn.onclick = async function() {
 };
 
 clear_btn.onclick = function() {
-	browser.storage.local.clear();
+	chrome.storage.local.clear();
 	// init_state();
-	browser.tabs.reload(
+	chrome.tabs.reload(
 		active_tab.id
 	)
 }
@@ -358,27 +358,18 @@ async function save_and_commit() {
 }
 
 async function get_active_tab() {
-	var query = browser.tabs.query({currentWindow: true, active: true});
-	await query.then(get_tab, onError);
-
-	function onError(error) {
-		console.log(`Error: ${error}`);
-	}
-
-	function get_tab(tabs) {
-		for (let tab of tabs){
-			active_tab = tab;
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		if (tabs[0]) { // Sanity check
+			active_tab = tabs[0];
+			console.log(active_tab);
 		}
-	}
+	});
 }
 
 function send_message() {
-	browser.tabs.sendMessage(active_tab.id, {
+	chrome.tabs.sendMessage(active_tab.id, {
 		state: state
 	});
-	// browser.tabs.reload(
-	// 	active_tab.id
-	// )
 }
 
 async function add_url() {
@@ -419,7 +410,7 @@ function contains_url() {
 }
 
 async function save_state() {
-	browser.storage.local.set({
+	chrome.storage.local.set({
 		state: state
 	});
 }
@@ -431,15 +422,10 @@ function init_state() {
 	state.active_btn = "fore";
 	state.urls = [];
 	state.lightness = state.fg.lightness;
+	console.log(state);
 }
 
-async function init(storage) {
-	if (storage.state) {
-		state = storage.state;
-	} else {
-		init_state();
-	}
-	
+async function init() {
 	fore_swatch.style.background = state.fg.hsl;
 	back_swatch.style.background = state.bg.hsl;
 	link_swatch.style.background = state.li.hsl;
@@ -448,11 +434,9 @@ async function init(storage) {
 	
 	if (contains_url() > -1) {
 		set_button_active(true);
-		// send_message();
 	}
 
 	update_color_buttons();
-	// console.log(state);
 }
 
 function compare_url(aa, bb) {
@@ -465,12 +449,14 @@ function compare_url(aa, bb) {
 }
 
 function get_state() {
-	var getting = browser.storage.local.get("state");
-	getting.then(init, on_error);
-
-  function on_error(error) {
-    console.log(`Error: ${error}`);
-  }
+	chrome.storage.local.get('state', function(result) {
+		if (result.state) {
+			state = result.state;
+		} else {
+			init_state();
+		}
+		init();
+	});
 }
 
 document.addEventListener("DOMContentLoaded", get_state);

@@ -15,11 +15,6 @@
     }
 	],
 	"permissions": ["storage", "tabs", "activeTab"],
-	"applications": {
-    "gecko": {
-      "id": "addon@colorchanger.com"
-    }
-  },
   "browser_action": {
 		"browser_style": true,
     "default_popup": "popup/cc_popup.html",
