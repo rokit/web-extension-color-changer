@@ -1,0 +1,4 @@
+1.0.2
+will now preserve background images
+will now preserve borders
+Change Colors button is now a toggle
