@@ -1,3 +1,5 @@
+var bIsChrome = /Chrome/.test(navigator.userAgent);
+
 var state = null;
 
 function change_colors() {
@@ -79,18 +81,30 @@ function first_run() {
 	if (window.hasRun) {
 		return;
 	}
-	
-	chrome.storage.local.get('state', function(result) {
-		if (result.state.lightness) {
-			state = result.state;
-			init();
-		} else {
-			return;
-		}
-	});
+
+	if (bIsChrome) {
+		chrome.runtime.onMessage.addListener(notify);
+		chrome.storage.local.get('state', function(result) {
+			if (result.state) {
+				state = result.state;
+				init();
+			} else {
+				return;
+			}
+		});
+	} else {
+		browser.runtime.onMessage.addListener(notify);
+		browser.storage.local.get('state', function(result) {
+			if (result.state) {
+				state = result.state;
+				init();
+			} else {
+				return;
+			}
+		});		
+	}
 	
 	window.hasRun = true;
-	chrome.runtime.onMessage.addListener(notify);
 }
 
 first_run();

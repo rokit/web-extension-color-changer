@@ -1,3 +1,4 @@
+var bIsChrome = /Chrome/.test(navigator.userAgent);
 
 function Swatch (x, y, id, radius, hue, saturation, lightness) {
 	this.x = x;
@@ -58,9 +59,6 @@ lightness_slider.oninput = function() {
 	draw_canvas();
 }
 
-var active_btn_color = "#9B9EE3";
-var inactive_btn_color = "#eeeeee";
-
 var active_tab = null;
 
 var cc_subdomain_btn = document.getElementById("cc-subdomain");
@@ -79,9 +77,7 @@ cc_subdomain_btn.onclick = async function() {
 	if (contains_url() > -1) {
 		await remove_url();
 		set_button_active(false);
-		chrome.tabs.reload(
-			active_tab.id
-		)
+		reload_tab();
 	} else {
 		await add_url();
 		set_button_active(true);
@@ -94,11 +90,8 @@ cc_temp_btn.onclick = async function() {
 };
 
 clear_btn.onclick = function() {
-	chrome.storage.local.clear();
-	// init_state();
-	chrome.tabs.reload(
-		active_tab.id
-	)
+	clear_storage();
+	reload_tab();
 }
 
 fore_swatch.onclick = function() {
@@ -163,8 +156,6 @@ function set_active_color_button() {
 
 	document.getElementById(state.active_btn).classList.add("active-btn");
 }
-
-
 
 function set_active_swatch() {
 	fore_swatch.classList.remove("active-swatch");
@@ -258,7 +249,6 @@ function draw_canvas() {
 			
 			ctx.beginPath();
 			ctx.ellipse(x, y, little_radius, little_radius * ellipse_length, to_rad(hue - 45), 0, 2 * Math.PI, false);
-			// ctx.arc(x, y, little_radius, 0, 2 * Math.PI, false);
 			ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${state.lightness}%)`;
 			ctx.fill();
 			
@@ -302,7 +292,6 @@ function draw_canvas() {
 
 function check_collision(swatches, x, y) {
 	for (var s in swatches) {
-		// console.log(swatches[s]);
 		var left = swatches[s].x - swatches[s].radius;
 		var right = swatches[s].x + swatches[s].radius;
 		var top = swatches[s].y - swatches[s].radius;
@@ -353,23 +342,41 @@ canvas.onmousemove = function(e) {
 	}
 };
 
+function reload_tab() {
+	if (bIsChrome) {
+		chrome.tabs.reload(active_tab.id);
+	} else {
+		browser.tabs.reload(active_tab.id);
+	}
+}
+
 async function save_and_commit() {
 	await save_state();
 	send_message();
 }
 
 async function get_active_tab() {
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		if (tabs[0]) { // Sanity check
-			active_tab = tabs[0];
-		}
-	});
+	if (bIsChrome) {
+		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+			if (tabs[0]) { // Sanity check
+				active_tab = tabs[0];
+			}
+		});
+	} else {
+		browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
+			if (tabs[0]) { // Sanity check
+				active_tab = tabs[0];
+			}
+		});
+	}
 }
 
 function send_message() {
-	chrome.tabs.sendMessage(active_tab.id, {
-		state: state
-	});
+	if (bIsChrome) {
+		chrome.tabs.sendMessage(active_tab.id, {state: state});
+	} else {
+		browser.tabs.sendMessage(active_tab.id, {state: state});
+	}
 }
 
 async function add_url() {
@@ -402,7 +409,6 @@ async function remove_url() {
 // check if tab url is already in our list
 function contains_url() {
 	for (let i = 0; i < state.urls.length; i++) {
-		console.log(active_tab);
 		if (compare_url(state.urls[i], active_tab.url)) {
 			return i;
 		}
@@ -410,10 +416,20 @@ function contains_url() {
 	return -1;
 }
 
+function clear_storage() {
+	if (bIsChrome) {
+		chrome.storage.local.clear();
+	} else {
+		browser.storage.local.clear();
+	}
+}
+
 async function save_state() {
-	chrome.storage.local.set({
-		state: state
-	});
+	if (bIsChrome) {
+		chrome.storage.local.set({state: state});
+	} else {
+		browser.storage.local.set({state: state});
+	}
 }
 
 function init_state() {
@@ -423,15 +439,12 @@ function init_state() {
 	state.active_btn = "fore";
 	state.urls = [];
 	state.lightness = state.fg.lightness;
-	console.log(state);
 }
 
-async function init() {
+async function init_ui() {
 	fore_swatch.style.background = state.fg.hsl;
 	back_swatch.style.background = state.bg.hsl;
 	link_swatch.style.background = state.li.hsl;
-	
-	// await get_active_tab();
 	
 	if (contains_url() > -1) {
 		set_button_active(true);
@@ -451,14 +464,26 @@ function compare_url(aa, bb) {
 
 async function get_state() {
 	await get_active_tab();
-	chrome.storage.local.get('state', function(result) {
-		if (result.state) {
-			state = result.state;
-		} else {
-			init_state();
-		}
-		init();
-	});
+
+	if (bIsChrome) {
+		await chrome.storage.local.get('state', function(result) {
+			if (result.state) {
+				state = result.state;
+			} else {
+				init_state();
+			}
+			init_ui();
+		});
+	} else {
+		await browser.storage.local.get('state', function(result) {
+			if (result.state) {
+				state = result.state;
+			} else {
+				init_state();
+			}
+			init_ui();
+		});
+	}
 }
 
 document.addEventListener("DOMContentLoaded", get_state);
