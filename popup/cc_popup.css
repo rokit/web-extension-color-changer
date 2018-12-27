@@ -6,14 +6,17 @@ button::-moz-focus-inner {
 	margin: 0px;
 	padding: 0px;
 }
-body {
+body, html {
+	font-size: 16px;
 	overflow: hidden;
+	max-height: 600px;
 }
 #content {
 	padding: 5px;
 	width: 410px;
+	max-height: 600px;
 	overflow: hidden;
-	/* margin-bottom: 10px; */
+	margin-bottom: 4px;
 }
 #scope {
 	display: grid;
@@ -36,15 +39,15 @@ canvas {
 }
 
 #colors {
-	padding: 16px;
+	padding: 10px;
 	display: grid;
 	grid-template:
 		[row1-start] "fore fore_swatch" auto [row1-end]
 		[row2-start] "back back_swatch" auto [row2-end]
 		[row3-start] "link link_swatch" auto [row3-end]
 		/ 80% auto;
-	grid-column-gap: 16px;
-  grid-row-gap: 16px;
+	grid-column-gap: 10px;
+  grid-row-gap: 10px;
 }
 
 #fore {
@@ -71,8 +74,8 @@ canvas {
 
 button {
   width: 100%;
-	height: 3.5rem;
-  font-size: 1.6rem;
+	height: 3rem;
+  font-size: 1.3rem;
   text-align: center;
 	cursor: pointer;
 	border: none;
@@ -134,6 +137,7 @@ button:active {
 	border-radius: 10000%;
 	width: 25px;
 	height: 25px;
+	margin-top: -11px;
 	background: #cccccc;
 	cursor: pointer;
 }
@@ -144,6 +148,16 @@ button:active {
 	background: #cccccc;
 	border-radius: 10000%;
 	cursor: pointer;
+}
+
+.slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  cursor: pointer;
+  /* box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d; */
+  background: #333;
+  border-radius: 1.3px;
+  /* border: 0.2px solid #010101; */
 }
 
 footer {

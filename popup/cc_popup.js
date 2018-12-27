@@ -384,7 +384,7 @@ async function add_url() {
 
 	// if no match was found, this is a new url
 	state.urls.push(active_tab.url);
-	save_state();
+	await save_state();
 }
 
 async function remove_url() {
@@ -394,7 +394,7 @@ async function remove_url() {
 	let i = contains_url();
 	if (i > -1) {
 		state.urls.splice(i, 1);
-		save_state();
+		await save_state();
 	}
 }
 
