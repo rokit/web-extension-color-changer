@@ -19,7 +19,7 @@
 		"browser_style": true,
     "default_popup": "popup/cc_popup.html",
     "default_icon": {
-      "16": "icons/icon.svg"
+      "16": "color changer.png"
     }
   }
 }

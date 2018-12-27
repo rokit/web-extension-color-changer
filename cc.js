@@ -54,8 +54,6 @@ function notify(msg){
 }
 
 async function init() {
-
-	console.log("init called");
 	for (let i = 0; i < state.urls.length; i++) {
 		let url = state.urls[i];
 		if (compare_urls(url, location.href)) {
@@ -83,8 +81,6 @@ function first_run() {
 	}
 	
 	chrome.storage.local.get('state', function(result) {
-		console.log("get state");
-		console.log(result.state.lightness);
 		if (result.state.lightness) {
 			state = result.state;
 			init();

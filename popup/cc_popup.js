@@ -361,7 +361,6 @@ async function get_active_tab() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		if (tabs[0]) { // Sanity check
 			active_tab = tabs[0];
-			console.log(active_tab);
 		}
 	});
 }
@@ -402,6 +401,7 @@ async function remove_url() {
 // check if tab url is already in our list
 function contains_url() {
 	for (let i = 0; i < state.urls.length; i++) {
+		console.log(active_tab);
 		if (compare_url(state.urls[i], active_tab.url)) {
 			return i;
 		}
@@ -430,7 +430,7 @@ async function init() {
 	back_swatch.style.background = state.bg.hsl;
 	link_swatch.style.background = state.li.hsl;
 	
-	await get_active_tab();
+	// await get_active_tab();
 	
 	if (contains_url() > -1) {
 		set_button_active(true);
@@ -448,7 +448,8 @@ function compare_url(aa, bb) {
 	return false;
 }
 
-function get_state() {
+async function get_state() {
+	await get_active_tab();
 	chrome.storage.local.get('state', function(result) {
 		if (result.state) {
 			state = result.state;
