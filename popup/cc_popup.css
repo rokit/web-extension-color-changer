@@ -6,17 +6,15 @@ button::-moz-focus-inner {
 	margin: 0px;
 	padding: 0px;
 }
+
 body, html {
 	font-size: 16px;
 	overflow: hidden;
-	max-height: 600px;
+	height: 600px;
+	width: 410px;
 }
 #content {
 	padding: 5px;
-	width: 410px;
-	max-height: 600px;
-	overflow: hidden;
-	margin-bottom: 4px;
 }
 #scope {
 	display: grid;
@@ -161,16 +159,16 @@ button:active {
 }
 
 footer {
-	position: relative;
+	position: absolute;
 	background-color: #bbb;
 	color: #ccc;
-	bottom: 5px;
+	bottom: -88px;
 	height: 100px;
-
+	width: 100%;
 	transition: bottom 200ms;
 }
 footer:hover {
-	bottom: 80px;
+	bottom: 0px;
 }
 
 #divider {

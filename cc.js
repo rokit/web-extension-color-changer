@@ -4,8 +4,6 @@ var state = null;
 
 function change_colors() {
 	if (!state) return;
-
-	document.body.style.background = state.bg.hsl;
 	
 	var all = document.getElementsByTagName("*");
 	for (var i = 0; i < all.length; i++) {
@@ -34,7 +32,7 @@ function change_colors() {
 
 	var anchors = document.querySelectorAll('a, a *');
 	for (var i = 0; i < anchors.length; i++) {
-		// anchors[i].style.backgroundColor = state.bg.hsl;
+		anchors[i].style.backgroundColor = state.bg.hsl;
 		anchors[i].style.color = state.li.hsl;
 		anchors[i].onmouseover = function() {
 			this.style.color = state.li.hsl_shift;
