@@ -1,0 +1,15 @@
+How to use:
+1. Click the Text Color, Background Color, or Link Color button. A border will appear around the button letting you know it's active.
+2. Choose a color on the color wheel to change the color. You can see your changes dynamically.
+3. Now, whenever you want to change the colors of a site, just hit the Change Colors button.
+
+If you'd like Color Changer to always change the colors for a subdomain, you can click Change Subdomain. Click the button again to make Color Changer forget that subdomain.
+
+What is a subdomain? For example, in developer.mozilla.org, the subdomain is "developer". So whenever you visit any url that has developer.mozilla.org, the colors will be changed. If you visited www.mozilla.org, the colors would not be changed because the subdomain is "www", not "developer".
+
+If you would like to reset the colors for all subdomains, you can mouse over the gray bar at the bottom which will open a flyout menu. From there, click the Reset All Sites button. There also happens to be a donate button down there. :)
+
+About the color wheel:
+There are three rings. The colors are less saturated near the center and 100% saturated on the edge. There is a separate swatch to the side that says 0% Sat meaning 0% saturation or 100% gray.
+
+There is also a lightness slider below the color wheel. 0% is black. 100% is white.

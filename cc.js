@@ -1,6 +1,8 @@
-var state = {};
+var state = null;
 
 function change_colors() {
+	if (!state) return;
+
 	document.body.style.background = state.bg.hsl;
 	
 	var all = document.getElementsByTagName("*");
@@ -63,6 +65,8 @@ async function init(storage) {
 		let url = state.urls[i];
 		if (compare_urls(url, location.href)) {
 			change_colors();
+			// some sites take a long time to load, so change colors again
+			setTimeout(change_colors, 1000);
 			return;
 		}
 	}
@@ -96,5 +100,4 @@ function first_run() {
 }
 
 first_run();
-
 // var interval = setInterval(change_colors, 1000);

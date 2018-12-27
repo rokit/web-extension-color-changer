@@ -52,7 +52,7 @@ var lightness_slider = document.getElementById("lightness");
 var lightness_output = document.getElementById("lightness-value");
 
 lightness_slider.oninput = function() {
-	lightness_output.innerHTML = `${this.value}%`;
+	lightness_output.childNodes[0].nodeValue = `${this.value}%`;
 	state.lightness = parseInt(this.value);
 	
 	draw_canvas();
@@ -64,6 +64,7 @@ var inactive_btn_color = "#eeeeee";
 var active_tab = null;
 
 var cc_subdomain_btn = document.getElementById("cc-subdomain");
+var cc_temp_btn = document.getElementById("cc-temp");
 var clear_btn = document.getElementById("clear-storage");
 
 var fore = document.getElementById("fore");
@@ -86,6 +87,10 @@ cc_subdomain_btn.onclick = async function() {
 		set_button_active(true);
 		send_message();
 	}
+};
+
+cc_temp_btn.onclick = async function() {
+	send_message();
 };
 
 clear_btn.onclick = function() {
@@ -135,7 +140,7 @@ link.onclick = function() {
 
 function update_color_buttons() {
 	lightness_slider.value = state.lightness;
-	lightness_output.innerHTML = `${state.lightness}%`;
+	lightness_output.childNodes[0].nodeValue = `${state.lightness}%`;
 	draw_canvas();
 	set_active_color_button();
 	set_active_swatch();
@@ -144,10 +149,10 @@ function update_color_buttons() {
 function set_button_active(bActive) {
 	if (bActive) {
 		cc_subdomain_btn.classList.add("active-btn");
-		cc_subdomain_btn.innerHTML = "Change Colors 🗸"
+		cc_subdomain_btn.innerHTML = "Subdomain 🗸"
 	} else {
 		cc_subdomain_btn.classList.remove("active-btn");
-		cc_subdomain_btn.innerHTML = "Change Colors"
+		cc_subdomain_btn.innerHTML = "Change Subdomain"
 	}
 }
 

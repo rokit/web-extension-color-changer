@@ -18,18 +18,15 @@ body {
 #scope {
 	display: grid;
 	grid-template:
-		[row1-start] "cc-subdomain" auto [row1-end]
-		/ 1fr;	
+		[row1-start] "cc-temp cc-subdomain" auto [row1-end]
+		/ 1fr 1fr;	
 }
 
-#cc-page {
-	grid-area: cc-page;
+#cc-temp {
+	grid-area: cc-temp;
 }
 #cc-subdomain {
 	grid-area: cc-subdomain;
-}
-#cc-domain {
-	grid-area: cc-domain;
 }
 
 canvas {
