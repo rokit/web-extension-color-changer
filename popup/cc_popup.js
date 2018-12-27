@@ -46,6 +46,7 @@ function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 }
 
 var hover_id = null;
+var cc_toggle = false;
 
 var state = {};
 
@@ -62,7 +63,7 @@ lightness_slider.oninput = function() {
 var active_tab = null;
 
 var cc_subdomain_btn = document.getElementById("cc-subdomain");
-var cc_temp_btn = document.getElementById("cc-temp");
+var cc_btn = document.getElementById("cc");
 var clear_btn = document.getElementById("clear-storage");
 
 var fore = document.getElementById("fore");
@@ -85,7 +86,14 @@ cc_subdomain_btn.onclick = async function() {
 	}
 };
 
-cc_temp_btn.onclick = async function() {
+cc_btn.onclick = async function() {
+	cc_toggle = !cc_toggle;
+	if (cc_toggle === false) {
+		cc_btn.innerHTML = "Change Colors";
+		reload_tab();
+	} else {
+		cc_btn.innerHTML = "Change Colors 🗸";
+	}
 	send_message();
 };
 

@@ -19,12 +19,12 @@ body, html {
 #scope {
 	display: grid;
 	grid-template:
-		[row1-start] "cc-temp cc-subdomain" auto [row1-end]
+		[row1-start] "cc cc-subdomain" auto [row1-end]
 		/ 1fr 1fr;	
 }
 
-#cc-temp {
-	grid-area: cc-temp;
+#cc {
+	grid-area: cc;
 }
 #cc-subdomain {
 	grid-area: cc-subdomain;
