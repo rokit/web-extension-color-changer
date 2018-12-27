@@ -212,6 +212,7 @@ function to_rad(degrees) {
 }
 
 function draw_canvas() {
+	ctx.fillStyle = "white";
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	ctx.fillStyle = "black";

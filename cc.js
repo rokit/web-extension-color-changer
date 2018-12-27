@@ -8,9 +8,9 @@ function change_colors() {
 	var all = document.getElementsByTagName("*");
 	for (var i = 0; i < all.length; i++) {
 		if (all[i].tagName !== "IMG") {
-			all[i].style.background = state.bg.hsl;
+			all[i].style.backgroundColor = state.bg.hsl;
 			all[i].style.color = state.fg.hsl;
-			all[i].style.borderColor = state.bg.hsl;
+			all[i].style.borderColor = state.bg.hsl_lighter;
 		}
 	}
 	
@@ -21,18 +21,18 @@ function change_colors() {
 
 	var buttons = document.querySelectorAll('button');
 	for (var i = 0; i < buttons.length; i++) {
-		buttons[i].style.background = state.bg.hsl_lighter;
+		buttons[i].style.backgroundColor = state.bg.hsl_lighter;
 		buttons[i].style.color = state.li.hsl;
 	}
 
 	var inputs = document.querySelectorAll('input, textarea, pre, code, code span');
 	for (var i = 0; i < inputs.length; i++) {
-		inputs[i].style.background = state.bg.hsl_lighter;
+		inputs[i].style.backgroundColor = state.bg.hsl_lighter;
 	}
 
 	var anchors = document.querySelectorAll('a, a *');
 	for (var i = 0; i < anchors.length; i++) {
-		// anchors[i].style.background = state.bg.hsl;
+		// anchors[i].style.backgroundColor = state.bg.hsl;
 		anchors[i].style.color = state.li.hsl;
 		anchors[i].onmouseover = function() {
 			this.style.color = state.li.hsl_shift;
