@@ -19,18 +19,18 @@ function update_swatch (swatch, hue, saturation, lightness) {
 	swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-function ChosenColor (hue, saturation, lightness, chosen_id) {
-	this.hue = hue;
-	this.saturation = saturation;
-	this.lightness = lightness;
-	this.chosen_id = chosen_id;
+// function ChosenColor (hue, saturation, lightness, chosen_id) {
+// 	this.hue = hue;
+// 	this.saturation = saturation;
+// 	this.lightness = lightness;
+// 	this.chosen_id = chosen_id;
 
-	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
-	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
-	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
-}
+// 	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+// 	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+// 	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
+// 	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
+// 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+// }
 
 function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 	col.hue = hue;
@@ -75,26 +75,29 @@ var back_swatch = document.getElementById("back_swatch");
 var link_swatch = document.getElementById("link_swatch");
 
 cc_subdomain_btn.onclick = async function() {
-	if (contains_url() > -1) {
-		await remove_url();
-		set_button_active(false);
-		reload_tab();
-	} else {
-		await add_url();
-		set_button_active(true);
-		send_message();
-	}
+	chrome.runtime.sendMessage({popup_subdomain_click: state});
+	// if (contains_url() > -1) {
+	// 	await remove_url();
+	// 	set_button_active(false);
+	// 	reload_tab();
+	// } else {
+	// 	await add_url();
+	// 	set_button_active(true);
+	// 	content_change();
+	// }
 };
 
 cc_btn.onclick = async function() {
-	cc_toggle = !cc_toggle;
-	if (cc_toggle === false) {
-		cc_btn.innerHTML = "Change Colors";
+	// content_change("cc_btn");
+	state.cc_toggle = !state.cc_toggle;
+	save_state();
+	set_button_active(cc_btn, state.cc_toggle);
+
+	if (state.cc_toggle === false) {
 		reload_tab();
 	} else {
-		cc_btn.innerHTML = "Change Colors 🗸";
+		content_change();
 	}
-	send_message();
 };
 
 clear_btn.onclick = function() {
@@ -147,13 +150,14 @@ function update_color_buttons() {
 	set_active_swatch();
 }
 
-function set_button_active(bActive) {
+function set_button_active(btn, bActive) {
+	var check = " 🗸";
 	if (bActive) {
-		cc_subdomain_btn.classList.add("active-btn");
-		cc_subdomain_btn.innerHTML = "Subdomain 🗸"
+		btn.classList.add("active-btn");
+		btn.innerHTML = btn.dataset.value + check;
 	} else {
-		cc_subdomain_btn.classList.remove("active-btn");
-		cc_subdomain_btn.innerHTML = "Change Subdomain"
+		btn.classList.remove("active-btn");
+		btn.innerHTML = btn.dataset.value;
 	}
 }
 
@@ -325,7 +329,7 @@ canvas.onclick = function(e) {
 			default: break;
 		}
 
-		save_and_commit();
+		save_and_change();
 		draw_canvas();
 	}
 };
@@ -350,78 +354,43 @@ canvas.onmousemove = function(e) {
 	}
 };
 
+async function init_ui() {
+	fore_swatch.style.background = state.fg.hsl;
+	back_swatch.style.background = state.bg.hsl;
+	link_swatch.style.background = state.li.hsl;
+
+	set_button_active(cc_subdomain_btn, state.subdomain_active);
+	set_button_active(cc_btn, state.cc_toggle);
+	update_color_buttons();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function reload_tab() {
 	if (bIsChrome) {
-		chrome.tabs.reload(active_tab.id);
+		chrome.tabs.reload(state.active_tab.id);
 	} else {
-		browser.tabs.reload(active_tab.id);
+		browser.tabs.reload(state.active_tab.id);
 	}
 }
 
-async function save_and_commit() {
+async function save_and_change() {
 	await save_state();
-	send_message();
+	content_change();
 }
 
-async function get_active_tab() {
-	if (bIsChrome) {
-		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			if (tabs[0]) { // Sanity check
-				active_tab = tabs[0];
-			}
-		});
-	} else {
-		browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			if (tabs[0]) { // Sanity check
-				active_tab = tabs[0];
-			}
-		});
-	}
-}
-
-function send_message() {
-	if (bIsChrome) {
-		chrome.tabs.sendMessage(active_tab.id, {state: state});
-	} else {
-		browser.tabs.sendMessage(active_tab.id, {state: state});
-	}
-}
-
-async function add_url() {
-	if (!active_tab) return;
-	if (!active_tab.url) return;
-
-	for (let i = 0; i < state.urls.length; i++) {
-		if (compare_url(state.urls[i], active_tab.url)) {
-			// url already added
-			return;
+function content_change() {
+	if (state.active_tab) {
+		if (bIsChrome) {
+			chrome.tabs.sendMessage(state.active_tab.id, {content_change: state});
+		} else {
+			browser.tabs.sendMessage(state.active_tab.id, {content_change: state});
 		}
 	}
-
-	// if no match was found, this is a new url
-	state.urls.push(active_tab.url);
-	await save_state();
-}
-
-async function remove_url() {
-	if (!active_tab) return;
-	if (!active_tab.url) return;
-
-	let i = contains_url();
-	if (i > -1) {
-		state.urls.splice(i, 1);
-		await save_state();
-	}
-}
-
-// check if tab url is already in our list
-function contains_url() {
-	for (let i = 0; i < state.urls.length; i++) {
-		if (compare_url(state.urls[i], active_tab.url)) {
-			return i;
-		}
-	}
-	return -1;
 }
 
 function clear_storage() {
@@ -434,64 +403,22 @@ function clear_storage() {
 
 async function save_state() {
 	if (bIsChrome) {
-		chrome.storage.local.set({state: state});
+		chrome.runtime.sendMessage({save_state: state});
 	} else {
-		browser.storage.local.set({state: state});
+		browser.runtime.sendMessage({save_state: state});
 	}
-}
-
-function init_state() {
-	state.fg = new ChosenColor(0,  0, 80,  "zero");
-	state.bg = new ChosenColor(0,  0, 25,  "zero");
-	state.li = new ChosenColor(68, 80, 80, "2-6");
-	state.active_btn = "fore";
-	state.urls = [];
-	state.lightness = state.fg.lightness;
-}
-
-async function init_ui() {
-	fore_swatch.style.background = state.fg.hsl;
-	back_swatch.style.background = state.bg.hsl;
-	link_swatch.style.background = state.li.hsl;
-	
-	if (contains_url() > -1) {
-		set_button_active(true);
-	}
-
-	update_color_buttons();
-}
-
-function compare_url(aa, bb) {
-	let a = new URL(aa);
-	let b = new URL(bb);
-	if (a.hostname === b.hostname) {
-		return true;
-	}
-	return false;
 }
 
 async function get_state() {
-	await get_active_tab();
+	chrome.runtime.sendMessage({request_state: true});
+}
 
-	if (bIsChrome) {
-		await chrome.storage.local.get('state', function(result) {
-			if (result.state) {
-				state = result.state;
-			} else {
-				init_state();
-			}
-			init_ui();
-		});
-	} else {
-		await browser.storage.local.get('state', function(result) {
-			if (result.state) {
-				state = result.state;
-			} else {
-				init_state();
-			}
-			init_ui();
-		});
+function notify(msg){
+	if (msg.popup_state) {
+		state = msg.popup_state;
+		init_ui();
 	}
 }
 
-document.addEventListener("DOMContentLoaded", get_state);
+window.onload = get_state;
+chrome.runtime.onMessage.addListener(notify);

@@ -47,63 +47,30 @@ function change_colors() {
 }
 
 function notify(msg){
-	if (msg.state) {
-		state = msg.state;
+	console.log("notify cc");
+	if (msg.content_change) {
+		console.log("content change cc");
+		state = msg.content_change;
 		change_colors();
 	}
 }
 
-async function init() {
-	for (let i = 0; i < state.urls.length; i++) {
-		let url = state.urls[i];
-		if (compare_urls(url, location.href)) {
-			change_colors();
-			// some sites take a long time to load, so change colors again
-			setTimeout(change_colors, 1000);
-			return;
-		}
-	}
-}
+// change_colors();
+// // some sites take a long time to load, so change colors again
+// setTimeout(change_colors, 1000);
 
-function compare_urls(aa, bb) {
-	let a = new URL(aa);
-	let b = new URL(bb);
-
-	if (a.hostname === b.hostname) {
-		return true;
-	}
-	return false;
-}
-
-function first_run() {
-	if (window.hasRun) {
-		return;
-	}
-
+async function get_state() {
 	if (bIsChrome) {
-		chrome.runtime.onMessage.addListener(notify);
-		chrome.storage.local.get('state', function(result) {
-			if (result.state) {
-				state = result.state;
-				init();
-			} else {
-				return;
-			}
-		});
+		chrome.runtime.sendMessage({request_state: true});
 	} else {
-		browser.runtime.onMessage.addListener(notify);
-		browser.storage.local.get('state', function(result) {
-			if (result.state) {
-				state = result.state;
-				init();
-			} else {
-				return;
-			}
-		});		
+		browser.runtime.sendMessage({request_state: true});
 	}
-	
-	window.hasRun = true;
 }
 
-first_run();
+if (bIsChrome) {
+	chrome.runtime.onMessage.addListener(notify);
+} else {
+	browser.runtime.onMessage.addListener(notify);
+}
+window.onload = get_state;
 // var interval = setInterval(change_colors, 1000);

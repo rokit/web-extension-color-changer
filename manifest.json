@@ -14,7 +14,8 @@
 			"js": ["cc.js"]
     }
 	],
-	"permissions": ["storage", "tabs", "activeTab"],
+	"background": {"scripts": ["background.js"]},
+	"permissions": ["storage", "tabs", "activeTab", "contextMenus"],
   "browser_action": {
 		"browser_style": true,
     "default_popup": "popup/cc_popup.html",
