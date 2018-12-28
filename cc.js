@@ -61,9 +61,9 @@ function notify(msg){
 
 async function get_state() {
 	if (bIsChrome) {
-		chrome.runtime.sendMessage({request_state: true});
+		chrome.runtime.sendMessage({content_request_state: true});
 	} else {
-		browser.runtime.sendMessage({request_state: true});
+		browser.runtime.sendMessage({content_request_state: true});
 	}
 }
 

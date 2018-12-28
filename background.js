@@ -13,19 +13,6 @@ function ChosenColor (hue, saturation, lightness, chosen_id) {
 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
-function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
-	col.hue = hue;
-	col.saturation = saturation;
-	col.lightness = lightness;
-	col.chosen_id = chosen_id;
-
-	col.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
-	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
-	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
-}
-
 var state = {};
 
 function reload_tab() {
@@ -65,19 +52,13 @@ async function remove_url() {
 
 // check if tab url is already in our list
 function contains_url() {
-	for (let i = 0; i < state.urls.length; i++) {
-		if (compare_urls(state.urls[i], state.active_tab.url)) {
-			return i;
+	if (state.urls) {
+		for (let i = 0; i < state.urls.length; i++) {
+			if (compare_urls(state.urls[i], state.active_tab.url)) {
+				return i;
+			}
 		}
-	}
-	return -1;
-}
-
-function clear_storage() {
-	if (bIsChrome) {
-		chrome.storage.local.clear();
-	} else {
-		browser.storage.local.clear();
+		return -1;
 	}
 }
 
@@ -128,7 +109,8 @@ function do_content_change() {
 	}
 }
 
-function get_active_tab() {
+// callbackOne
+function get_active_tab(callbackTwo) {
 	console.log("getting active tab");
 	function check_tabs(tabs) {
 		if (tabs[0]) { // Sanity check
@@ -142,8 +124,10 @@ function get_active_tab() {
 		} else {
 			state.subdomain_active = false;
 		}
-	
-		chrome.runtime.sendMessage({popup_state: state});
+
+		if (callbackTwo) {
+			callbackTwo();
+		}
 	}
 
 	if (bIsChrome) {
@@ -153,7 +137,11 @@ function get_active_tab() {
 	}
 }
 
-function get_state() {
+// getting local storage isn't synchronous, and neither is getting tabs.
+// We need both of those before we can create the context menu.
+// Chrome also doesn't implement promises for getting local storage or tabs.
+// Therefore we do the wonky callback deal.
+function get_state(callbackOne, callbackTwo) {
 	console.log("getting state");
 	
 	function check_result(res) {
@@ -171,31 +159,62 @@ function get_state() {
 			// state.subdomain_active handled in get_active_tab
 			// state.active_tab handled in get_active_tab
 		}
+		if (callbackOne) {
+			if (callbackTwo) {
+				callbackOne(callbackTwo);
+			} else {
+				callbackOne();
+			}
+		}
 	}
 
 	if (bIsChrome) {
 		chrome.storage.local.get('state', check_result);
-		console.log("got state");
 	} else {
 		browser.storage.local.get('state', check_result);
 	}
 }
 
-async function request_state() {
-	// need to get active tab before we send state to popup
-	// but getting tab is not synchronous,
-	// so sending actual state happens in get tab function.
-	// it's wonky, but chrome does not implement promises
-	// for getting tab like firefox. Ideally, I would do this:
-	// await get_active_tab();
-	// chrome.runtime.sendMessage({popup_state: state});
-	get_active_tab();
+// callbackTwo
+function setup_context_menu() {
+	let addObject = {
+		id: "add",
+		title: "Add this subdomain",
+		contexts: ["all"],
+	};
+	let removeObject = {
+		id: "remove",
+		title: "Remove this subdomain",
+		contexts: ["all"],
+	};
+
+	if (bIsChrome) {
+		chrome.contextMenus.create(removeObject, onCreated);
+		chrome.contextMenus.create(addObject, onCreated);
+	} else {
+		browser.contextMenus.create(removeObject, onCreated);
+		browser.contextMenus.create(addObject, onCreated);
+	}
+}
+
+function popup_request_state() {
+	function send() {
+		chrome.runtime.sendMessage({popup_state: state});
+	}
+	get_state(get_active_tab, send);
+}
+function content_request_state() {
+	get_state(get_active_tab, setup_context_menu);
 }
 
 function notify(msg){
-	if (msg.request_state) {
+	if (msg.popup_request_state) {
 		console.log("script requested state", Date());
-		request_state();
+		popup_request_state();
+	}
+	else if (msg.content_request_state) {
+		console.log("script requested state", Date());
+		content_request_state();
 	}
 	else if (msg.save_state) {
 		console.log("saving state");
@@ -211,43 +230,35 @@ function notify(msg){
 
 if (bIsChrome) {
 	chrome.runtime.onMessage.addListener(notify);
+	chrome.contextMenus.onClicked.addListener(handle_context_menu);
 } else {
 	browser.runtime.onMessage.addListener(notify);
+	browser.contextMenus.onClicked.addListener(handle_context_menu);
 }
 
-window.onload = get_state;
+// window.onload = get_state;
 
-// async function init() {
-// 	await get_active_tab();
+function onCreated() {
+	if (bIsChrome) {
+		if (chrome.runtime.lastError) {
+			console.log(`Error: ${chrome.runtime.lastError}`);
+		}
+	} else {
+		if (browser.runtime.lastError) {
+			console.log(`Error: ${browser.runtime.lastError}`);
+		}		
+	}
+}
 
-// 	if (contains_url() > -1) {
-// 		browser.contextMenus.create({
-// 			id: "remove",
-// 			title: "Remove this subdomain",
-// 			contexts: ["all"],
-// 		}, onCreated);
-// 	} else {
-// 		browser.contextMenus.create({
-// 			id: "add",
-// 			title: "Add this subdomain",
-// 			contexts: ["all"],
-// 		}, onCreated);
-// 	}
-// }
-
-// function onCreated() {
-//   if (browser.runtime.lastError) {
-//     console.log(`Error: ${browser.runtime.lastError}`);
-//   }
-// }
-
-// browser.contextMenus.onClicked.addListener((info, tab) => {
-//   switch (info.menuItemId) {
-//     case "add":
-//       add_url();
-//       break;
-//     case "remove":
-// 			console.log("remove");
-//       break;
-//   }
-// });
+function handle_context_menu(info, tab) {
+  switch (info.menuItemId) {
+    case "add":
+			add_url();
+			do_content_change();
+      break;
+    case "remove":
+			remove_url();
+			reload_tab();
+      break;
+  }
+}

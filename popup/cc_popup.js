@@ -19,19 +19,6 @@ function update_swatch (swatch, hue, saturation, lightness) {
 	swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-// function ChosenColor (hue, saturation, lightness, chosen_id) {
-// 	this.hue = hue;
-// 	this.saturation = saturation;
-// 	this.lightness = lightness;
-// 	this.chosen_id = chosen_id;
-
-// 	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-// 	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
-// 	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-// 	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
-// 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
-// }
-
 function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 	col.hue = hue;
 	col.saturation = saturation;
@@ -46,7 +33,6 @@ function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 }
 
 var hover_id = null;
-var cc_toggle = false;
 
 var state = {};
 
@@ -60,8 +46,6 @@ lightness_slider.oninput = function() {
 	draw_canvas();
 }
 
-var active_tab = null;
-
 var cc_subdomain_btn = document.getElementById("cc-subdomain");
 var cc_btn = document.getElementById("cc");
 var clear_btn = document.getElementById("clear-storage");
@@ -74,29 +58,19 @@ var fore_swatch = document.getElementById("fore_swatch");
 var back_swatch = document.getElementById("back_swatch");
 var link_swatch = document.getElementById("link_swatch");
 
-cc_subdomain_btn.onclick = async function() {
+cc_subdomain_btn.onclick = function() {
 	chrome.runtime.sendMessage({popup_subdomain_click: state});
-	// if (contains_url() > -1) {
-	// 	await remove_url();
-	// 	set_button_active(false);
-	// 	reload_tab();
-	// } else {
-	// 	await add_url();
-	// 	set_button_active(true);
-	// 	content_change();
-	// }
 };
 
-cc_btn.onclick = async function() {
-	// content_change("cc_btn");
+cc_btn.onclick = function() {
 	state.cc_toggle = !state.cc_toggle;
-	save_state();
-	set_button_active(cc_btn, state.cc_toggle);
-
+	
 	if (state.cc_toggle === false) {
+		save_state();
+		set_button_active(cc_btn, state.cc_toggle);
 		reload_tab();
 	} else {
-		content_change();
+		save_and_change();
 	}
 };
 
@@ -379,8 +353,18 @@ function reload_tab() {
 }
 
 async function save_and_change() {
+	state.cc_toggle = true;
+	set_button_active(cc_btn, state.cc_toggle);
 	await save_state();
 	content_change();
+}
+
+async function save_state() {
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({save_state: state});
+	} else {
+		browser.runtime.sendMessage({save_state: state});
+	}
 }
 
 function content_change() {
@@ -401,16 +385,8 @@ function clear_storage() {
 	}
 }
 
-async function save_state() {
-	if (bIsChrome) {
-		chrome.runtime.sendMessage({save_state: state});
-	} else {
-		browser.runtime.sendMessage({save_state: state});
-	}
-}
-
 async function get_state() {
-	chrome.runtime.sendMessage({request_state: true});
+	chrome.runtime.sendMessage({popup_request_state: true});
 }
 
 function notify(msg){
