@@ -7,7 +7,7 @@ If you'd like Color Changer to always change the colors for a subdomain, you can
 
 What is a subdomain? For example, in developer.mozilla.org, the subdomain is "developer". So whenever you visit any url that has developer.mozilla.org, the colors will be changed. If you visited www.mozilla.org, the colors would not be changed because the subdomain is "www", not "developer".
 
-Mousing over the gray bar at the bottom will open a flyout menu. If you would like to clear all Color Changer's data, including colors and saved sites, click the Clear Data button. You can also put Color Changer in Always On mode. There also happens to be a donate button down there. :)
+Mousing over the gray bar at the bottom will open a flyout menu. To clear all saved colors and subdomains, click Clear Data. Always On will automatically change colors of new tabs. There also happens to be a donate button down there. :)
 
 About the color wheel:
 Colors are less saturated near the center and 100% saturated on the edge. There is a separate swatch to the side that says "0% Sat", meaning 0% saturation or 100% gray.

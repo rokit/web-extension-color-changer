@@ -19,7 +19,6 @@
 	"background": {"scripts": ["background.js"]},
 	"permissions": ["storage", "tabs", "activeTab", "contextMenus"],
   "browser_action": {
-		"browser_style": true,
     "default_popup": "popup/cc_popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
