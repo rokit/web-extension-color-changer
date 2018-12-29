@@ -397,7 +397,11 @@ function content_change() {
 }
 
 async function get_state() {
-	chrome.runtime.sendMessage({popup_request_state: true});
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({popup_request_state: true});
+	} else {
+		browser.runtime.sendMessage({popup_request_state: true});
+	}
 }
 
 function notify(msg){
@@ -408,4 +412,9 @@ function notify(msg){
 }
 
 window.onload = get_state;
-chrome.runtime.onMessage.addListener(notify);
+
+if (bIsChrome) {
+	chrome.runtime.onMessage.addListener(notify);
+} else {
+	browser.runtime.onMessage.addListener(notify);
+}

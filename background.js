@@ -180,7 +180,11 @@ function popup_request_state() {
 
 function content_request_state() {
 	function send() {
-		chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
+		if (bIsChrome) {
+			chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
+		} else {
+			browser.tabs.sendMessage(state.active_tab.id, {content_state: state});
+		}
 	}
 
 	get_state(get_active_tab, send);
@@ -329,7 +333,11 @@ function notify(msg){
 	}
 	else if (msg.save_state) {
 		state = msg.save_state;
-		chrome.storage.local.set({state: msg.save_state});
+		if (bIsChrome) {
+			chrome.storage.local.set({state: msg.save_state});
+		} else {
+			browser.storage.local.set({state: msg.save_state});
+		}
 	}
 
 	// buttons
@@ -354,7 +362,11 @@ function notify(msg){
 function tab_activated() {
 	if (state) {
 		if (state.active_tab) {
-			chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
+			if (bIsChrome) {
+				chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
+			} else {
+				browser.tabs.sendMessage(state.active_tab.id, {content_state: state});
+			}
 		}
 	}
 }
