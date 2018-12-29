@@ -49,6 +49,7 @@ lightness_slider.oninput = function() {
 var cc_subdomain_btn = document.getElementById("cc-subdomain");
 var cc_btn = document.getElementById("cc");
 var clear_btn = document.getElementById("clear-storage");
+var always_on_btn = document.getElementById("always-on");
 
 var fore = document.getElementById("fore");
 var back = document.getElementById("back");
@@ -58,23 +59,35 @@ var fore_swatch = document.getElementById("fore_swatch");
 var back_swatch = document.getElementById("back_swatch");
 var link_swatch = document.getElementById("link_swatch");
 
-cc_subdomain_btn.onclick = function() {
-	chrome.runtime.sendMessage({popup_subdomain_click: state});
-};
-
 cc_btn.onclick = function() {
-	state.cc_toggle = !state.cc_toggle;
-	
-	if (state.cc_toggle === false) {
-		save_state();
-		set_button_active(cc_btn, state.cc_toggle);
-		reload_tab();
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({handle_cc_btn: state});
 	} else {
-		save_and_change();
+		browser.runtime.sendMessage({handle_cc_btn: state});
 	}
 };
 
+cc_subdomain_btn.onclick = function() {
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({handle_cc_subdomain_btn: state});
+	} else {
+		browser.runtime.sendMessage({handle_cc_subdomain_btn: state});
+	}
+};
+
+always_on_btn.onclick = function() {
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({handle_always_on_btn: state});
+	} else {
+		browser.runtime.sendMessage({handle_always_on_btn: state});
+	}
+}
+
 clear_btn.onclick = function() {
+	set_button_active(cc_btn, false);
+	set_button_active(cc_subdomain_btn, false);
+	set_button_active(always_on_btn, false);
+
 	clear_storage();
 	reload_tab();
 }
@@ -328,13 +341,14 @@ canvas.onmousemove = function(e) {
 	}
 };
 
-async function init_ui() {
+async function update_ui() {
 	fore_swatch.style.background = state.fg.hsl;
 	back_swatch.style.background = state.bg.hsl;
 	link_swatch.style.background = state.li.hsl;
 
 	set_button_active(cc_subdomain_btn, state.subdomain_active);
 	set_button_active(cc_btn, state.cc_toggle);
+	set_button_active(always_on_btn, state.always_on);
 	update_color_buttons();
 }
 
@@ -392,7 +406,7 @@ async function get_state() {
 function notify(msg){
 	if (msg.popup_state) {
 		state = msg.popup_state;
-		init_ui();
+		update_ui();
 	}
 }
 

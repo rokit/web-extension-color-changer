@@ -47,19 +47,28 @@ function change_colors() {
 }
 
 function notify(msg){
-	console.log("notify cc");
-	if (msg.content_change) {
-		console.log("content change cc");
+	if (msg.content_state) {
+		state = msg.content_state;
+		if (state.always_on) {
+			change_colors();
+			setTimeout(change_colors, 1000);
+		}		
+	}
+	else if (msg.content_change) {
 		state = msg.content_change;
 		change_colors();
+		setTimeout(change_colors, 1000);
 	}
+	// else if (msg.tab_activated) {
+	// 	state = msg.tab_activated;
+	// 	if (state.always_on) {
+	// 		change_colors();
+	// 	}
+	// }
 }
 
-// change_colors();
-// // some sites take a long time to load, so change colors again
-// setTimeout(change_colors, 1000);
-
-async function get_state() {
+function get_state() {
+	console.log("requesting state");
 	if (bIsChrome) {
 		chrome.runtime.sendMessage({content_request_state: true});
 	} else {

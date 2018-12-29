@@ -1,3 +1,7 @@
+1.0.3
+added context menu
+added "always on" option in the flyout menu
+
 1.0.2
 will now preserve background images
 will now preserve borders

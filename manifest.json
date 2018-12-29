@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Color Changer",
   "version": "1.0.2",
-	"description": "This extension changes website colors to your liking.",
+	"description": "Change website colors to your liking.",
 
   "icons": {
     "48": "icons/icon.svg"
