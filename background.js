@@ -201,12 +201,12 @@ function setup_context_menu() {
 	};
 	let always = {
 		id: "always",
-		title: state.always_on ? "Toggle Always On 🗸" : "Toggle Always On",
+		title: state.always_on ? "Always On 🗸" : "Always On",
 		contexts: ["all"],
 	};
 	let clear = {
 		id: "clear",
-		title: "Clear data",
+		title: "Clear Data",
 		contexts: ["all"],
 	};
 

@@ -68,7 +68,6 @@ function notify(msg){
 }
 
 function get_state() {
-	console.log("requesting state");
 	if (bIsChrome) {
 		chrome.runtime.sendMessage({content_request_state: true});
 	} else {
