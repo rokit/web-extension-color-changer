@@ -99,9 +99,7 @@ function do_content_change() {
 	}
 }
 
-// callbackOne
-function get_active_tab(callbackTwo) {
-	console.log("getting active tab");
+function get_active_tab() {
 	function check_tabs(tabs) {
 		if (tabs[0]) { // Sanity check
 			state.active_tab = tabs[0];
@@ -115,9 +113,10 @@ function get_active_tab(callbackTwo) {
 			state.subdomain_active = false;
 		}
 
-		if (callbackTwo) {
-			callbackTwo();
-		}
+		console.log("got active tab");
+		create_context_menu();
+		send_popup_state();
+		send_content_state();
 	}
 
 	if (bIsChrome) {
@@ -127,13 +126,7 @@ function get_active_tab(callbackTwo) {
 	}
 }
 
-// getting local storage isn't synchronous, and neither is getting tabs.
-// We need both of those before we can create the context menu.
-// Chrome also doesn't implement promises for getting local storage or tabs.
-// Therefore we do the wonky callback deal.
-function get_state(callbackOne, callbackTwo) {
-	console.log("getting state");
-	
+function get_state() {	
 	function check_result(res) {
 		if (res.state) {
 			state = res.state;
@@ -150,13 +143,8 @@ function get_state(callbackOne, callbackTwo) {
 			// state.subdomain_active handled in get_active_tab
 			// state.active_tab handled in get_active_tab
 		}
-		if (callbackOne) {
-			if (callbackTwo) {
-				callbackOne(callbackTwo);
-			} else {
-				callbackOne();
-			}
-		}
+		console.log("got state");
+		get_active_tab();
 	}
 
 	if (bIsChrome) {
@@ -167,6 +155,7 @@ function get_state(callbackOne, callbackTwo) {
 }
 
 function send_popup_state() {
+	console.log("send popup state");
 	if (bIsChrome) {
 		chrome.runtime.sendMessage({popup_state: state});
 	} else {
@@ -174,88 +163,68 @@ function send_popup_state() {
 	}
 }
 
-function popup_request_state() {
-	get_state(get_active_tab, send_popup_state);
-}
-
-function content_request_state() {
-	function send() {
-		if (bIsChrome) {
-			chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
-		} else {
-			browser.tabs.sendMessage(state.active_tab.id, {content_state: state});
-		}
+function send_content_state() {
+	console.log("send content state");
+	if (bIsChrome) {
+		chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
+	} else {
+		browser.tabs.sendMessage(state.active_tab.id, {content_state: state});
 	}
-
-	get_state(get_active_tab, send);
-	get_state(get_active_tab, setup_context_menu);
 }
 
-// callbackTwo
-function setup_context_menu() {
+function create_context_menu() {
 	let change = {
 		id: "change",
-		title: state.cc_toggle ? "Change Colors 🗸" : "Change Colors",
+		title: "Change Colors",
 		contexts: ["all"],
+		type: "checkbox",
+		checked: state.cc_toggle,
+		onclick: handle_cc_btn
 	};
 	let sub = {
 		id: "sub",
-		title: state.subdomain_active ? "Change Subdomain 🗸" : "Change Subdomain",
+		title: "Change Subdomain",
 		contexts: ["all"],
+		type: "checkbox",
+		checked: state.subdomain_active,
+		onclick: handle_cc_subdomain_btn
 	};
 	let always = {
 		id: "always",
-		title: state.always_on ? "Always On 🗸" : "Always On",
+		title: "Always On",
 		contexts: ["all"],
+		type: "checkbox",
+		checked: state.always_on,
+		onclick: handle_always_on_btn
 	};
 	let clear = {
 		id: "clear",
 		title: "Clear Data",
 		contexts: ["all"],
+		onclick: handle_clear_btn
 	};
 
 	if (bIsChrome) {
-		chrome.contextMenus.remove("change", on_context_menu_item);
-		chrome.contextMenus.remove("sub", on_context_menu_item);
-		chrome.contextMenus.remove("always", on_context_menu_item);
-		chrome.contextMenus.remove("clear", on_context_menu_item);
-
-		chrome.contextMenus.create(change, on_context_menu_item);
-		chrome.contextMenus.create(sub, on_context_menu_item);
-		chrome.contextMenus.create(always, on_context_menu_item);
-		chrome.contextMenus.create(clear, on_context_menu_item);
+		chrome.contextMenus.removeAll();
+		chrome.contextMenus.create(change);
+		chrome.contextMenus.create(sub);
+		chrome.contextMenus.create(always);
+		chrome.contextMenus.create(clear);
 	} else {
-		browser.contextMenus.remove("change", on_context_menu_item);
-		browser.contextMenus.remove("sub", on_context_menu_item);
-		browser.contextMenus.remove("always", on_context_menu_item);
-		browser.contextMenus.remove("clear", on_context_menu_item);
-
-		browser.contextMenus.create(change, on_context_menu_item);
-		browser.contextMenus.create(sub, on_context_menu_item);
-		browser.contextMenus.create(always, on_context_menu_item);
-		browser.contextMenus.create(clear, on_context_menu_item);
+		browser.contextMenus.removeAll();
+		browser.contextMenus.create(change);
+		browser.contextMenus.create(sub);
+		browser.contextMenus.create(always);
+		browser.contextMenus.create(clear);
 	}
 }
 
-function on_context_menu_item() {
+function update_context_menu_item(item, checked) {
 	if (bIsChrome) {
-		if (chrome.runtime.lastError) {
-			console.log(`Error: ${chrome.runtime.lastError}`);
-		}
+		chrome.contextMenus.update(item, {checked: checked})
 	} else {
-		if (browser.runtime.lastError) {
-			console.log(`Error: ${browser.runtime.lastError}`);
-		}		
+		browser.contextMenus.update(item, {checked: checked})
 	}
-}
-
-function handle_context_menu(info, tab) {
-  switch (info.menuItemId) {
-		case "change": handle_cc_btn(); break;
-		case "sub": handle_cc_subdomain_btn(); break;
-		case "always": handle_always_on_btn(); break;
-		case "clear": handle_clear_btn(); break;
-  }
 }
 
 function handle_cc_btn() {
@@ -271,7 +240,7 @@ function handle_cc_btn() {
 		reload_tab();
 	}
 	send_popup_state();
-	setup_context_menu();
+	update_context_menu_item("change", state.cc_toggle);
 }
 
 function handle_cc_subdomain_btn() {
@@ -292,7 +261,7 @@ function handle_cc_subdomain_btn() {
 	}
 
 	send_popup_state();
-	setup_context_menu();
+	update_context_menu_item("sub", state.subdomain_active);
 }
 
 function handle_always_on_btn() {
@@ -307,7 +276,7 @@ function handle_always_on_btn() {
 		state.subdomain_active ? true : reload_tab();
 	}
 	send_popup_state();
-	setup_context_menu();
+	update_context_menu_item("always", state.always_on);
 }
 
 function handle_clear_btn() {
@@ -319,17 +288,19 @@ function handle_clear_btn() {
 	clear_storage();
 	reload_tab();
 
-	setup_context_menu();
+	update_context_menu_item("change", false);
+	update_context_menu_item("sub", false);
+	update_context_menu_item("always", false);
 }
 
 function notify(msg){
 	if (msg.popup_request_state) {
 		console.log("popup requested state", Date());
-		popup_request_state();
+		get_state();
 	}
 	else if (msg.content_request_state) {
-		console.log("cc requested state", Date());
-		content_request_state();
+		console.log("content requested state", Date());
+		get_state();
 	}
 	else if (msg.save_state) {
 		state = msg.save_state;
@@ -359,24 +330,15 @@ function notify(msg){
 	}
 }
 
-function tab_activated() {
-	if (state) {
-		if (state.active_tab) {
-			if (bIsChrome) {
-				chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
-			} else {
-				browser.tabs.sendMessage(state.active_tab.id, {content_state: state});
-			}
-		}
-	}
+async function tab_activated() {
+	console.log("tab activated");
+	get_state();
 }
 
 if (bIsChrome) {
 	chrome.runtime.onMessage.addListener(notify);
-	chrome.contextMenus.onClicked.addListener(handle_context_menu);
 	chrome.tabs.onActivated.addListener(tab_activated);
 } else {
 	browser.runtime.onMessage.addListener(notify);
-	browser.contextMenus.onClicked.addListener(handle_context_menu);
 	browser.tabs.onActivated.addListener(tab_activated);
 }
