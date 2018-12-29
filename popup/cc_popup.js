@@ -32,8 +32,6 @@ function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
-var hover_id = null;
-
 var state = {};
 
 var lightness_slider = document.getElementById("lightness");
@@ -84,12 +82,11 @@ always_on_btn.onclick = function() {
 }
 
 clear_btn.onclick = function() {
-	set_button_active(cc_btn, false);
-	set_button_active(cc_subdomain_btn, false);
-	set_button_active(always_on_btn, false);
-
-	clear_storage();
-	reload_tab();
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({handle_clear_btn: state});
+	} else {
+		browser.runtime.sendMessage({handle_clear_btn: state});
+	}
 }
 
 fore_swatch.onclick = function() {
@@ -164,6 +161,12 @@ function set_active_swatch() {
 	document.getElementById(`${state.active_btn}_swatch`).classList.add("active-swatch");
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------Canvas
 var canvas = document.querySelector("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = document.querySelector("canvas").offsetWidth;
@@ -194,6 +197,8 @@ let zero_sat_offset_y = origin_y + canvas.width * 0.3;
 
 let zero_sat_text_offset_y = zero_sat_offset_y - 30;
 let sat_radius = big_radius * 0.5;
+
+var hover_id = null;
 
 var swatches = {};
 
@@ -388,14 +393,6 @@ function content_change() {
 		} else {
 			browser.tabs.sendMessage(state.active_tab.id, {content_change: state});
 		}
-	}
-}
-
-function clear_storage() {
-	if (bIsChrome) {
-		chrome.storage.local.clear();
-	} else {
-		browser.storage.local.clear();
 	}
 }
 

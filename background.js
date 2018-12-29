@@ -70,14 +70,6 @@ function contains_url() {
 	}
 }
 
-async function save_state() {
-	if (bIsChrome) {
-		chrome.storage.local.set({state: state});
-	} else {
-		browser.storage.local.set({state: state});
-	}
-}
-
 function compare_urls(aa, bb) {
 	let a = new URL(aa);
 	let b = new URL(bb);
@@ -85,6 +77,14 @@ function compare_urls(aa, bb) {
 		return true;
 	}
 	return false;
+}
+
+async function save_state() {
+	if (bIsChrome) {
+		chrome.storage.local.set({state: state});
+	} else {
+		browser.storage.local.set({state: state});
+	}
 }
 
 function do_content_change() {
@@ -180,7 +180,6 @@ function popup_request_state() {
 
 function content_request_state() {
 	function send() {
-		console.log("sending state to content");
 		chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
 	}
 
@@ -192,22 +191,17 @@ function content_request_state() {
 function setup_context_menu() {
 	let change = {
 		id: "change",
-		title: "Change page",
+		title: state.cc_toggle ? "Change Colors 🗸" : "Change Colors",
 		contexts: ["all"],
 	};
-	let add = {
-		id: "add",
-		title: "Add this subdomain",
-		contexts: ["all"],
-	};
-	let remove = {
-		id: "remove",
-		title: "Remove this subdomain",
+	let sub = {
+		id: "sub",
+		title: state.subdomain_active ? "Change Subdomain 🗸" : "Change Subdomain",
 		contexts: ["all"],
 	};
 	let always = {
 		id: "always",
-		title: "Toggle always on: currently " + `${state.always_on ? "on" : "off"}`,
+		title: state.always_on ? "Toggle Always On 🗸" : "Toggle Always On",
 		contexts: ["all"],
 	};
 	let clear = {
@@ -218,26 +212,22 @@ function setup_context_menu() {
 
 	if (bIsChrome) {
 		chrome.contextMenus.remove("change", on_context_menu_item);
-		chrome.contextMenus.remove("remove", on_context_menu_item);
-		chrome.contextMenus.remove("add", on_context_menu_item);
+		chrome.contextMenus.remove("sub", on_context_menu_item);
 		chrome.contextMenus.remove("always", on_context_menu_item);
 		chrome.contextMenus.remove("clear", on_context_menu_item);
 
 		chrome.contextMenus.create(change, on_context_menu_item);
-		chrome.contextMenus.create(remove, on_context_menu_item);
-		chrome.contextMenus.create(add, on_context_menu_item);
+		chrome.contextMenus.create(sub, on_context_menu_item);
 		chrome.contextMenus.create(always, on_context_menu_item);
 		chrome.contextMenus.create(clear, on_context_menu_item);
 	} else {
 		browser.contextMenus.remove("change", on_context_menu_item);
-		browser.contextMenus.remove("remove", on_context_menu_item);
-		browser.contextMenus.remove("add", on_context_menu_item);
+		browser.contextMenus.remove("sub", on_context_menu_item);
 		browser.contextMenus.remove("always", on_context_menu_item);
 		browser.contextMenus.remove("clear", on_context_menu_item);
 
 		browser.contextMenus.create(change, on_context_menu_item);
-		browser.contextMenus.create(remove, on_context_menu_item);
-		browser.contextMenus.create(add, on_context_menu_item);
+		browser.contextMenus.create(sub, on_context_menu_item);
 		browser.contextMenus.create(always, on_context_menu_item);
 		browser.contextMenus.create(clear, on_context_menu_item);
 	}
@@ -257,22 +247,10 @@ function on_context_menu_item() {
 
 function handle_context_menu(info, tab) {
   switch (info.menuItemId) {
-		case "change": {
-			handle_cc_btn();
-		} break;
-		case "add": {
-			handle_cc_subdomain_btn("add");
-		} break;
-		case "remove": {
-			handle_cc_subdomain_btn("remove");
-		} break;
-		case "always": {
-			handle_always_on_btn();
-		} break;
-		case "clear": {
-			clear_storage();
-			reload_tab();
-		} break;
+		case "change": handle_cc_btn(); break;
+		case "sub": handle_cc_subdomain_btn(); break;
+		case "always": handle_always_on_btn(); break;
+		case "clear": handle_clear_btn(); break;
   }
 }
 
@@ -289,19 +267,11 @@ function handle_cc_btn() {
 		reload_tab();
 	}
 	send_popup_state();
+	setup_context_menu();
 }
 
-function handle_cc_subdomain_btn(type) {
-	// type will not be false if user initiated this method from the context menu
-	if (type) {
-		if (type === "add") {
-			state.subdomain_active = true;
-		} else {
-			state.subdomain_active = false;
-		}
-	} else {
-		state.subdomain_active = !state.subdomain_active;
-	}
+function handle_cc_subdomain_btn() {
+	state.subdomain_active = !state.subdomain_active;
 
 	if (state.subdomain_active) {
 		state.cc_toggle = true;
@@ -318,6 +288,7 @@ function handle_cc_subdomain_btn(type) {
 	}
 
 	send_popup_state();
+	setup_context_menu();
 }
 
 function handle_always_on_btn() {
@@ -332,7 +303,19 @@ function handle_always_on_btn() {
 		state.subdomain_active ? true : reload_tab();
 	}
 	send_popup_state();
-	setup_context_menu(); // redo context menu to reflect "always on" change
+	setup_context_menu();
+}
+
+function handle_clear_btn() {
+	state.cc_toggle = false;
+	state.subdomain_active = false;
+	state.always_on = false;
+	send_popup_state();
+
+	clear_storage();
+	reload_tab();
+
+	setup_context_menu();
 }
 
 function notify(msg){
@@ -345,7 +328,6 @@ function notify(msg){
 		content_request_state();
 	}
 	else if (msg.save_state) {
-		console.log("saving state");
 		state = msg.save_state;
 		chrome.storage.local.set({state: msg.save_state});
 	}
@@ -362,6 +344,10 @@ function notify(msg){
 	else if (msg.handle_always_on_btn) {
 		state = msg.handle_always_on_btn;
 		handle_always_on_btn();
+	}
+	else if (msg.handle_clear_btn) {
+		state = msg.handle_clear_btn;
+		handle_clear_btn();
 	}
 }
 
