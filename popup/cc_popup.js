@@ -26,9 +26,9 @@ function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
 	col.chosen_id = chosen_id;
 
 	col.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 30}%)`;
 	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
+	col.hsl_shift = `hsl(${hue + 60 % 360}, ${saturation + 20}%, ${lightness + 10}%)`;
 	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
@@ -93,7 +93,7 @@ fore_swatch.onclick = function() {
 	state.active_btn = "fore";
 	state.lightness = state.fg.lightness;
 	update_color_buttons();
-	save_state();
+	save_state(); // does not update content
 };
 back_swatch.onclick = function() {
 	state.active_btn = "back";
@@ -320,9 +320,13 @@ canvas.onclick = function(e) {
 			case "link": update_chosen_color(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); link_swatch.style.background = state.li.hsl; break;
 			default: break;
 		}
-
-		save_and_change();
 		draw_canvas();
+
+		if (bIsChrome) {
+			chrome.runtime.sendMessage({handle_swatch_btn: state});
+		} else {
+			browser.runtime.sendMessage({handle_swatch_btn: state});
+		}
 	}
 };
 
@@ -374,8 +378,7 @@ function reload_tab() {
 async function save_and_change() {
 	state.cc_toggle = true;
 	set_button_active(cc_btn, state.cc_toggle);
-	await save_state();
-	content_change();
+	update_background_state(); // background then updates content
 }
 
 async function save_state() {
@@ -386,12 +389,12 @@ async function save_state() {
 	}
 }
 
-function content_change() {
+function update_background_state() {
 	if (state.active_tab) {
 		if (bIsChrome) {
-			chrome.tabs.sendMessage(state.active_tab.id, {content_change: state});
+			chrome.runtime.sendMessage({popup_new_state: state});
 		} else {
-			browser.tabs.sendMessage(state.active_tab.id, {content_change: state});
+			browser.runtime.sendMessage({popup_new_state: state});
 		}
 	}
 }

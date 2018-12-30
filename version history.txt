@@ -1,6 +1,8 @@
-1.0.3
-added context menu
-added "always on" option in the flyout menu
+2.0.0
+colors now change almost instantaneously
+colors can now be reversed without a page refresh
+Color Change button is now a toggle that applies to all tabs. It will stay on until you turn it off.
+added right-click context menu for convenience
 
 1.0.2
 will now preserve background images

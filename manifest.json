@@ -11,13 +11,13 @@
 	},
   "content_scripts": [
     {
-			"run_at": "document_idle",
+			"run_at": "document_start",
       "matches": ["<all_urls>"],
 			"js": ["cc.js"]
     }
 	],
 	"background": {"scripts": ["background.js"]},
-	"permissions": ["storage", "tabs", "activeTab", "contextMenus"],
+	"permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
   "browser_action": {
     "default_popup": "popup/cc_popup.html",
     "default_icon": {

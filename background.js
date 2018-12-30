@@ -1,4 +1,13 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
+var state = {};
+
+if (bIsChrome) {
+	chrome.runtime.onMessage.addListener(notify);
+	chrome.tabs.onActivated.addListener(tab_activated);
+} else {
+	browser.runtime.onMessage.addListener(notify);
+	browser.tabs.onActivated.addListener(tab_activated);
+}
 
 function ChosenColor (hue, saturation, lightness, chosen_id) {
 	this.hue = hue;
@@ -7,20 +16,47 @@ function ChosenColor (hue, saturation, lightness, chosen_id) {
 	this.chosen_id = chosen_id;
 
 	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 30}%)`;
 	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-	this.hsl_shift = `hsl(${hue + 40 % 360}, ${saturation}%, ${lightness}%)`;
+	this.hsl_shift = `hsl(${hue + 60 % 360}, ${saturation + 20}%, ${lightness + 10}%)`;
 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
-var state = {};
-
-function reload_tab() {
-	if (bIsChrome) {
-		chrome.tabs.reload(state.active_tab.id);
-	} else {
-		browser.tabs.reload(state.active_tab.id);
+function update_css() {
+	console.log(state.li.hsl);
+	console.log(state.li.hsl_shift);
+	state.css = `
+	.color-changer-sledge * {
+		color: ${state.fg.hsl} !important;
+		background-color: ${state.bg.hsl} !important;
+		border-color: ${state.bg.hsl_lighter} !important;
 	}
+	.color-changer-sledge button {
+		color: ${state.li.hsl} !important;
+		background-color: ${state.bg.hsl_lighter} !important;
+	}
+
+	.color-changer-sledge input,
+	.color-changer-sledge textarea,
+	.color-changer-sledge pre,
+	.color-changer-sledge code,
+	.color-changer-sledge code span {
+		background-color: ${state.bg.hsl_lighter} !important;
+	}
+	.color-changer-sledge a, .color-changer-sledge a * {
+		color: ${state.li.hsl} !important;
+		background-color: ${state.bg.hsl} !important;
+	}
+	.color-changer-sledge a:hover, .color-changer-sledge a:hover * {
+		color: ${state.li.hsl_shift} !important;
+	}
+	.color-changer-sledge a:active, .color-changer-sledge a:active * {
+		color: ${state.li.hsl_darker} !important;
+	}
+	.color-changer-sledge a:visited, .color-changer-sledge a:visited * {
+		color: ${state.li.hsl_darker} !important;
+	}
+`;
 }
 
 function clear_storage() {
@@ -87,15 +123,26 @@ async function save_state() {
 	}
 }
 
-function do_content_change() {
+function update_popup() {
+	console.log("send popup state");
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({popup_state: state});
+	} else {
+		browser.runtime.sendMessage({popup_state: state});
+	}
+}
+
+function update_content() {
+	update_css();
+	var details = {};
+	details.code = state.css;
+
 	if (state.active_tab) {
 		if (bIsChrome) {
-			chrome.tabs.sendMessage(state.active_tab.id, {content_change: state});
+			chrome.tabs.sendMessage(state.active_tab.id, {new_state: state});
 		} else {
-			browser.tabs.sendMessage(state.active_tab.id, {content_change: state});
+			browser.tabs.sendMessage(state.active_tab.id, {new_state: state});
 		}
-	} else {
-		console.log("no active tab");
 	}
 }
 
@@ -106,17 +153,17 @@ function get_active_tab() {
 		} else {
 			state.active_tab = null;
 		}
+
 		if (contains_url() > -1) {
 			state.subdomain_active = true;
-			do_content_change();
 		} else {
 			state.subdomain_active = false;
 		}
 
 		console.log("got active tab");
 		create_context_menu();
-		send_popup_state();
-		send_content_state();
+		update_popup();
+		update_content();
 	}
 
 	if (bIsChrome) {
@@ -126,49 +173,40 @@ function get_active_tab() {
 	}
 }
 
+function init_state() {
+	if (!state.fg) state.fg = new ChosenColor(0,  0, 80,  "zero");
+	if (!state.bg) state.bg = new ChosenColor(0,  0, 25,  "zero");
+	if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
+	if (!state.urls) state.urls = [];
+	if (!state.active_btn) state.active_btn = "fore";
+	switch (state.active_btn) {
+		case "fore": state.lightness = state.fg.lightness; break;
+		case "back": state.lightness = state.bg.lightness; break;
+		case "link": state.lightness = state.li.lightness; break;
+	}
+	if (!state.cc_toggle) state.cc_toggle = false;
+	if (!state.subdomain_active) state.subdomain_active = false;
+	if (!state.always_on) state.always_on = false;
+	if (!state.css) state.css = "";
+	// state.subdomain_active handled in get_active_tab
+	// state.active_tab handled in get_active_tab
+}
+
 function get_state() {	
 	function check_result(res) {
 		if (res.state) {
 			state = res.state;
-		} else {
-			state.fg = new ChosenColor(0,  0, 80,  "zero");
-			state.bg = new ChosenColor(0,  0, 25,  "zero");
-			state.li = new ChosenColor(68, 80, 80, "2-6");
-			state.active_btn = "fore";
-			state.urls = [];
-			state.lightness = state.fg.lightness;
-			state.cc_toggle = false;
-			state.subdomain_active = false;
-			state.always_on = false;
-			// state.subdomain_active handled in get_active_tab
-			// state.active_tab handled in get_active_tab
 		}
+		init_state();
+
 		console.log("got state");
 		get_active_tab();
 	}
 
 	if (bIsChrome) {
-		chrome.storage.local.get('state', check_result);
+		chrome.storage.local.get("state", check_result);
 	} else {
-		browser.storage.local.get('state', check_result);
-	}
-}
-
-function send_popup_state() {
-	console.log("send popup state");
-	if (bIsChrome) {
-		chrome.runtime.sendMessage({popup_state: state});
-	} else {
-		browser.runtime.sendMessage({popup_state: state});
-	}
-}
-
-function send_content_state() {
-	console.log("send content state");
-	if (bIsChrome) {
-		chrome.tabs.sendMessage(state.active_tab.id, {content_state: state});
-	} else {
-		browser.tabs.sendMessage(state.active_tab.id, {content_state: state});
+		browser.storage.local.get("state", check_result);
 	}
 }
 
@@ -232,14 +270,10 @@ function handle_cc_btn() {
 	if (state.subdomain_active || state.always_on) {
 		state.cc_toggle = true;
 	}
-	save_state();
 
-	if (state.cc_toggle) {
-		do_content_change();
-	} else {
-		reload_tab();
-	}
-	send_popup_state();
+	save_state();
+	update_content();
+	update_popup();
 	update_context_menu_item("change", state.cc_toggle);
 }
 
@@ -254,28 +288,28 @@ function handle_cc_subdomain_btn() {
 
 	if (state.subdomain_active) {
 		add_url();
-		do_content_change();
 	} else {
 		remove_url();
-		state.always_on ? true : reload_tab();
 	}
-
-	send_popup_state();
+	
+	// add url and remove url handle saving state
+	update_content();
+	update_popup();
 	update_context_menu_item("sub", state.subdomain_active);
 }
 
 function handle_always_on_btn() {
 	state.always_on = !state.always_on;
+
 	if (state.always_on) {
 		state.cc_toggle = true;
-		save_state();
-		do_content_change();
 	} else {
 		state.subdomain_active ? state.cc_toggle = true : state.cc_toggle = false;
-		save_state();
-		state.subdomain_active ? true : reload_tab();
 	}
-	send_popup_state();
+	
+	save_state();
+	update_content();
+	update_popup();
 	update_context_menu_item("always", state.always_on);
 }
 
@@ -283,14 +317,23 @@ function handle_clear_btn() {
 	state.cc_toggle = false;
 	state.subdomain_active = false;
 	state.always_on = false;
-	send_popup_state();
 
+	update_content();
+	update_popup();
 	clear_storage();
-	reload_tab();
 
 	update_context_menu_item("change", false);
 	update_context_menu_item("sub", false);
 	update_context_menu_item("always", false);
+}
+
+function handle_swatch_btn() {
+	state.cc_toggle = true;
+
+	save_state();
+	update_content();
+	update_popup();
+	update_context_menu_item("change", state.cc_toggle);
 }
 
 function notify(msg){
@@ -302,13 +345,14 @@ function notify(msg){
 		console.log("content requested state", Date());
 		get_state();
 	}
+	if (msg.popup_new_state) {
+		state = msg.popup_new_state;
+		save_state();
+		update_content();
+	}
 	else if (msg.save_state) {
 		state = msg.save_state;
-		if (bIsChrome) {
-			chrome.storage.local.set({state: msg.save_state});
-		} else {
-			browser.storage.local.set({state: msg.save_state});
-		}
+		save_state();
 	}
 
 	// buttons
@@ -328,17 +372,13 @@ function notify(msg){
 		state = msg.handle_clear_btn;
 		handle_clear_btn();
 	}
+	else if (msg.handle_swatch_btn) {
+		state = msg.handle_swatch_btn;
+		handle_swatch_btn();
+	}
 }
 
 async function tab_activated() {
 	console.log("tab activated");
 	get_state();
-}
-
-if (bIsChrome) {
-	chrome.runtime.onMessage.addListener(notify);
-	chrome.tabs.onActivated.addListener(tab_activated);
-} else {
-	browser.runtime.onMessage.addListener(notify);
-	browser.tabs.onActivated.addListener(tab_activated);
 }
