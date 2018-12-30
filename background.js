@@ -1,14 +1,6 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 var state = {};
 
-if (bIsChrome) {
-	chrome.runtime.onMessage.addListener(notify);
-	chrome.tabs.onActivated.addListener(tab_activated);
-} else {
-	browser.runtime.onMessage.addListener(notify);
-	browser.tabs.onActivated.addListener(tab_activated);
-}
-
 function ChosenColor (hue, saturation, lightness, chosen_id) {
 	this.hue = hue;
 	this.saturation = saturation;
@@ -33,7 +25,6 @@ function update_css() {
 	}
 	.color-changer-sledge button {
 		color: ${state.li.hsl} !important;
-		background-color: ${state.bg.hsl_lighter} !important;
 	}
 
 	.color-changer-sledge input,
@@ -381,4 +372,12 @@ function notify(msg){
 async function tab_activated() {
 	console.log("tab activated");
 	get_state();
+}
+
+if (bIsChrome) {
+	chrome.runtime.onMessage.addListener(notify);
+	chrome.tabs.onActivated.addListener(tab_activated);
+} else {
+	browser.runtime.onMessage.addListener(notify);
+	browser.tabs.onActivated.addListener(tab_activated);
 }

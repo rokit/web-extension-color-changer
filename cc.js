@@ -1,17 +1,14 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
-var first_load = true;
 
 function notify(msg){
 	if (msg.new_state) {
 		// console.log("new state");
 		state = msg.new_state;
 
-		if (first_load) {
-			var css = document.createElement('style');
-			css.innerText = state.css;
-			document.head.appendChild(css);
-			first_load = false;
-		}
+		// todo: remove previous entry from head
+		let css = document.createElement('style');
+		css.innerText = state.css;
+		document.head.appendChild(css);
 
 		let html = document.getElementsByTagName("HTML")[0];
 		if (state.cc_toggle) {
