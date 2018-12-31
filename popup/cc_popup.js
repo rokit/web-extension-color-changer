@@ -43,11 +43,13 @@ lightness_slider.oninput = function() {
 	
 	draw_canvas();
 }
+var info = document.getElementById("info");
+var info_text = document.querySelector("#info p");
 
-var cc_subdomain_btn = document.getElementById("cc-subdomain");
 var cc_btn = document.getElementById("cc");
+var cc_always_btn = document.getElementById("cc-always");
+var cc_never_btn = document.getElementById("cc-never");
 var clear_btn = document.getElementById("clear-storage");
-var always_on_btn = document.getElementById("always-on");
 
 var fore = document.getElementById("fore");
 var back = document.getElementById("back");
@@ -65,21 +67,48 @@ cc_btn.onclick = function() {
 	}
 };
 
-cc_subdomain_btn.onclick = function() {
+cc_always_btn.onclick = function() {
 	if (bIsChrome) {
-		chrome.runtime.sendMessage({handle_cc_subdomain_btn: state});
+		chrome.runtime.sendMessage({handle_cc_always_btn: state});
 	} else {
-		browser.runtime.sendMessage({handle_cc_subdomain_btn: state});
+		browser.runtime.sendMessage({handle_cc_always_btn: state});
 	}
 };
 
-always_on_btn.onclick = function() {
-	if (bIsChrome) {
-		chrome.runtime.sendMessage({handle_always_on_btn: state});
-	} else {
-		browser.runtime.sendMessage({handle_always_on_btn: state});
-	}
+cc_always_btn.onmouseover = function() {
+	let url = new URL(state.active_tab.url);
+	info_text.textContent = `Always change pages on subdomain: ${url.hostname}`;
+	info.style.opacity = 1;
 }
+
+cc_always_btn.onmouseout = function() {
+	info.style.opacity = 0;
+}
+
+cc_never_btn.onclick = function() {
+	if (bIsChrome) {
+		chrome.runtime.sendMessage({handle_cc_never_btn: state});
+	} else {
+		browser.runtime.sendMessage({handle_cc_never_btn: state});
+	}
+};
+
+cc_never_btn.onmouseover = function() {
+	let url = new URL(state.active_tab.url);
+	info_text.textContent = `Never change pages on subdomain: ${url.hostname}`;
+	info.style.opacity = 1;
+}
+
+cc_never_btn.onmouseout = function() {
+	info.style.opacity = 0;
+}
+// always_on_btn.onclick = function() {
+// 	if (bIsChrome) {
+// 		chrome.runtime.sendMessage({handle_always_on_btn: state});
+// 	} else {
+// 		browser.runtime.sendMessage({handle_always_on_btn: state});
+// 	}
+// }
 
 clear_btn.onclick = function() {
 	if (bIsChrome) {
@@ -355,9 +384,16 @@ async function update_ui() {
 	back_swatch.style.background = state.bg.hsl;
 	link_swatch.style.background = state.li.hsl;
 
-	set_button_active(cc_subdomain_btn, state.subdomain_active);
+	if (state.url_index > -1) {
+		let bAlways = state.urls[state.url_index].always;
+		set_button_active(cc_always_btn, bAlways);
+		set_button_active(cc_never_btn, !bAlways);
+	} else {
+		set_button_active(cc_always_btn, false);
+		set_button_active(cc_never_btn, false);
+	}
 	set_button_active(cc_btn, state.cc_toggle);
-	set_button_active(always_on_btn, state.always_on);
+
 	update_color_buttons();
 }
 

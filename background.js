@@ -1,4 +1,5 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
+var class_name = "color-changer-sledge";
 var state = {};
 
 function ChosenColor (hue, saturation, lightness, chosen_id) {
@@ -14,37 +15,44 @@ function ChosenColor (hue, saturation, lightness, chosen_id) {
 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
+function CC_URL (url, bAlways) {
+	this.url = url;
+	this.type = "sub";
+	this.always = bAlways;
+}
+
 function update_css() {
-	console.log(state.li.hsl);
-	console.log(state.li.hsl_shift);
 	state.css = `
-	.color-changer-sledge * {
+	.${class_name} * {
 		color: ${state.fg.hsl} !important;
 		background-color: ${state.bg.hsl} !important;
 		border-color: ${state.bg.hsl_lighter} !important;
 	}
-	.color-changer-sledge button {
+	.${class_name} img {
+		visibility: visible !important;
+	}
+	.${class_name} button {
 		color: ${state.li.hsl} !important;
 	}
 
-	.color-changer-sledge input,
-	.color-changer-sledge textarea,
-	.color-changer-sledge pre,
-	.color-changer-sledge code,
-	.color-changer-sledge code span {
+	.${class_name} input,
+	.${class_name} textarea,
+	.${class_name} pre,
+	.${class_name} code,
+	.${class_name} code span {
 		background-color: ${state.bg.hsl_lighter} !important;
 	}
-	.color-changer-sledge a, .color-changer-sledge a * {
+	.${class_name} a, .${class_name} a * {
 		color: ${state.li.hsl} !important;
 		background-color: ${state.bg.hsl} !important;
 	}
-	.color-changer-sledge a:hover, .color-changer-sledge a:hover * {
+	.${class_name} a:hover, .${class_name} a:hover * {
 		color: ${state.li.hsl_shift} !important;
 	}
-	.color-changer-sledge a:active, .color-changer-sledge a:active * {
+	.${class_name} a:active, .${class_name} a:active * {
 		color: ${state.li.hsl_darker} !important;
 	}
-	.color-changer-sledge a:visited, .color-changer-sledge a:visited * {
+	.${class_name} a:visited, .${class_name} a:visited * {
 		color: ${state.li.hsl_darker} !important;
 	}
 `;
@@ -58,19 +66,22 @@ function clear_storage() {
 	}
 }
 
-async function add_url() {
+async function add_url(bAlways) {
 	if (!state.active_tab) return;
 	if (!state.active_tab.url) return;
 
 	for (let i = 0; i < state.urls.length; i++) {
-		if (compare_urls(state.urls[i], state.active_tab.url)) {
-			// url already added
+		if (compare_urls(state.urls[i].url, state.active_tab.url)) {
+			// url already added, so just update it
+			state.urls[i].always = bAlways;
+			state.url_index = i;
+			await save_state()
 			return;
 		}
 	}
 
 	// if no match was found, this is a new url
-	state.urls.push(state.active_tab.url);
+	state.url_index = state.urls.push(new CC_URL(state.active_tab.url, bAlways)) - 1;
 	await save_state();
 }
 
@@ -81,6 +92,7 @@ async function remove_url() {
 	let i = contains_url();
 	if (i > -1) {
 		state.urls.splice(i, 1);
+		state.url_index = -1; // hmm
 		await save_state();
 	}
 }
@@ -89,7 +101,7 @@ async function remove_url() {
 function contains_url() {
 	if (state.urls) {
 		for (let i = 0; i < state.urls.length; i++) {
-			if (compare_urls(state.urls[i], state.active_tab.url)) {
+			if (compare_urls(state.urls[i].url, state.active_tab.url)) {
 				return i;
 			}
 		}
@@ -115,7 +127,6 @@ async function save_state() {
 }
 
 function update_popup() {
-	console.log("send popup state");
 	if (bIsChrome) {
 		chrome.runtime.sendMessage({popup_state: state});
 	} else {
@@ -145,13 +156,8 @@ function get_active_tab() {
 			state.active_tab = null;
 		}
 
-		if (contains_url() > -1) {
-			state.subdomain_active = true;
-		} else {
-			state.subdomain_active = false;
-		}
+		state.url_index = contains_url();
 
-		console.log("got active tab");
 		create_context_menu();
 		update_popup();
 		update_content();
@@ -168,7 +174,26 @@ function init_state() {
 	if (!state.fg) state.fg = new ChosenColor(0,  0, 80,  "zero");
 	if (!state.bg) state.bg = new ChosenColor(0,  0, 25,  "zero");
 	if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
-	if (!state.urls) state.urls = [];
+
+	if (!state.urls) {
+		state.urls = [];
+	}
+	else {
+		// urls present
+		// urls used to be an array of strings, but now it's objects,
+		// so we need to update urls entry.
+		if (state.urls.length > 0) {
+			if (!state.urls[0].url) {
+				// urls length is greater than zero, but url object is not present,
+				// so reset urls
+				state.urls = [];
+			}
+		} else {
+			// urls has no length. reset it anyway i guess
+			state.urls = [];
+		}
+	}
+
 	if (!state.active_btn) state.active_btn = "fore";
 	switch (state.active_btn) {
 		case "fore": state.lightness = state.fg.lightness; break;
@@ -176,11 +201,11 @@ function init_state() {
 		case "link": state.lightness = state.li.lightness; break;
 	}
 	if (!state.cc_toggle) state.cc_toggle = false;
-	if (!state.subdomain_active) state.subdomain_active = false;
-	if (!state.always_on) state.always_on = false;
 	if (!state.css) state.css = "";
-	// state.subdomain_active handled in get_active_tab
-	// state.active_tab handled in get_active_tab
+	// state.url_index / get_active_tab
+	// state.active_tab / get_active_tab
+
+	update_css();
 }
 
 function get_state() {	
@@ -189,8 +214,6 @@ function get_state() {
 			state = res.state;
 		}
 		init_state();
-
-		console.log("got state");
 		get_active_tab();
 	}
 
@@ -210,21 +233,21 @@ function create_context_menu() {
 		checked: state.cc_toggle,
 		onclick: handle_cc_btn
 	};
-	let sub = {
-		id: "sub",
-		title: "Change Subdomain",
+	let sub_always = {
+		id: "sub_always",
+		title: "Always",
 		contexts: ["all"],
 		type: "checkbox",
-		checked: state.subdomain_active,
-		onclick: handle_cc_subdomain_btn
+		checked: state.url_index > -1 ? state.urls[state.url_index].always : false,
+		onclick: handle_cc_always_btn
 	};
-	let always = {
-		id: "always",
-		title: "Always On",
+	let sub_never = {
+		id: "sub_never",
+		title: "Never",
 		contexts: ["all"],
 		type: "checkbox",
-		checked: state.always_on,
-		onclick: handle_always_on_btn
+		checked: state.url_index > -1 ? !state.urls[state.url_index].always : false,
+		onclick: handle_cc_never_btn
 	};
 	let clear = {
 		id: "clear",
@@ -236,14 +259,14 @@ function create_context_menu() {
 	if (bIsChrome) {
 		chrome.contextMenus.removeAll();
 		chrome.contextMenus.create(change);
-		chrome.contextMenus.create(sub);
-		chrome.contextMenus.create(always);
+		chrome.contextMenus.create(sub_always);
+		chrome.contextMenus.create(sub_never);
 		chrome.contextMenus.create(clear);
 	} else {
 		browser.contextMenus.removeAll();
 		browser.contextMenus.create(change);
-		browser.contextMenus.create(sub);
-		browser.contextMenus.create(always);
+		browser.contextMenus.create(sub_always);
+		browser.contextMenus.create(sub_never);
 		browser.contextMenus.create(clear);
 	}
 }
@@ -258,64 +281,66 @@ function update_context_menu_item(item, checked) {
 
 function handle_cc_btn() {
 	state.cc_toggle = !state.cc_toggle;
-	if (state.subdomain_active || state.always_on) {
-		state.cc_toggle = true;
-	}
-
+	
 	save_state();
 	update_content();
 	update_popup();
 	update_context_menu_item("change", state.cc_toggle);
 }
 
-function handle_cc_subdomain_btn() {
-	state.subdomain_active = !state.subdomain_active;
+async function handle_cc_always_btn() {
 
-	if (state.subdomain_active) {
-		state.cc_toggle = true;
+	// add_url() and remove_url() will save state
+	if (state.url_index > -1 && state.urls[state.url_index].always) {
+		// url in list and always = true, so remove this url
+		await remove_url();
 	} else {
-		state.always_on ? state.cc_toggle = true : state.cc_toggle = false;
-	}
-
-	if (state.subdomain_active) {
-		add_url();
-	} else {
-		remove_url();
+		await add_url(true);
 	}
 	
-	// add url and remove url handle saving state
 	update_content();
 	update_popup();
-	update_context_menu_item("sub", state.subdomain_active);
+
+	if (state.url_index === -1) {
+		update_context_menu_item("sub_always", false);
+		update_context_menu_item("sub_never", false);
+	} else {
+		update_context_menu_item("sub_always", state.urls[state.url_index].always);
+		update_context_menu_item("sub_never", !state.urls[state.url_index].always);
+	}
 }
 
-function handle_always_on_btn() {
-	state.always_on = !state.always_on;
+async function handle_cc_never_btn() {
 
-	if (state.always_on) {
-		state.cc_toggle = true;
+	// add_url() and remove_url() will save state
+	if (state.url_index > -1 && !state.urls[state.url_index].always) {
+		// url in list and always = false, so remove this url
+		await remove_url();
 	} else {
-		state.subdomain_active ? state.cc_toggle = true : state.cc_toggle = false;
+		await add_url(false);
 	}
 	
-	save_state();
 	update_content();
 	update_popup();
-	update_context_menu_item("always", state.always_on);
+
+	if (state.url_index === -1) {
+		update_context_menu_item("sub_always", false);
+		update_context_menu_item("sub_never", false);
+	} else {
+		update_context_menu_item("sub_always", state.urls[state.url_index].always);
+		update_context_menu_item("sub_never", !state.urls[state.url_index].always);
+	}
 }
 
-function handle_clear_btn() {
-	state.cc_toggle = false;
-	state.subdomain_active = false;
-	state.always_on = false;
+async function handle_clear_btn() {
+	let active_tab = state.active_tab; // preserve active tab
+	state = {};
 
-	update_content();
-	update_popup();
 	clear_storage();
-
-	update_context_menu_item("change", false);
-	update_context_menu_item("sub", false);
-	update_context_menu_item("always", false);
+	await init_state();
+	state.active_tab = active_tab;
+	update_popup();
+	update_content();
 }
 
 function handle_swatch_btn() {
@@ -329,11 +354,9 @@ function handle_swatch_btn() {
 
 function notify(msg){
 	if (msg.popup_request_state) {
-		console.log("popup requested state", Date());
 		get_state();
 	}
 	else if (msg.content_request_state) {
-		console.log("content requested state", Date());
 		get_state();
 	}
 	if (msg.popup_new_state) {
@@ -351,16 +374,15 @@ function notify(msg){
 		state = msg.handle_cc_btn;
 		handle_cc_btn();
 	}
-	else if (msg.handle_cc_subdomain_btn) {
-		state = msg.handle_cc_subdomain_btn;
-		handle_cc_subdomain_btn(null);
+	else if (msg.handle_cc_always_btn) {
+		state = msg.handle_cc_always_btn;
+		handle_cc_always_btn(null);
 	}
-	else if (msg.handle_always_on_btn) {
-		state = msg.handle_always_on_btn;
-		handle_always_on_btn();
+	else if (msg.handle_cc_never_btn) {
+		state = msg.handle_cc_never_btn;
+		handle_cc_never_btn(null);
 	}
 	else if (msg.handle_clear_btn) {
-		state = msg.handle_clear_btn;
 		handle_clear_btn();
 	}
 	else if (msg.handle_swatch_btn) {
@@ -370,7 +392,6 @@ function notify(msg){
 }
 
 async function tab_activated() {
-	console.log("tab activated");
 	get_state();
 }
 

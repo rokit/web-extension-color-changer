@@ -1,22 +1,60 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
+var state = null;
+var first = true;
+var class_name = "color-changer-sledge";
+
+var cc_style = document.createElement('style');
+cc_style.id = "color-changer-style";
+
+var observer = new MutationObserver(class_list_changed);
+var observer_config = {attributes: true, attributeFilter: ["class"]};
+
+function class_list_changed(mutationList, obs) {
+	add_class();
+}
+
+function add_class() {
+	let html = document.getElementsByTagName("HTML")[0];
+	if (!html) return;
+	if (!state) return;
+
+	if (!html.classList.contains(class_name)) {
+		html.classList.add(class_name);
+	}
+
+	observer.observe(html, observer_config);
+}
+
+function remove_class() {
+	let html = document.getElementsByTagName("HTML")[0];
+	if (!html) return;
+	if (!state) return;
+
+	html.classList.remove(class_name);
+	observer.disconnect();
+}
 
 function notify(msg){
 	if (msg.new_state) {
-		// console.log("new state");
 		state = msg.new_state;
+		cc_style.innerHTML = state.css;
 
-		// todo: remove previous entry from head
-		let css = document.createElement('style');
-		css.innerText = state.css;
-		document.head.appendChild(css);
+		if (!document.getElementById("color-changer-style")) {
+			document.head.appendChild(cc_style);
+		}
 
-		let html = document.getElementsByTagName("HTML")[0];
-		if (state.cc_toggle) {
-			// console.log("toogle is true");
-			html.classList.add("color-changer-sledge");
+		let bAlways = false;
+		if (state.url_index > -1) {
+			bAlways = state.urls[state.url_index].always;
+		}
+
+		if (state.url_index > -1 && bAlways || state.cc_toggle) {
+			add_class();
 		} else {
-			// console.log("toogle is false");
-			html.classList.remove("color-changer-sledge");
+			remove_class();
+		}
+		if (state.url_index > -1 && !bAlways) {
+			remove_class();
 		}
 	}
 }
@@ -36,3 +74,5 @@ if (bIsChrome) {
 }
 
 get_state();
+
+document.onscroll = add_class();

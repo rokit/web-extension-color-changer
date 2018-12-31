@@ -7,13 +7,17 @@
     <link rel="stylesheet" href="cc_popup.css"/>
   </head>
 
-<body>
+	<body>
+	<div id="info"><p>Enable for</p></div>
+
 	<div id="content">
 		<div id="scope">
 			<button data-value="Change Colors" id="cc">Change Colors</button>
-			<button data-value="Change Subdomain" id="cc-subdomain">Change Subdomain</button>
+			<button data-value="Always" id="cc-always">Always</button>
+			<button data-value="Never" id="cc-never">Never</button>
 		</div>
-	
+
+
 		<canvas></canvas>
 
 		<div class="slide-container">
@@ -31,7 +35,7 @@
 		<div id="divider"><div id="thumb"></div></div>
 		<section>
 			<a id="donate" target="_blank" href="http://color-changer.surge.sh/" title="If you like this add-on, please consider donating. Thank you!">Donate</a>
-			<button data-value="Always On" id="always-on" title="Apply color changer to every site.">Always On</button>
+			<!-- <button data-value="Always On" id="always-on" title="Apply color changer to every site.">Always On</button> -->
 			<button id="clear-storage" title="This button will reset all sites back to their normal colors.">Clear Data</button>
 		</section>
 	</footer>
