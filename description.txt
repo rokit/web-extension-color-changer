@@ -3,13 +3,15 @@ How to use:
 2. Choose a color on the color wheel to change the color. You can see your changes dynamically.
 3. Now, whenever you want to change the colors of a site, just hit the Change Colors button. You can also change colors via a right-click context menu.
 
-If you'd like Color Changer to always change the colors for a subdomain, you can click Change Subdomain. Clicking again will make Color Changer forget that subdomain.
+If you'd like Color Changer to always change the colors for a subdomain, you can click the Always button. Click again to make Color Changer forget that subdomain. There is also a Never button that does the opposite.
 
 What is a subdomain? For example, in developer.mozilla.org, the subdomain is "developer". So whenever you visit any url that has developer.mozilla.org, the colors will be changed. If you visited www.mozilla.org, the colors would not be changed because the subdomain is "www", not "developer".
 
-Mousing over the gray bar at the bottom will open a flyout menu. To clear all saved colors and subdomains, click Clear Data. Always On will automatically change colors of new tabs. There also happens to be a donate button down there. :)
+Mousing over the gray bar at the bottom will open a flyout menu. To clear all saved colors and subdomains, click Clear Data. There also happens to be a donate button down there. :)
 
 About the color wheel:
-Colors are less saturated near the center and 100% saturated on the edge. There is a separate swatch to the side that says "0% Sat", meaning 0% saturation or 100% gray.
+Colors are less saturated (more gray) near the center and 100% saturated (no gray) on the edge. There is a separate swatch to the side that says "0% Sat", meaning 0% saturation or 100% gray.
 
-There is also a lightness slider below the color wheel. 0% is black. 100% is white.
+There is also a lightness slider below the color wheel. Lower tends to black, and higher tends to white.
+
+Please report any bugs or problems with specific sites to: webextdev@gmail.com.

@@ -1,8 +1,12 @@
 2.0.0
 colors now change almost instantaneously
 colors can now be reversed without a page refresh
-Color Change button is now a toggle that applies to all tabs. It will stay on until you turn it off.
+Added two new buttons: Always and Never. Always will always change pages on a subdomain. Never will never change pages on a subdomain.
+Change Colors button is now a global toggle that applies to all tabs. It will stay on until you turn it off.
 added right-click context menu for convenience
+
+If it doesn't work, please try refreshing your current tab or reopening your browser.
+Please report any bugs to webextdev@gmail.com
 
 1.0.2
 will now preserve background images
