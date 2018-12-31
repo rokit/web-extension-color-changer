@@ -1,3 +1,6 @@
+2.0.1
+fixed bug where info bar made part of the color wheel inaccessible
+
 2.0.0
 colors now change almost instantaneously
 colors can now be reversed without a page refresh

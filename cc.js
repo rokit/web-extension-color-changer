@@ -1,6 +1,5 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 var state = null;
-var first = true;
 var class_name = "color-changer-sledge";
 
 var cc_style = document.createElement('style');
@@ -43,17 +42,12 @@ function notify(msg){
 			document.head.appendChild(cc_style);
 		}
 
-		let bAlways = false;
-		if (state.url_index > -1) {
-			bAlways = state.urls[state.url_index].always;
-		}
-
-		if (state.url_index > -1 && bAlways || state.cc_toggle) {
+		if (state.url_index > -1 && state.urls[state.url_index].always || state.cc_toggle) {
 			add_class();
 		} else {
 			remove_class();
 		}
-		if (state.url_index > -1 && !bAlways) {
+		if (state.url_index > -1 && !state.urls[state.url_index].always) {
 			remove_class();
 		}
 	}

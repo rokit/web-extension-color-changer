@@ -22,14 +22,15 @@ function update_swatch (swatch, hue, saturation, lightness) {
 var state = {};
 
 var lightness_slider = document.getElementById("lightness");
-var lightness_output = document.getElementById("lightness-value");
+var lightness_value = document.getElementById("lightness-value");
 
 lightness_slider.oninput = function() {
-	lightness_output.childNodes[0].nodeValue = `${this.value}%`;
+	lightness_value.childNodes[0].nodeValue = `${this.value}%`;
 	state.lightness = parseInt(this.value);
 	
 	draw_canvas();
 }
+
 var info = document.getElementById("info");
 var info_text = document.querySelector("#info p");
 
@@ -89,13 +90,6 @@ cc_never_btn.onmouseover = function() {
 cc_never_btn.onmouseout = function() {
 	info.style.opacity = 0;
 }
-// always_on_btn.onclick = function() {
-// 	if (bIsChrome) {
-// 		chrome.runtime.sendMessage({handle_always_on_btn: state});
-// 	} else {
-// 		browser.runtime.sendMessage({handle_always_on_btn: state});
-// 	}
-// }
 
 clear_btn.onclick = function() {
 	if (bIsChrome) {
@@ -105,49 +99,34 @@ clear_btn.onclick = function() {
 	}
 }
 
-fore_swatch.onclick = function() {
+function handle_fore() {
 	state.active_btn = "fore";
 	state.lightness = state.fg.lightness;
 	update_color_buttons();
-	save_state(); // does not update content
-};
-back_swatch.onclick = function() {
+}
+function handle_back() {
 	state.active_btn = "back";
 	state.lightness = state.bg.lightness;
 	update_color_buttons();
-	save_state();
-};
-link_swatch.onclick = function() {
+}
+function handle_link() {
 	state.active_btn = "link";
 	state.lightness = state.li.lightness;
 	update_color_buttons();
-	save_state();
-};
-fore.onclick = function() {
-	state.active_btn = "fore";
-	state.lightness = state.fg.lightness;
-	update_color_buttons();
-	save_state();
 }
-back.onclick = function() {
-	state.active_btn = "back";
-	state.lightness = state.bg.lightness;
-	update_color_buttons();
-	save_state();
-}
-link.onclick = function() {
-	state.active_btn = "link";
-	state.lightness = state.li.lightness;
-	update_color_buttons();
-	save_state();
-}
+fore_swatch.onclick = handle_fore;
+fore.onclick = handle_fore;
+back_swatch.onclick = handle_back;
+back.onclick = handle_back;
+link_swatch.onclick = handle_link;
+link.onclick = handle_link;
 
 function update_color_buttons() {
 	lightness_slider.value = state.lightness;
-	lightness_output.childNodes[0].nodeValue = `${state.lightness}%`;
+	lightness_value.childNodes[0].nodeValue = `${state.lightness}%`;
 	draw_canvas();
 	set_active_color_button();
-	set_active_swatch();
+	save_state(); // does not update content
 }
 
 function set_button_active(btn, bActive) {
@@ -167,9 +146,10 @@ function set_active_color_button() {
 	link.classList.remove("active-btn");
 
 	document.getElementById(state.active_btn).classList.add("active-btn");
+	set_active_swatch_button();
 }
 
-function set_active_swatch() {
+function set_active_swatch_button() {
 	fore_swatch.classList.remove("active-swatch");
 	back_swatch.classList.remove("active-swatch");
 	link_swatch.classList.remove("active-swatch");
@@ -335,7 +315,6 @@ canvas.onclick = function(e) {
 		} else {
 			browser.runtime.sendMessage({handle_swatch_btn: state, swatch: swatch});
 		}
-		// draw_canvas();
 	}
 };
 
@@ -359,6 +338,12 @@ canvas.onmousemove = function(e) {
 	}
 };
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 async function update_ui() {
 	fore_swatch.style.background = state.fg.hsl;
 	back_swatch.style.background = state.bg.hsl;
@@ -377,41 +362,11 @@ async function update_ui() {
 	update_color_buttons();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function reload_tab() {
-	if (bIsChrome) {
-		chrome.tabs.reload(state.active_tab.id);
-	} else {
-		browser.tabs.reload(state.active_tab.id);
-	}
-}
-
-async function save_and_change() {
-	state.cc_toggle = true;
-	set_button_active(cc_btn, state.cc_toggle);
-	update_background_state(); // background then updates content
-}
-
 async function save_state() {
 	if (bIsChrome) {
 		chrome.runtime.sendMessage({save_state: state});
 	} else {
 		browser.runtime.sendMessage({save_state: state});
-	}
-}
-
-function update_background_state() {
-	if (state.active_tab) {
-		if (bIsChrome) {
-			chrome.runtime.sendMessage({popup_new_state: state});
-		} else {
-			browser.runtime.sendMessage({popup_new_state: state});
-		}
 	}
 }
 

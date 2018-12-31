@@ -1,1 +1,2 @@
 fix youtube player div
+check url for chrome://extensions, about:debugging etc

@@ -2,30 +2,28 @@ var bIsChrome = /Chrome/.test(navigator.userAgent);
 var class_name = "color-changer-sledge";
 var state = {};
 
-function ChosenColor (hue, saturation, lightness, chosen_id) {
+function ChosenColor(hue, saturation, lightness, chosen_id) {
 	this.hue = hue;
 	this.saturation = saturation;
 	this.lightness = lightness;
 	this.chosen_id = chosen_id;
-
-	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
-	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-	this.hsl_shift = `hsl(${hue + 60 % 360}, ${saturation + 20}%, ${lightness + 10}%)`;
-	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+	create_strings(this);
 }
 
-function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
-	col.hue = hue;
-	col.saturation = saturation;
-	col.lightness = lightness;
-	col.chosen_id = chosen_id;
+function update_chosen_color(color, hue, saturation, lightness, chosen_id) {
+	color.hue = hue;
+	color.saturation = saturation;
+	color.lightness = lightness;
+	color.chosen_id = chosen_id;
+	create_strings(color);
+}
 
-	col.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
-	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-	col.hsl_shift = `hsl(${hue + 60 % 360}, ${saturation + 20}%, ${lightness + 10}%)`;
-	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+function create_strings(color) {
+	color.hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
+	color.hsl_darker = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
+	color.hsl_lighter = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
+	color.hsl_shift = `hsl(${color.hue + 50 % 360}, ${color.saturation + 20}%, ${color.lightness + 10}%)`;
+	color.a_50 = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
 }
 
 function CC_URL (url, bAlways) {
@@ -360,9 +358,15 @@ function handle_swatch_btn(swatch) {
 	state.cc_toggle = true;
 
 	switch(state.active_btn) {
-		case "fore": update_chosen_color(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); break;
-		case "back": update_chosen_color(state.bg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); break;
-		case "link": update_chosen_color(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); break;
+		case "fore": {
+			update_chosen_color(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
+		} break;
+		case "back": {
+			update_chosen_color(state.bg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
+		} break;
+		case "link": {
+			update_chosen_color(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
+		} break;
 		default: break;
 	}
 	
