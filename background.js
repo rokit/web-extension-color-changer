@@ -34,9 +34,9 @@ function CC_URL (url, bAlways) {
 
 function update_css() {
 	state.css = `
-	.${class_name} * {
+	.${class_name} *, .${class_name} *:before, .${class_name} *:after {
 		color: ${state.fg.hsl} !important;
-		background-color: ${state.bg.hsl} !important;
+		background: ${state.bg.hsl} !important;
 		border-color: ${state.bg.hsl_lighter} !important;
 	}
 	.${class_name} img {
@@ -46,13 +46,13 @@ function update_css() {
 		color: ${state.li.hsl} !important;
 	}
 
-	.${class_name} input,
-	.${class_name} textarea,
-	.${class_name} pre,
-	.${class_name} code,
-	.${class_name} code span {
+	.${class_name} input, .${class_name} input *,
+	.${class_name} textarea, .${class_name} textarea *,
+	.${class_name} pre, .${class_name} pre *,
+	.${class_name} code, .${class_name} code * {
 		background-color: ${state.bg.hsl_lighter} !important;
 	}
+
 	.${class_name} a, .${class_name} a * {
 		color: ${state.li.hsl} !important;
 		background-color: ${state.bg.hsl} !important;
@@ -199,9 +199,6 @@ function init_state() {
 				// so reset urls
 				state.urls = [];
 			}
-		} else {
-			// urls has no length. reset it anyway i guess
-			state.urls = [];
 		}
 	}
 

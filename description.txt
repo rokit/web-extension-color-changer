@@ -1,11 +1,9 @@
 How to use:
 1. Click the Text Color, Background Color, or Link Color button. A border will appear around the button letting you know it's active.
 2. Choose a color on the color wheel to change the color. You can see your changes dynamically.
-3. Now, whenever you want to change the colors of a site, just hit the Change Colors button. This is a global toggle, so it will apply to all sites. You can also change colors via a right-click context menu.
+3. Now, whenever you want to change the colors of a site, just hit the Change Colors button. This is a global toggle, so it will apply to all tabs. You can also change colors via a right-click context menu.
 
-You can also enable or disable Color Changer for specific subdomains with the Always or Never button.
-
-What is a subdomain? For example, the subdomain in developer.mozilla.org is "developer". Most of the time, the subdomain will be "www".
+You can also enable or disable Color Changer for specific subdomains with the Always or Never button. For example, the subdomain in developer.mozilla.org is "developer". Most of the time, the subdomain will be "www". Maybe you want to change colors for developer.mozilla.org, but not www.mozilla.org. With this extension, you can do that.
 
 Mousing over the gray bar at the bottom will open a flyout menu. To clear all saved colors and subdomains, click Clear Data. There also happens to be a donate button down there. :)
 
@@ -13,5 +11,7 @@ About the color wheel:
 Colors are less saturated (more gray) near the center and 100% saturated (no gray) on the edge. There is a separate swatch to the side that says "0% Sat", meaning 0% saturation or 100% gray.
 
 There is also a lightness slider below the color wheel. Lower tends to black, and higher tends to white.
+
+This extension doesn't use Google Analytics.
 
 Please report any bugs or problems with specific sites to: webextdev@gmail.com.
