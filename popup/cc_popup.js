@@ -167,10 +167,10 @@ function set_button_active(btn, bActive) {
 	var check = " 🗸";
 	if (bActive) {
 		btn.classList.add("active-btn");
-		btn.innerHTML = btn.dataset.value + check;
+		btn.textContent = btn.dataset.value + check;
 	} else {
 		btn.classList.remove("active-btn");
-		btn.innerHTML = btn.dataset.value;
+		btn.textContent = btn.dataset.value;
 	}
 }
 

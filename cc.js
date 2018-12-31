@@ -37,7 +37,7 @@ function remove_class() {
 function notify(msg){
 	if (msg.new_state) {
 		state = msg.new_state;
-		cc_style.innerHTML = state.css;
+		cc_style.textContent = state.css;
 
 		if (!document.getElementById("color-changer-style")) {
 			document.head.appendChild(cc_style);
