@@ -19,19 +19,6 @@ function update_swatch (swatch, hue, saturation, lightness) {
 	swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
-	col.hue = hue;
-	col.saturation = saturation;
-	col.lightness = lightness;
-	col.chosen_id = chosen_id;
-
-	col.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 30}%)`;
-	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
-	col.hsl_shift = `hsl(${hue + 60 % 360}, ${saturation + 20}%, ${lightness + 10}%)`;
-	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
-}
-
 var state = {};
 
 var lightness_slider = document.getElementById("lightness");
@@ -343,19 +330,12 @@ function check_collision(swatches, x, y) {
 canvas.onclick = function(e) {
 	var swatch = check_collision(swatches, e.offsetX, e.offsetY);
 	if (swatch) {
-		switch(state.active_btn) {
-			case "fore": update_chosen_color(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); fore_swatch.style.background = state.fg.hsl; break;
-			case "back": update_chosen_color(state.bg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); back_swatch.style.background = state.bg.hsl; break;
-			case "link": update_chosen_color(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); link_swatch.style.background = state.li.hsl; break;
-			default: break;
-		}
-		draw_canvas();
-
 		if (bIsChrome) {
-			chrome.runtime.sendMessage({handle_swatch_btn: state});
+			chrome.runtime.sendMessage({handle_swatch_btn: state, swatch: swatch});
 		} else {
-			browser.runtime.sendMessage({handle_swatch_btn: state});
+			browser.runtime.sendMessage({handle_swatch_btn: state, swatch: swatch});
 		}
+		// draw_canvas();
 	}
 };
 

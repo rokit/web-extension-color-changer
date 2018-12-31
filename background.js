@@ -9,10 +9,23 @@ function ChosenColor (hue, saturation, lightness, chosen_id) {
 	this.chosen_id = chosen_id;
 
 	this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 30}%)`;
+	this.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
 	this.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
 	this.hsl_shift = `hsl(${hue + 60 % 360}, ${saturation + 20}%, ${lightness + 10}%)`;
 	this.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
+}
+
+function update_chosen_color (col, hue, saturation, lightness, chosen_id) {
+	col.hue = hue;
+	col.saturation = saturation;
+	col.lightness = lightness;
+	col.chosen_id = chosen_id;
+
+	col.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+	col.hsl_darker = `hsl(${hue}, ${saturation}%, ${lightness - 10}%)`;
+	col.hsl_lighter = `hsl(${hue}, ${saturation}%, ${lightness + 10}%)`;
+	col.hsl_shift = `hsl(${hue + 60 % 360}, ${saturation + 20}%, ${lightness + 10}%)`;
+	col.a_50 = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.5)`;
 }
 
 function CC_URL (url, bAlways) {
@@ -343,9 +356,16 @@ async function handle_clear_btn() {
 	update_content();
 }
 
-function handle_swatch_btn() {
+function handle_swatch_btn(swatch) {
 	state.cc_toggle = true;
 
+	switch(state.active_btn) {
+		case "fore": update_chosen_color(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); break;
+		case "back": update_chosen_color(state.bg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); break;
+		case "link": update_chosen_color(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id); break;
+		default: break;
+	}
+	
 	save_state();
 	update_content();
 	update_popup();
@@ -387,7 +407,7 @@ function notify(msg){
 	}
 	else if (msg.handle_swatch_btn) {
 		state = msg.handle_swatch_btn;
-		handle_swatch_btn();
+		handle_swatch_btn(msg.swatch);
 	}
 }
 
