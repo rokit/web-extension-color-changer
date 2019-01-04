@@ -1,5 +1,5 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
-var class_name = "color-changer-sledge";
+var class_name = "color-changer-2";
 var state = {};
 
 function ChosenColor(hue, saturation, lightness, chosen_id) {
@@ -23,7 +23,7 @@ function create_strings(color) {
 	color.hsl_darker = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
 	color.hsl_lighter = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
 	color.hsl_shift = `hsl(${color.hue + 50 % 360}, ${color.saturation + 20}%, ${color.lightness + 10}%)`;
-	color.a_50 = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
+	color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
 }
 
 function CC_URL (url, bAlways) {
@@ -34,7 +34,15 @@ function CC_URL (url, bAlways) {
 
 function update_css() {
 	state.css = `
-	.${class_name} *, .${class_name} *:before, .${class_name} *:after {
+	.${class_name} {
+		background-color: ${state.bg.hsl} !important;
+	}
+	.${class_name} :not(#player):not(#player *) {
+		color: ${state.fg.hsl} !important;
+		background-color: ${state.bg.hsl} !important;
+		border-color: ${state.bg.hsl_lighter} !important;
+	}
+	.${class_name} *:before, .${class_name} *:after {
 		color: ${state.fg.hsl} !important;
 		background: ${state.bg.hsl} !important;
 		border-color: ${state.bg.hsl_lighter} !important;

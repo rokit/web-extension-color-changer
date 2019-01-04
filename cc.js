@@ -1,6 +1,6 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 var state = null;
-var class_name = "color-changer-sledge";
+var class_name = "color-changer-2";
 
 var cc_style = document.createElement('style');
 cc_style.id = "color-changer-style";

@@ -1,3 +1,6 @@
+2.0.2
+Changed "0% Sat" to "Gray".
+
 2.0.1
 fixed bug where info bar made part of the color wheel inaccessible
 

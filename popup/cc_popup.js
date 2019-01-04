@@ -209,7 +209,7 @@ function draw_canvas() {
 	ctx.fillStyle = "black";
 	ctx.textAlign = "center";
 	ctx.font = '16pt Helvetica';
-	ctx.fillText("0% Sat", zero_sat_offset_x, zero_sat_text_offset_y); 
+	ctx.fillText("Gray", zero_sat_offset_x, zero_sat_text_offset_y); 
 
 	ctx.beginPath();
 	ctx.arc(zero_sat_offset_x, zero_sat_offset_y, sat_radius, 0, 2 * Math.PI, true);
