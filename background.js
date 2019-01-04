@@ -37,7 +37,7 @@ function update_css() {
 	.${class_name} {
 		background-color: ${state.bg.hsl} !important;
 	}
-	.${class_name} :not(#player):not(#player *) {
+	.${class_name} * {
 		color: ${state.fg.hsl} !important;
 		background-color: ${state.bg.hsl} !important;
 		border-color: ${state.bg.hsl_lighter} !important;
