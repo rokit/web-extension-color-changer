@@ -20,9 +20,13 @@ function update_chosen_color(color, hue, saturation, lightness, chosen_id) {
 
 function create_strings(color) {
 	color.hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
-	color.hsl_darker = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
-	color.hsl_lighter = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
-	color.hsl_shift = `hsl(${color.hue + 50 % 360}, ${color.saturation + 20}%, ${color.lightness + 10}%)`;
+	if (color.lightness >= 50) {
+		color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
+	} else {
+		color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
+	}
+	color.hue_hovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
+	color.hue_visited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
 	color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
 }
 
@@ -40,12 +44,12 @@ function update_css() {
 	.${class_name} * {
 		color: ${state.fg.hsl} !important;
 		background-color: ${state.bg.hsl} !important;
-		border-color: ${state.bg.hsl_lighter} !important;
+		border-color: ${state.bg.lightness_shift} !important;
 	}
 	.${class_name} *:before, .${class_name} *:after {
 		color: ${state.fg.hsl} !important;
 		background: ${state.bg.hsl} !important;
-		border-color: ${state.bg.hsl_lighter} !important;
+		border-color: ${state.bg.lightness_shift} !important;
 	}
 	.${class_name} img {
 		visibility: visible !important;
@@ -58,7 +62,7 @@ function update_css() {
 	.${class_name} textarea, .${class_name} textarea *,
 	.${class_name} pre, .${class_name} pre *,
 	.${class_name} code, .${class_name} code * {
-		background-color: ${state.bg.hsl_lighter} !important;
+		background-color: ${state.bg.lightness_shift} !important;
 	}
 
 	.${class_name} a, .${class_name} a * {
@@ -66,13 +70,13 @@ function update_css() {
 		background-color: ${state.bg.hsl} !important;
 	}
 	.${class_name} a:hover, .${class_name} a:hover * {
-		color: ${state.li.hsl_shift} !important;
+		color: ${state.li.hue_hovered} !important;
 	}
 	.${class_name} a:active, .${class_name} a:active * {
-		color: ${state.li.hsl_darker} !important;
+		color: ${state.li.hue_visited} !important;
 	}
 	.${class_name} a:visited, .${class_name} a:visited * {
-		color: ${state.li.hsl_darker} !important;
+		color: ${state.li.hue_visited} !important;
 	}
 `;
 }
