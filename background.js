@@ -143,9 +143,9 @@ function compare_urls(aa, bb) {
 
 async function save_state() {
 	if (bIsChrome) {
-		chrome.storage.local.set({state: state});
+		chrome.storage.local.set({state});
 	} else {
-		browser.storage.local.set({state: state});
+		browser.storage.local.set({state});
 	}
 }
 
@@ -159,8 +159,6 @@ function update_popup() {
 
 function update_content() {
 	update_css();
-	var details = {};
-	details.code = state.css;
 
 	if (state.active_tab) {
 		if (bIsChrome) {
@@ -219,11 +217,11 @@ function init_state() {
 		case "fore": state.lightness = state.fg.lightness; break;
 		case "back": state.lightness = state.bg.lightness; break;
 		case "link": state.lightness = state.li.lightness; break;
-	}
+  }
+
+  // if undefined
 	if (!state.cc_toggle) state.cc_toggle = false;
 	if (!state.css) state.css = "";
-	// state.url_index / get_active_tab
-	// state.active_tab / get_active_tab
 
 	update_css();
 }
@@ -246,7 +244,7 @@ function get_state() {
 
 function create_context_menu() {
 	let change = {
-		id: "change",
+		id: "change_colors",
 		title: "Change Colors",
 		contexts: ["all"],
 		type: "checkbox",
@@ -293,9 +291,9 @@ function create_context_menu() {
 
 function update_context_menu_item(item, checked) {
 	if (bIsChrome) {
-		chrome.contextMenus.update(item, {checked: checked})
+		chrome.contextMenus.update(item, {checked})
 	} else {
-		browser.contextMenus.update(item, {checked: checked})
+		browser.contextMenus.update(item, {checked})
 	}
 }
 
@@ -305,7 +303,7 @@ function handle_cc_btn() {
 	save_state();
 	update_content();
 	update_popup();
-	update_context_menu_item("change", state.cc_toggle);
+	update_context_menu_item("change_colors", state.cc_toggle);
 }
 
 async function handle_cc_always_btn() {
@@ -382,7 +380,7 @@ function handle_swatch_btn(swatch) {
 	save_state();
 	update_content();
 	update_popup();
-	update_context_menu_item("change", state.cc_toggle);
+	update_context_menu_item("change_colors", state.cc_toggle);
 }
 
 function notify(msg){
