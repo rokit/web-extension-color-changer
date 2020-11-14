@@ -2,22 +2,22 @@
   "manifest_version": 2,
   "name": "Color Changer",
   "version": "2.0.3",
-	"description": "Change website colors to your liking.",
+  "description": "Change website colors to your liking.",
 
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
-	},
+  },
   "content_scripts": [
     {
-			"run_at": "document_start",
+      "run_at": "document_start",
       "matches": ["<all_urls>"],
-			"js": ["cc.js"]
+      "js": ["cc.js"]
     }
-	],
-	"background": {"scripts": ["background.js"]},
-	"permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
+  ],
+  "background": {"scripts": ["background.js"]},
+  "permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
   "browser_action": {
     "default_popup": "popup/cc_popup.html",
     "default_icon": {
@@ -25,8 +25,8 @@
       "24": "icons/icon-24.png",
       "32": "icons/icon-32.png"
     }
-	},
-	"browser_specific_settings": {
+  },
+  "browser_specific_settings": {
     "gecko": {
       "id": "@colorchanger"
     }
