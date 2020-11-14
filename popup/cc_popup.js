@@ -65,7 +65,7 @@ cc_always_btn.onclick = function() {
 
 cc_always_btn.onmouseover = function() {
   let url = new URL(state.active_tab.url);
-  info_text.textContent = `Always change pages on subdomain: ${url.hostname}`;
+  info_text.textContent = `Always change pages on host: ${url.hostname}`;
   info.style.opacity = 1;
 }
 
@@ -83,7 +83,7 @@ cc_never_btn.onclick = function() {
 
 cc_never_btn.onmouseover = function() {
   let url = new URL(state.active_tab.url);
-  info_text.textContent = `Never change pages on subdomain: ${url.hostname}`;
+  info_text.textContent = `Never change pages on host: ${url.hostname}`;
   info.style.opacity = 1;
 }
 
