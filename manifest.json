@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Color Changer",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Change website colors to your liking.",
 
   "icons": {
@@ -24,11 +24,6 @@
       "16": "icons/icon-16.png",
       "24": "icons/icon-24.png",
       "32": "icons/icon-32.png"
-    }
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "@colorchanger"
     }
   }
 }

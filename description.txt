@@ -1,17 +1,26 @@
+Why did I make this?
+Some sites have good information, but use bad colors that make them hard to read or use. With this extension, you can change a page's colors and make it more accessible. This extension isn't meant to be a global themer for the web and will not work well on all sites, such as Facebook.
+
 How to use:
+When you first install the extension, please refresh any tabs you have open so that the CSS styles from the extension are loaded in the page.
+
 1. Click the Text Color, Background Color, or Link Color button. A border will appear around the button letting you know it's active.
 2. Choose a color on the color wheel to change the color. You can see your changes live.
 3. Now, whenever you want to change the colors of a site, just hit the Change Colors button. This is a global toggle, so it will apply to all tabs. You can also change colors via a right-click context menu.
 
-You can also enable or disable Color Changer for specific subdomains with the Always or Never button. For example, the subdomain in developer.mozilla.org is "developer". Most of the time, the subdomain will be "www". Maybe you want to change colors for developer.mozilla.org, but not www.mozilla.org. With this extension, you can do that.
+You can also enable or disable Color Changer for all pages on a host with the Always or Never button. For example, if you visit a page on developer.mozilla.org, you can click the Always button and no matter what page you visit under that host, Color Changer will be applied.
 
-Mousing over the gray bar at the bottom will open a flyout menu. To clear all saved colors and subdomains, click Clear Data. There also happens to be a donate button down there. :)
+Mousing over the gray bar at the bottom will open a flyout menu where you can click Clear Data and reset colors for all sites.
 
 About the color wheel:
-Colors are less saturated (more gray) near the center and 100% saturated (no gray) on the edge. There is a separate swatch that says "Gray", meaning 100% gray.
+Colors are less saturated (more gray) near the center and more saturated (less gray) on the edge. There is a separate swatch that says "Gray", meaning 100% gray.
 
 The lightness slider is below the color wheel. Lower tends to black, and higher tends to white.
 
 This extension doesn't use Google Analytics.
 
-Please report any bugs or problems with specific sites to: webextdev@gmail.com.
+Please report any bugs to:
+webextdev@gmail.com.
+
+To view code:
+https://github.com/rokit/web-extension-color-changer
