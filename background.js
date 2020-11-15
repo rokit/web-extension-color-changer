@@ -404,8 +404,10 @@ function notify(request, sender, response) {
 async function tabActivated(tabInfo) {
   if (bIsChrome) {
     chrome.storage.local.set({tabInfo});
+    chrome.tabs.sendMessage(tabInfo.tabId, {message: 'updateContent'});
   } else {
     browser.storage.local.set({tabInfo});
+    browser.tabs.sendMessage(tabInfo.tabId, {message: 'updateContent'});
   }
 }
 

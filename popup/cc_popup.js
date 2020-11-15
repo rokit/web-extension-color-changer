@@ -50,8 +50,6 @@ function updateSwatch(swatch, hue, saturation, lightness) {
 
 var state = {};
 
-var changeColors = false;
-
 var lightnessSlider = document.getElementById("lightness");
 var lightnessValue = document.getElementById("lightness-value");
 
@@ -80,8 +78,6 @@ var linkSwatch = document.getElementById("link-swatch");
 
 ccBtn.onclick = function() {
   toggleChangeColors();
-  // changeColors = !changeColors;
-  // setButtonActive(ccBtn, changeColors);
 };
 
 ccAlwaysBtn.onclick = function() {
@@ -352,6 +348,7 @@ canvas.onclick = function(e) {
 
   saveState();
   updateUi();
+  updateContentViaSwatch();
   // updateContextMenuItem("change_colors", state.cc_toggle);
 }
 
@@ -379,6 +376,17 @@ canvas.onmousemove = function(e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function updateContentViaSwatch() {
+  if (activeTabId) {
+    setButtonActive(ccBtn, true);
+    if (bIsChrome) {
+      chrome.tabs.sendMessage(activeTabId, {message: 'updateContentViaSwatch'});
+    } else {
+      browser.tabs.sendMessage(activeTabId, {message: 'updateContentViaSwatch'});
+    }
+  }
+}
 
 function initState() {
   console.log('init state called');
@@ -506,7 +514,6 @@ async function getState() {
 function notify(req){
   switch (req.message) {
     case 'changeColors': {
-      console.log('ccreq', req);
       setButtonActive(ccBtn, req.changeColors)
     }; break;
     default: break;
