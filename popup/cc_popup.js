@@ -435,13 +435,11 @@ async function toggleChangeColors() {
     setButtonActive(ccBtn, value);
   }
 
-  let tabInfo = await readStorage('tabInfo');
-  activeTabId = tabInfo.tabId;
-  console.log('tabInfo', tabInfo);
+  let result = await readStorage('tabInfo');
+  activeTabId = result.tabInfo.tabId;
 
   if (activeTabId) {
     if (bIsChrome) {
-      console.log('toggleChangeColors');
       chrome.tabs.sendMessage(activeTabId, {message: 'toggleChangeColors'}, response);
     } else {
       browser.tabs.sendMessage(activeTabId, {message: 'toggleChangeColors'}, response);
