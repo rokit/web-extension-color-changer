@@ -481,6 +481,10 @@ async function getState() {
     updateUi();
   }
 
+  function getChangeColorsResponse(value) {
+    setButtonActive(ccBtn, value);
+  }
+
   let result = await readStorage('tabInfo');
   activeTabId = result.tabInfo.tabId;
 
@@ -488,6 +492,14 @@ async function getState() {
     chrome.storage.local.get("state", getStateCallback);
   } else {
     browser.storage.local.get("state", getStateCallback);
+  }
+
+  if (activeTabId) {
+    if (bIsChrome) {
+      chrome.tabs.sendMessage(activeTabId, {message: 'getChangeColors'}, getChangeColorsResponse);
+    } else {
+      browser.tabs.sendMessage(activeTabId, {message: 'getChangeColors'}, getChangeColorsResponse);
+    }
   }
 }
 

@@ -39,20 +39,13 @@ function remove_class() {
 }
 
 function notify(req, sender, res){
-  console.log('cc', req.message);
   switch(req.message) {
     case 'toggleChangeColors': {
       changeColors = !changeColors;
-      console.log('changeColors', changeColors);
       res(changeColors);
     }; break;
     case 'getChangeColors': {
-      console.log('get changeColors', changeColors);
-      if (bIsChrome) {
-        chrome.runtime.sendMessage({message: 'changeColors', changeColors});
-      } else {
-        browser.runtime.sendMessage({message: 'changeColors', changeColors});
-      }
+      res(changeColors);
     }
     default: break;
   }
