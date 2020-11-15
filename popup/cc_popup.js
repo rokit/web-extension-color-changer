@@ -53,10 +53,10 @@ var state = {};
 var lightnessSlider = document.getElementById("lightness");
 var lightnessValue = document.getElementById("lightness-value");
 
-lightnessSlider.oninput = function() {
+lightnessSlider.oninput = function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
   state.lightness = parseInt(this.value);
-  
+
   drawCanvas();
 }
 
@@ -76,19 +76,19 @@ var foreSwatch = document.getElementById("fore-swatch");
 var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
-ccBtn.onclick = function() {
+ccBtn.onclick = function () {
   toggleChangeColors();
 };
 
-ccAlwaysBtn.onclick = function() {
+ccAlwaysBtn.onclick = function () {
   if (bIsChrome) {
-    chrome.runtime.sendMessage({handle_cc_always_btn: state});
+    chrome.runtime.sendMessage({ handle_cc_always_btn: state });
   } else {
-    browser.runtime.sendMessage({handle_cc_always_btn: state});
+    browser.runtime.sendMessage({ handle_cc_always_btn: state });
   }
 };
 
-ccAlwaysBtn.onmouseover = function() {
+ccAlwaysBtn.onmouseover = function () {
   if (!activeTabId) {
     return;
   }
@@ -97,19 +97,19 @@ ccAlwaysBtn.onmouseover = function() {
   // info.style.opacity = 1;
 }
 
-ccAlwaysBtn.onmouseout = function() {
+ccAlwaysBtn.onmouseout = function () {
   info.style.opacity = 0;
 }
 
-ccNeverBtn.onclick = function() {
+ccNeverBtn.onclick = function () {
   if (bIsChrome) {
-    chrome.runtime.sendMessage({handle_cc_never_btn: state});
+    chrome.runtime.sendMessage({ handle_cc_never_btn: state });
   } else {
-    browser.runtime.sendMessage({handle_cc_never_btn: state});
+    browser.runtime.sendMessage({ handle_cc_never_btn: state });
   }
 };
 
-ccNeverBtn.onmouseover = function() {
+ccNeverBtn.onmouseover = function () {
   if (!activeTabId) {
     return;
   }
@@ -118,15 +118,15 @@ ccNeverBtn.onmouseover = function() {
   // info.style.opacity = 1;
 }
 
-ccNeverBtn.onmouseout = function() {
+ccNeverBtn.onmouseout = function () {
   info.style.opacity = 0;
 }
 
-clearBtn.onclick = function() {
+clearBtn.onclick = function () {
   if (bIsChrome) {
-    chrome.runtime.sendMessage({handle_clear_btn: state});
+    chrome.runtime.sendMessage({ handle_clear_btn: state });
   } else {
-    browser.runtime.sendMessage({handle_clear_btn: state});
+    browser.runtime.sendMessage({ handle_clear_btn: state });
   }
 }
 
@@ -227,7 +227,7 @@ var hoverId = null;
 var swatches = {};
 
 function toRads(degrees) {
-  return degrees * (Math.PI/180);
+  return degrees * (Math.PI / 180);
 }
 
 function drawCanvas() {
@@ -237,7 +237,7 @@ function drawCanvas() {
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.font = '16pt Helvetica';
-  ctx.fillText("Gray", zeroSatOffsetX, zeroSatTextOffsetY); 
+  ctx.fillText("Gray", zeroSatOffsetX, zeroSatTextOffsetY);
 
   ctx.beginPath();
   ctx.arc(zeroSatOffsetX, zeroSatOffsetY, satRadius, 0, 2 * Math.PI, true);
@@ -250,9 +250,9 @@ function drawCanvas() {
     (state.activeBtn === "fore" && state.fg.chosenId === "zero") ||
     (state.activeBtn === "back" && state.bg.chosenId === "zero") ||
     (state.activeBtn === "link" && state.li.chosenId === "zero")) {
-      ctx.strokeStyle = "#000000";
-      ctx.lineWidth = strokeHoverWidth;
-      ctx.setLineDash([5, 2]);
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = strokeHoverWidth;
+    ctx.setLineDash([5, 2]);
   }
   ctx.stroke();
   ctx.setLineDash([0]);
@@ -269,17 +269,17 @@ function drawCanvas() {
       let angle = 360 / adjustedNumSwatches;
       let x = originX + ((bigRadius + gap + (j * littleGap) + (j * littleRadius * 2)) * Math.cos(toRads(angle * i)));
       let y = originY + ((bigRadius + gap + (j * littleGap) + (j * littleRadius * 2)) * Math.sin(toRads(angle * i)));
-      
+
       let hue = angle * i;
       let saturation = (j * saturationSteps + (100 - (saturationSteps * (rings - 1))));
-      
+
       let = id = `${j}-${i}`;
-      
+
       ctx.beginPath();
       ctx.ellipse(x, y, littleRadius, littleRadius * ellipseLength, toRads(hue - 45), 0, 2 * Math.PI, false);
       ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${state.lightness}%)`;
       ctx.fill();
-      
+
       if (swatches[id]) {
         updateSwatch(swatches[id], hue, saturation, state.lightness);
       } else {
@@ -289,12 +289,12 @@ function drawCanvas() {
       ctx.strokeStyle = strokeColor;
       hoverId === id ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
-      if (	(state.activeBtn === "fore" && state.fg.chosenId === id) ||
-            (state.activeBtn === "back" && state.bg.chosenId === id) ||
-            (state.activeBtn === "link" && state.li.chosenId === id)	) {
-          ctx.strokeStyle = "#000000";
-          ctx.lineWidth = strokeHoverWidth;
-          ctx.setLineDash([5, 2]);
+      if ((state.activeBtn === "fore" && state.fg.chosenId === id) ||
+        (state.activeBtn === "back" && state.bg.chosenId === id) ||
+        (state.activeBtn === "link" && state.li.chosenId === id)) {
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = strokeHoverWidth;
+        ctx.setLineDash([5, 2]);
       }
       ctx.stroke();
       ctx.setLineDash([0]);
@@ -321,19 +321,19 @@ function checkCollision(swatches, x, y) {
     var bottom = swatches[s].y + swatches[s].radius;
 
     if (right >= x
-        && left <= x
-        && bottom >= y
-        && top <= y) {
-        return swatches[s];
+      && left <= x
+      && bottom >= y
+      && top <= y) {
+      return swatches[s];
     }
   }
   return false;
 }
 
-canvas.onclick = function(e) {
+canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
 
-  switch(state.activeBtn) {
+  switch (state.activeBtn) {
     case "fore": {
       updateChosenColor(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
     } break;
@@ -352,22 +352,22 @@ canvas.onclick = function(e) {
   // updateContextMenuItem("change_colors", state.cc_toggle);
 }
 
-canvas.onmouseout = function() {
+canvas.onmouseout = function () {
   hoverId = null;
   drawCanvas();
 }
 
-canvas.onmousemove = function(e) {
+canvas.onmousemove = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
 
   if (swatch) {
-      hoverId = swatch.id;
+    hoverId = swatch.id;
 
-      drawCanvas();
+    drawCanvas();
 
-      canvas.style.cursor = 'pointer';
+    canvas.style.cursor = 'pointer';
   } else {
-      canvas.style.cursor = 'default';
+    canvas.style.cursor = 'default';
   }
 };
 
@@ -381,17 +381,17 @@ function updateContentViaSwatch() {
   if (activeTabId) {
     setButtonActive(ccBtn, true);
     if (bIsChrome) {
-      chrome.tabs.sendMessage(activeTabId, {message: 'updateContentViaSwatch'});
+      chrome.tabs.sendMessage(activeTabId, { message: 'updateContentViaSwatch' });
     } else {
-      browser.tabs.sendMessage(activeTabId, {message: 'updateContentViaSwatch'});
+      browser.tabs.sendMessage(activeTabId, { message: 'updateContentViaSwatch' });
     }
   }
 }
 
 function initState() {
   console.log('init state called');
-  if (!state.fg) state.fg = new ChosenColor(0,  0, 80,  "zero");
-  if (!state.bg) state.bg = new ChosenColor(0,  0, 25,  "zero");
+  if (!state.fg) state.fg = new ChosenColor(0, 0, 80, "zero");
+  if (!state.bg) state.bg = new ChosenColor(0, 0, 25, "zero");
   if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
 
   if (!state.urls) {
@@ -445,9 +445,9 @@ async function toggleChangeColors() {
 
   if (activeTabId) {
     if (bIsChrome) {
-      chrome.tabs.sendMessage(activeTabId, {message: 'toggleChangeColors'}, response);
+      chrome.tabs.sendMessage(activeTabId, { message: 'toggleChangeColors' }, response);
     } else {
-      browser.tabs.sendMessage(activeTabId, {message: 'toggleChangeColors'}, response);
+      browser.tabs.sendMessage(activeTabId, { message: 'toggleChangeColors' }, response);
     }
   }
 }
@@ -455,19 +455,19 @@ async function toggleChangeColors() {
 function readStorage(key) {
   return new Promise((resolve, reject) => {
     if (bIsChrome) {
-      chrome.storage.local.get(key, function(result) {
+      chrome.storage.local.get(key, function (result) {
         if (result != undefined) {
-            resolve(result);
+          resolve(result);
         } else {
-            reject(null);
+          reject(null);
         }
       });
     } else {
-      browser.storage.local.get(key, function(result) {
+      browser.storage.local.get(key, function (result) {
         if (result != undefined) {
-            resolve(result);
+          resolve(result);
         } else {
-            reject(null);
+          reject(null);
         }
       });
     }
@@ -476,9 +476,9 @@ function readStorage(key) {
 
 function saveState() {
   if (bIsChrome) {
-    chrome.storage.local.set({state});
+    chrome.storage.local.set({ state });
   } else {
-    browser.storage.local.set({state});
+    browser.storage.local.set({ state });
   }
 }
 
@@ -504,14 +504,14 @@ async function getState() {
 
   if (activeTabId) {
     if (bIsChrome) {
-      chrome.tabs.sendMessage(activeTabId, {message: 'getChangeColors'}, getChangeColorsResponse);
+      chrome.tabs.sendMessage(activeTabId, { message: 'getChangeColors' }, getChangeColorsResponse);
     } else {
-      browser.tabs.sendMessage(activeTabId, {message: 'getChangeColors'}, getChangeColorsResponse);
+      browser.tabs.sendMessage(activeTabId, { message: 'getChangeColors' }, getChangeColorsResponse);
     }
   }
 }
 
-function notify(req){
+function notify(req) {
   switch (req.message) {
     case 'changeColors': {
       setButtonActive(ccBtn, req.changeColors)

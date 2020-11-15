@@ -5,7 +5,7 @@ var ccStyle = document.createElement('style');
 ccStyle.id = "color-changer-style";
 
 var observer = new MutationObserver(classListChanged);
-var observerConfig = {attributes: true, attributeFilter: ["class"]};
+var observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 var changeColors = false;
 var css = "";
@@ -60,7 +60,7 @@ function classListChanged(mutationList, obs) {
 }
 
 function addClass() {
-  let html = document.getElementsByTagName("HTML")[0];
+  let html = document.documentElement;
   if (!html) return;
 
   if (!html.classList.contains(className)) {
@@ -81,19 +81,19 @@ function removeClass() {
 function readStorage(key) {
   return new Promise((resolve, reject) => {
     if (bIsChrome) {
-      chrome.storage.local.get(key, function(result) {
+      chrome.storage.local.get(key, function (result) {
         if (result != undefined) {
-            resolve(result);
+          resolve(result);
         } else {
-            reject(null);
+          reject(null);
         }
       });
     } else {
-      browser.storage.local.get(key, function(result) {
+      browser.storage.local.get(key, function (result) {
         if (result != undefined) {
-            resolve(result);
+          resolve(result);
         } else {
-            reject(null);
+          reject(null);
         }
       });
     }
@@ -121,8 +121,8 @@ async function updateContent() {
   }
 }
 
-async function notify(req, sender, res){
-  switch(req.message) {
+async function notify(req, sender, res) {
+  switch (req.message) {
     case 'toggleChangeColors': {
       changeColors = !changeColors;
       res(changeColors);

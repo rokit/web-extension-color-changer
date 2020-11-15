@@ -284,7 +284,7 @@ var bIsChrome = /Chrome/.test(navigator.userAgent);
 //   } else {
 //     await add_url(true);
 //   }
-  
+
 //   update_content();
 //   update_popup();
 
@@ -306,7 +306,7 @@ var bIsChrome = /Chrome/.test(navigator.userAgent);
 //   } else {
 //     await add_url(false);
 //   }
-  
+
 //   update_content();
 //   update_popup();
 
@@ -345,7 +345,7 @@ var bIsChrome = /Chrome/.test(navigator.userAgent);
 //     } break;
 //     default: break;
 //   }
-  
+
 //   save_state();
 //   update_content();
 //   update_popup();
@@ -403,11 +403,11 @@ function notify(request, sender, response) {
 
 async function tabActivated(tabInfo) {
   if (bIsChrome) {
-    chrome.storage.local.set({tabInfo});
-    chrome.tabs.sendMessage(tabInfo.tabId, {message: 'updateContent'});
+    chrome.storage.local.set({ tabInfo });
+    chrome.tabs.sendMessage(tabInfo.tabId, { message: 'updateContent' });
   } else {
-    browser.storage.local.set({tabInfo});
-    browser.tabs.sendMessage(tabInfo.tabId, {message: 'updateContent'});
+    browser.storage.local.set({ tabInfo });
+    browser.tabs.sendMessage(tabInfo.tabId, { message: 'updateContent' });
   }
 }
 
