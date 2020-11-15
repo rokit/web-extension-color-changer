@@ -9,6 +9,7 @@ var observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 var changeColors = false;
 var css = "";
+var state = null;
 
 function updateCss() {
   css = `
@@ -78,7 +79,7 @@ function removeClass() {
   observer.disconnect();
 }
 
-function readStorage(key) {
+function getStorageValue(key) {
   return new Promise((resolve, reject) => {
     if (bIsChrome) {
       chrome.storage.local.get(key, function (result) {
@@ -102,8 +103,7 @@ function readStorage(key) {
 
 async function updateContent() {
   if (changeColors) {
-    let res = await readStorage('state');
-    state = res.state;
+    state = (await getStorageValue('state')).state;
     updateCss();
 
     ccStyle.textContent = css;
@@ -113,9 +113,6 @@ async function updateContent() {
     }
 
     addClass();
-    // if (state.url_index > -1 && !state.urls[state.url_index].always) {
-    //   removeClass();
-    // }
   } else {
     removeClass();
   }
@@ -135,44 +132,19 @@ async function notify(req, sender, res) {
     } break;
     default: break;
   }
-  //   state = msg.new_state;
-  //   isCcBtnOn = state.cc_toggle;
-  //   ccStyle.textContent = state.css;
-
-  //   if (!document.getElementById("color-changer-style")) {
-  //     document.head.appendChild(ccStyle);
-  //   }
-
-  //   if ((state.url_index > -1 && state.urls[state.url_index].always) || isCcBtnOn) {
-  //     addClass();
-  //   } else {
-  //     removeClass();
-  //   }
-  //   // if (state.url_index > -1 && !state.urls[state.url_index].always) {
-  //   //   removeClass();
-  //   // }
-  // } else if (msg.getCcBtnState) {
-  //   sendResponse(isCcBtnOn);
-  // } else if (msg.setCc) {
-  //   isCcBtnOn = msg.setCc;
-  // }
 }
 
-// function sendMessage(message, value) {
-//   if (bIsChrome) {
-//     chrome.runtime.sendMessage({message, value});
-//   } else {
-//     browser.runtime.sendMessage({message, value});
-//   }
-// }
+async function getState() {
+  state = (await getStorageValue('state')).state;
+  let thisLocationHostname = new URL(window.location.href).hostname;
+  let index = state.hosts.indexOf(thisLocationHostname);
 
-// function get_state() {
-//   if (bIsChrome) {
-//     chrome.runtime.sendMessage({content_request_state: true});
-//   } else {
-//     browser.runtime.sendMessage({content_request_state: true});
-//   }
-// }
+  if (index > -1) {
+    // if host is in list
+    changeColors = true;
+    updateContent();
+  }
+}
 
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);
@@ -180,6 +152,6 @@ if (bIsChrome) {
   browser.runtime.onMessage.addListener(notify);
 }
 
-// get_state();
+getState();
 
-document.onscroll = addClass();
+document.onscroll = updateContent();

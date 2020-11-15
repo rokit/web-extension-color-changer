@@ -10,11 +10,6 @@ function ChosenColor(hue, saturation, lightness, chosenId) {
   createStrings(this);
 }
 
-function CcHost(hostname, bAlways) {
-  this.hostname = hostname;
-  this.always = bAlways;
-}
-
 function updateChosenColor(color, hue, saturation, lightness, chosenId) {
   color.hue = hue;
   color.saturation = saturation;
@@ -86,7 +81,7 @@ ccCheckbox.onclick = async () => {
     currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
     if (!currentTabHostname) return;
 
-    let index = state.hosts.map(ccHost => ccHost.hostname).indexOf(currentTabHostname);
+    let index = state.hosts.indexOf(currentTabHostname);
     if (index > -1) {
       // if always not checked and host is present
       state.hosts.splice(index, 1);
@@ -101,12 +96,11 @@ alwaysCheckbox.onclick = async function () {
   currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
   if (!currentTabHostname) return;
 
-  let index = state.hosts.map(ccHost => ccHost.hostname).indexOf(currentTabHostname);
+  let index = state.hosts.indexOf(currentTabHostname);
 
   if (alwaysCheckbox.checked && index === -1) {
     // if checked and host not present
-    let host = new CcHost(currentTabHostname, true);
-    state.hosts.push(host);
+    state.hosts.push(currentTabHostname);
   } else if (!alwaysCheckbox.checked && index > -1) {
     // if not checked and host is present
     state.hosts.splice(index, 1);
@@ -494,7 +488,7 @@ async function getState() {
     ccCheckbox.checked = value;
     currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
     state = (await getStorageValue('state')).state;
-    let index = state.hosts.map(ccHost => ccHost.hostname).indexOf(currentTabHostname);
+    let index = state.hosts.indexOf(currentTabHostname);
 
     if (index > -1) {
       ccCheckbox.checked = true;
