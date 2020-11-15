@@ -123,11 +123,15 @@ ccNeverBtn.onmouseout = function () {
 }
 
 clearBtn.onclick = function () {
-  if (bIsChrome) {
-    chrome.runtime.sendMessage({ handle_clear_btn: state });
-  } else {
-    browser.runtime.sendMessage({ handle_clear_btn: state });
-  }
+  state.fg = null
+  state.bg = null
+  state.li = null;
+  state.urls = null;
+  state.activeBtn = null;
+  initState();
+  saveState();
+  updateUi();
+  updateContent();
 }
 
 function updateColorButtons() {
@@ -376,6 +380,16 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function updateContent() {
+  if (activeTabId) {
+    if (bIsChrome) {
+      chrome.tabs.sendMessage(activeTabId, { message: 'updateContent' });
+    } else {
+      browser.tabs.sendMessage(activeTabId, { message: 'updateContent' });
+    }
+  }
+}
 
 function updateContentViaSwatch() {
   if (activeTabId) {
