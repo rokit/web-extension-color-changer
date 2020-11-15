@@ -1,6 +1,34 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 
-function Swatch (x, y, id, radius, hue, saturation, lightness) {
+function ChosenColor(hue, saturation, lightness, chosenId) {
+  this.hue = hue;
+  this.saturation = saturation;
+  this.lightness = lightness;
+  this.chosenId = chosenId;
+  createStrings(this);
+}
+
+function updateChosenColor(color, hue, saturation, lightness, chosenId) {
+  color.hue = hue;
+  color.saturation = saturation;
+  color.lightness = lightness;
+  color.chosenId = chosenId;
+  createStrings(color);
+}
+
+function createStrings(color) {
+  color.hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
+  if (color.lightness >= 50) {
+    color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
+  } else {
+    color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
+  }
+  color.hue_hovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
+  color.hue_visited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
+  color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
+}
+
+function Swatch(x, y, id, radius, hue, saturation, lightness) {
   this.x = x;
   this.y = y;
   this.id = id;
@@ -12,7 +40,7 @@ function Swatch (x, y, id, radius, hue, saturation, lightness) {
   this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
-function update_swatch (swatch, hue, saturation, lightness) {
+function updateSwatch(swatch, hue, saturation, lightness) {
   swatch.hue = hue;
   swatch.saturation = saturation;
   swatch.lightness = lightness;
@@ -21,42 +49,37 @@ function update_swatch (swatch, hue, saturation, lightness) {
 
 var state = {};
 
-var lightness_slider = document.getElementById("lightness");
-var lightness_value = document.getElementById("lightness-value");
+var lightnessSlider = document.getElementById("lightness");
+var lightnessValue = document.getElementById("lightness-value");
 
-lightness_slider.oninput = function() {
-  lightness_value.childNodes[0].nodeValue = `${this.value}%`;
+lightnessSlider.oninput = function() {
+  lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
   state.lightness = parseInt(this.value);
   
-  draw_canvas();
+  drawCanvas();
 }
 
 var info = document.getElementById("info");
 var info_text = document.querySelector("#info p");
 
-var cc_btn = document.getElementById("cc");
-var cc_always_btn = document.getElementById("cc-always");
-var cc_never_btn = document.getElementById("cc-never");
-var clear_btn = document.getElementById("clear-storage");
+var ccBtn = document.getElementById("cc");
+var ccAlwaysBtn = document.getElementById("cc-always");
+var ccNeverBtn = document.getElementById("cc-never");
+var clearBtn = document.getElementById("clear-storage");
 
-var fore = document.getElementById("fore");
-var back = document.getElementById("back");
-var link = document.getElementById("link");
+var foreBtn = document.getElementById("fore");
+var backBtn = document.getElementById("back");
+var linkBtn = document.getElementById("link");
 
-var fore_swatch = document.getElementById("fore_swatch");
-var back_swatch = document.getElementById("back_swatch");
-var link_swatch = document.getElementById("link_swatch");
+var foreSwatch = document.getElementById("fore-swatch");
+var backSwatch = document.getElementById("back-swatch");
+var linkSwatch = document.getElementById("link-swatch");
 
-cc_btn.onclick = function() {
-  // setCcInTab(!state.cc_toggle);
-  if (bIsChrome) {
-    chrome.runtime.sendMessage({handle_cc_btn: state});
-  } else {
-    browser.runtime.sendMessage({handle_cc_btn: state});
-  }
+ccBtn.onclick = function() {
+  toggleCcInTab({message: 'toggleChangeColors'});
 };
 
-cc_always_btn.onclick = function() {
+ccAlwaysBtn.onclick = function() {
   if (bIsChrome) {
     chrome.runtime.sendMessage({handle_cc_always_btn: state});
   } else {
@@ -64,17 +87,20 @@ cc_always_btn.onclick = function() {
   }
 };
 
-cc_always_btn.onmouseover = function() {
-  let url = new URL(state.active_tab.url);
+ccAlwaysBtn.onmouseover = function() {
+  if (!state.activeTab) {
+    return;
+  }
+  let url = new URL(state.activeTab.url);
   info_text.textContent = `Always change pages on host: ${url.hostname}`;
   info.style.opacity = 1;
 }
 
-cc_always_btn.onmouseout = function() {
+ccAlwaysBtn.onmouseout = function() {
   info.style.opacity = 0;
 }
 
-cc_never_btn.onclick = function() {
+ccNeverBtn.onclick = function() {
   if (bIsChrome) {
     chrome.runtime.sendMessage({handle_cc_never_btn: state});
   } else {
@@ -82,17 +108,20 @@ cc_never_btn.onclick = function() {
   }
 };
 
-cc_never_btn.onmouseover = function() {
-  let url = new URL(state.active_tab.url);
+ccNeverBtn.onmouseover = function() {
+  if (!state.activeTab) {
+    return;
+  }
+  let url = new URL(state.activeTab.url);
   info_text.textContent = `Never change pages on host: ${url.hostname}`;
   info.style.opacity = 1;
 }
 
-cc_never_btn.onmouseout = function() {
+ccNeverBtn.onmouseout = function() {
   info.style.opacity = 0;
 }
 
-clear_btn.onclick = function() {
+clearBtn.onclick = function() {
   if (bIsChrome) {
     chrome.runtime.sendMessage({handle_clear_btn: state});
   } else {
@@ -100,37 +129,38 @@ clear_btn.onclick = function() {
   }
 }
 
-function handle_fore() {
-  state.active_btn = "fore";
+function handleFore() {
+  state.activeBtn = "fore";
   state.lightness = state.fg.lightness;
-  update_color_buttons();
+  updateColorButtons();
 }
-function handle_back() {
-  state.active_btn = "back";
+function handleBack() {
+  state.activeBtn = "back";
   state.lightness = state.bg.lightness;
-  update_color_buttons();
+  updateColorButtons();
 }
-function handle_link() {
-  state.active_btn = "link";
+function handleLink() {
+  state.activeBtn = "link";
   state.lightness = state.li.lightness;
-  update_color_buttons();
-}
-fore_swatch.onclick = handle_fore;
-fore.onclick = handle_fore;
-back_swatch.onclick = handle_back;
-back.onclick = handle_back;
-link_swatch.onclick = handle_link;
-link.onclick = handle_link;
-
-function update_color_buttons() {
-  lightness_slider.value = state.lightness;
-  lightness_value.childNodes[0].nodeValue = `${state.lightness}%`;
-  draw_canvas();
-  set_active_color_button();
-  save_state(); // does not update content
+  updateColorButtons();
 }
 
-function set_button_active(btn, bActive) {
+foreSwatch.onclick = handleFore;
+foreBtn.onclick = handleFore;
+backSwatch.onclick = handleBack;
+backBtn.onclick = handleBack;
+linkSwatch.onclick = handleLink;
+linkBtn.onclick = handleLink;
+
+function updateColorButtons() {
+  lightnessSlider.value = state.lightness;
+  lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
+  drawCanvas();
+  setActiveColorButton();
+  saveState();
+}
+
+function setButtonActive(btn, bActive) {
   var check = " 🗸";
   if (bActive) {
     btn.classList.add("active-btn");
@@ -141,21 +171,21 @@ function set_button_active(btn, bActive) {
   }
 }
 
-function set_active_color_button() {
-  fore.classList.remove("active-btn");
-  back.classList.remove("active-btn");
-  link.classList.remove("active-btn");
+function setActiveColorButton() {
+  foreBtn.classList.remove("active-btn");
+  backBtn.classList.remove("active-btn");
+  linkBtn.classList.remove("active-btn");
 
-  document.getElementById(state.active_btn).classList.add("active-btn");
-  set_active_swatch_button();
+  document.getElementById(state.activeBtn).classList.add("active-btn");
+  setActiveSwatchButton();
 }
 
-function set_active_swatch_button() {
-  fore_swatch.classList.remove("active-swatch");
-  back_swatch.classList.remove("active-swatch");
-  link_swatch.classList.remove("active-swatch");
+function setActiveSwatchButton() {
+  foreSwatch.classList.remove("active-swatch");
+  backSwatch.classList.remove("active-swatch");
+  linkSwatch.classList.remove("active-swatch");
 
-  document.getElementById(`${state.active_btn}_swatch`).classList.add("active-swatch");
+  document.getElementById(`${state.activeBtn}-swatch`).classList.add("active-swatch");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,130 +197,123 @@ var canvas = document.querySelector("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = document.querySelector("canvas").offsetWidth;
 canvas.height = document.querySelector("canvas").offsetHeight;
-var canvas_height = document.querySelector("canvas").offsetHeight;
+var canvasHeight = document.querySelector("canvas").offsetHeight;
 
-var origin_x = canvas.width / 2;
-var origin_y = canvas.height / 2;
+var originX = canvas.width / 2;
+var originY = canvas.height / 2;
 
-var big_radius = canvas_height / 6;
-var little_radius = canvas_height / 30;
-var ellipse_length = 1.5;
-var big_line = 3;
-var little_line = 1;
+var bigRadius = canvasHeight / 6;
+var littleRadius = canvasHeight / 30;
+var ellipseLength = 1.5;
 
-var gap = canvas_height / 14;
-var little_gap = canvas_height / 30;
-var num_swatches = 16;
-var steps = num_swatches / 2;
+var gap = canvasHeight / 14;
+var littleGap = canvasHeight / 30;
+var numSwatches = 16;
+var steps = numSwatches / 2;
 var rings = 3;
-var saturation_steps = 100 / rings;
-var stroke_color = "#555555";
+var saturationSteps = 100 / rings;
+var strokeColor = "#555555";
 
-let stroke_hover_width = 5;
+let strokeHoverWidth = 5;
 
-let zero_sat_offset_x = origin_x - canvas.width * 0.40;
-let zero_sat_offset_y = origin_y + canvas.width * 0.3;
+let zeroSatOffsetX = originX - canvas.width * 0.40;
+let zeroSatOffsetY = originY + canvas.width * 0.3;
 
-let zero_sat_text_offset_y = zero_sat_offset_y - 30;
-let sat_radius = big_radius * 0.5;
+let zeroSatTextOffsetY = zeroSatOffsetY - 30;
+let satRadius = bigRadius * 0.5;
 
-var hover_id = null;
+var hoverId = null;
 
 var swatches = {};
 
-function to_rad(degrees) {
+function toRads(degrees) {
   return degrees * (Math.PI/180);
 }
 
-function draw_canvas() {
+function drawCanvas() {
   ctx.fillStyle = "white";
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = "black";
   ctx.textAlign = "center";
   ctx.font = '16pt Helvetica';
-  ctx.fillText("Gray", zero_sat_offset_x, zero_sat_text_offset_y); 
+  ctx.fillText("Gray", zeroSatOffsetX, zeroSatTextOffsetY); 
 
   ctx.beginPath();
-  ctx.arc(zero_sat_offset_x, zero_sat_offset_y, sat_radius, 0, 2 * Math.PI, true);
+  ctx.arc(zeroSatOffsetX, zeroSatOffsetY, satRadius, 0, 2 * Math.PI, true);
   ctx.fillStyle = `hsl(0, 0%, ${state.lightness}%)`;
   ctx.fill();
-  ctx.strokeStyle = stroke_color;
-  hover_id === "zero" ? ctx.lineWidth = stroke_hover_width : ctx.lineWidth = 1;
+  ctx.strokeStyle = strokeColor;
+  hoverId === "zero" ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
   if (
-    (state.active_btn === "fore" && state.fg.chosen_id === "zero") ||
-    (state.active_btn === "back" && state.bg.chosen_id === "zero") ||
-    (state.active_btn === "link" && state.li.chosen_id === "zero")) {
+    (state.activeBtn === "fore" && state.fg.chosenId === "zero") ||
+    (state.activeBtn === "back" && state.bg.chosenId === "zero") ||
+    (state.activeBtn === "link" && state.li.chosenId === "zero")) {
       ctx.strokeStyle = "#000000";
-      ctx.lineWidth = stroke_hover_width;
+      ctx.lineWidth = strokeHoverWidth;
       ctx.setLineDash([5, 2]);
   }
   ctx.stroke();
   ctx.setLineDash([0]);
 
   if (swatches["zero"]) {
-    update_swatch(swatches["zero"], 0, 0, state.lightness);
+    updateSwatch(swatches["zero"], 0, 0, state.lightness);
   } else {
-    swatches["zero"] = new Swatch(zero_sat_offset_x, zero_sat_offset_y, "zero", sat_radius, 0, 0, state.lightness);
+    swatches["zero"] = new Swatch(zeroSatOffsetX, zeroSatOffsetY, "zero", satRadius, 0, 0, state.lightness);
   }
 
   for (var j = 0; j < rings; j++) {
-    let adjusted_num_swatches = num_swatches + (j * steps);
-    for (var i = 0; i < adjusted_num_swatches; i++) {
-      let angle = 360 / adjusted_num_swatches;
-      let x = origin_x + ((big_radius + gap + (j * little_gap) + (j * little_radius * 2)) * Math.cos(to_rad(angle * i)));
-      let y = origin_y + ((big_radius + gap + (j * little_gap) + (j * little_radius * 2)) * Math.sin(to_rad(angle * i)));
+    let adjustedNumSwatches = numSwatches + (j * steps);
+    for (var i = 0; i < adjustedNumSwatches; i++) {
+      let angle = 360 / adjustedNumSwatches;
+      let x = originX + ((bigRadius + gap + (j * littleGap) + (j * littleRadius * 2)) * Math.cos(toRads(angle * i)));
+      let y = originY + ((bigRadius + gap + (j * littleGap) + (j * littleRadius * 2)) * Math.sin(toRads(angle * i)));
       
       let hue = angle * i;
-      let saturation = (j * saturation_steps + (100 - (saturation_steps * (rings - 1))));
+      let saturation = (j * saturationSteps + (100 - (saturationSteps * (rings - 1))));
       
       let = id = `${j}-${i}`;
       
       ctx.beginPath();
-      ctx.ellipse(x, y, little_radius, little_radius * ellipse_length, to_rad(hue - 45), 0, 2 * Math.PI, false);
+      ctx.ellipse(x, y, littleRadius, littleRadius * ellipseLength, toRads(hue - 45), 0, 2 * Math.PI, false);
       ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${state.lightness}%)`;
       ctx.fill();
       
       if (swatches[id]) {
-        update_swatch(swatches[id], hue, saturation, state.lightness);
+        updateSwatch(swatches[id], hue, saturation, state.lightness);
       } else {
-        swatches[id] = new Swatch(x, y, id, little_radius, hue, saturation, state.lightness);
+        swatches[id] = new Swatch(x, y, id, littleRadius, hue, saturation, state.lightness);
       }
 
-      ctx.strokeStyle = stroke_color;
-      hover_id === id ? ctx.lineWidth = stroke_hover_width : ctx.lineWidth = 1;
+      ctx.strokeStyle = strokeColor;
+      hoverId === id ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
-      if (	(state.active_btn === "fore" && state.fg.chosen_id === id) ||
-            (state.active_btn === "back" && state.bg.chosen_id === id) ||
-            (state.active_btn === "link" && state.li.chosen_id === id)	) {
+      if (	(state.activeBtn === "fore" && state.fg.chosenId === id) ||
+            (state.activeBtn === "back" && state.bg.chosenId === id) ||
+            (state.activeBtn === "link" && state.li.chosenId === id)	) {
           ctx.strokeStyle = "#000000";
-          ctx.lineWidth = stroke_hover_width;
+          ctx.lineWidth = strokeHoverWidth;
           ctx.setLineDash([5, 2]);
       }
       ctx.stroke();
       ctx.setLineDash([0]);
     }
   }
-  if (hover_id) {
+
+  if (hoverId) {
     ctx.beginPath();
-    ctx.arc(origin_x, origin_y, big_radius, 0, 2 * Math.PI, false);
-    ctx.fillStyle = swatches[hover_id].hsl;
+    ctx.arc(originX, originY, bigRadius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = swatches[hoverId].hsl;
     ctx.fill();
     ctx.closePath();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = stroke_color;
+    ctx.strokeStyle = strokeColor;
     ctx.stroke();
-
-    // shows swatch id in center
-    // ctx.fillStyle = "black";
-    // ctx.textAlign = "center";
-    // ctx.font = '16pt Helvetica';
-    // ctx.fillText(`${hover_id}`, origin_x, origin_y); 
   }
 }
 
-function check_collision(swatches, x, y) {
+function checkCollision(swatches, x, y) {
   for (var s in swatches) {
     var left = swatches[s].x - swatches[s].radius;
     var right = swatches[s].x + swatches[s].radius;
@@ -302,36 +325,45 @@ function check_collision(swatches, x, y) {
         && bottom >= y
         && top <= y) {
         return swatches[s];
-    }		
+    }
   }
   return false;
 }
-  
+
 canvas.onclick = function(e) {
-  var swatch = check_collision(swatches, e.offsetX, e.offsetY);
-  if (swatch) {
-    if (bIsChrome) {
-      chrome.runtime.sendMessage({handle_swatch_btn: state, swatch: swatch});
-    } else {
-      browser.runtime.sendMessage({handle_swatch_btn: state, swatch: swatch});
-    }
+  var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
+
+  switch(state.activeBtn) {
+    case "fore": {
+      updateChosenColor(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
+    } break;
+    case "back": {
+      updateChosenColor(state.bg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
+    } break;
+    case "link": {
+      updateChosenColor(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
+    } break;
+    default: break;
   }
-};
+
+  saveState();
+  updateUi();
+  // updateContextMenuItem("change_colors", state.cc_toggle);
+}
 
 canvas.onmouseout = function() {
-  hover_id = null;
-  draw_canvas();
+  hoverId = null;
+  drawCanvas();
 }
 
 canvas.onmousemove = function(e) {
-
-  var swatch = check_collision(swatches, e.offsetX, e.offsetY);
+  var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
 
   if (swatch) {
-      hover_id = swatch.id;
+      hoverId = swatch.id;
 
-      draw_canvas();
-      
+      drawCanvas();
+
       canvas.style.cursor = 'pointer';
   } else {
       canvas.style.cursor = 'default';
@@ -344,73 +376,99 @@ canvas.onmousemove = function(e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-async function update_ui() {
-  fore_swatch.style.background = state.fg.hsl;
-  back_swatch.style.background = state.bg.hsl;
-  link_swatch.style.background = state.li.hsl;
+function initState() {
+  console.log('init state called');
+  if (!state.fg) state.fg = new ChosenColor(0,  0, 80,  "zero");
+  if (!state.bg) state.bg = new ChosenColor(0,  0, 25,  "zero");
+  if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
+
+  if (!state.urls) {
+    state.urls = [];
+  }
+
+  if (!state.activeBtn) state.activeBtn = "fore";
+  switch (state.activeBtn) {
+    case "fore": state.lightness = state.fg.lightness; break;
+    case "back": state.lightness = state.bg.lightness; break;
+    case "link": state.lightness = state.li.lightness; break;
+  }
+}
+
+function updateUi() {
+  foreSwatch.style.background = state.fg.hsl;
+  backSwatch.style.background = state.bg.hsl;
+  linkSwatch.style.background = state.li.hsl;
 
   if (state.url_index > -1) {
     let bAlways = state.urls[state.url_index].always;
-    set_button_active(cc_always_btn, bAlways);
-    set_button_active(cc_never_btn, !bAlways);
+    setButtonActive(ccAlwaysBtn, bAlways);
+    setButtonActive(ccNeverBtn, !bAlways);
   } else {
-    set_button_active(cc_always_btn, false);
-    set_button_active(cc_never_btn, false);
+    setButtonActive(ccAlwaysBtn, false);
+    setButtonActive(ccNeverBtn, false);
   }
 
   function getCcBtnStateResponse(value) {
     console.log('getCcBtnStateResponse', value);
     state.cc_toggle = value;
-    set_button_active(cc_btn, state.cc_toggle);
+    setButtonActive(ccBtn, state.cc_toggle);
   }
 
-  if (state.active_tab) {
+  if (state.activeTab) {
     if (bIsChrome) {
       console.log('init state getCcBtnState');
-      chrome.tabs.sendMessage(state.active_tab.id, {getCcBtnState: true}, getCcBtnStateResponse);
+      chrome.tabs.sendMessage(state.activeTab.id, {getCcBtnState: true}, getCcBtnStateResponse);
     } else {
-      browser.tabs.sendMessage(state.active_tab.id, {getCcBtnState: true}, getCcBtnStateResponse);
+      browser.tabs.sendMessage(state.activeTab.id, {getCcBtnState: true}, getCcBtnStateResponse);
     }
   }
 
-  update_color_buttons();
+  updateColorButtons();
 }
 
-// function setCcInTab(value) {
-//   if (state.active_tab) {
-//     if (bIsChrome) {
-//       console.log('setCcInTab');
-//       chrome.tabs.sendMessage(state.active_tab.id, {setCc: value});
-//     } else {
-//       browser.tabs.sendMessage(state.active_tab.id, {setCc: value});
-//     }
-//   }
-// }
-
-async function save_state() {
-  if (bIsChrome) {
-    chrome.runtime.sendMessage({save_state: state});
-  } else {
-    browser.runtime.sendMessage({save_state: state});
+function toggleCcInTab(value) {
+  if (state.activeTab) {
+    if (bIsChrome) {
+      console.log('toggleCcInTab');
+      chrome.tabs.sendMessage(state.activeTab.id, {setCc: value});
+    } else {
+      browser.tabs.sendMessage(state.activeTab.id, {setCc: value});
+    }
   }
 }
 
-async function get_state() {
+async function saveState() {
   if (bIsChrome) {
-    chrome.runtime.sendMessage({popup_request_state: true});
+    chrome.storage.local.set({state});
   } else {
-    browser.runtime.sendMessage({popup_request_state: true});
+    browser.storage.local.set({state});
+  }
+}
+
+function getState() {
+  function getStateCallback(res) {
+    state = res.state;
+  }
+
+  if (bIsChrome) {
+    chrome.storage.local.get("state", getStateCallback);
+  } else {
+    browser.storage.local.get("state", getStateCallback);
   }
 }
 
 function notify(msg){
   if (msg.popup_state) {
     state = msg.popup_state;
-    update_ui();
+    updateUi();
   }
 }
 
-window.onload = get_state;
+window.onload = () => {
+  getState();
+  initState();
+  updateUi();
+};
 
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);

@@ -1,0 +1,36 @@
+{
+  "state": {
+    "activeButton": "",
+    "activeTab": {
+      "id": 1,
+      "url": ""
+    },
+    "css": "",
+    "fg": {
+      "hue": "",
+      "saturation": "",
+      "lightness": "",
+      "alpha": "",
+      "hsl": "",
+      "hueHovered": "",
+      "hueVisited": "",
+      "lightnessShift": "",
+      "chosenId": ""
+    },
+    "bg": {
+    },
+    "li": {
+    },
+    "urls": [
+      {
+        "url": "",
+        "always": true,
+        "never": false
+      }
+    ]
+  }
+}
+
+
+
+

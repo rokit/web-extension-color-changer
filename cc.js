@@ -8,7 +8,8 @@ cc_style.id = "color-changer-style";
 var observer = new MutationObserver(class_list_changed);
 var observer_config = {attributes: true, attributeFilter: ["class"]};
 
-var isCcBtnOn = false;
+var changeColors = false;
+var css = "";
 
 function class_list_changed(mutationList, obs) {
   add_class();
@@ -28,37 +29,47 @@ function add_class() {
 }
 
 function remove_class() {
+  isCcBtnOn = false;
   let html = document.getElementsByTagName("HTML")[0];
   if (!html) return;
   if (!state) return;
 
   html.classList.remove(class_name);
-  isCcBtnOn = false;
   observer.disconnect();
 }
 
-function notify(msg, sender, sendResponse){
-  if (msg.new_state) {
-    state = msg.new_state;
-    cc_style.textContent = state.css;
-
-    if (!document.getElementById("color-changer-style")) {
-      document.head.appendChild(cc_style);
+function notify(request, sender, sendResponse){
+  console.log('cc', request.message);
+  switch(request.message) {
+    case 'toggleChangeColors': {
+      changeColors = !changeColors;
+    }; break;
+    case 'getChangeColors': {
+      sendResponse(changeColors);
     }
-
-    if ((state.url_index > -1 && state.urls[state.url_index].always) || state.cc_toggle) {
-      add_class();
-    } else {
-      remove_class();
-    }
-    if (state.url_index > -1 && !state.urls[state.url_index].always) {
-      remove_class();
-    }
-  } else if (msg.getCcBtnState) {
-    sendResponse(isCcBtnOn);
-  } else if (msg.setCc) {
-    isCcBtnOn = msg.setCc;
+    default: break;
   }
+  //   state = msg.new_state;
+  //   isCcBtnOn = state.cc_toggle;
+  //   cc_style.textContent = state.css;
+
+  //   if (!document.getElementById("color-changer-style")) {
+  //     document.head.appendChild(cc_style);
+  //   }
+
+  //   if ((state.url_index > -1 && state.urls[state.url_index].always) || isCcBtnOn) {
+  //     add_class();
+  //   } else {
+  //     remove_class();
+  //   }
+  //   // if (state.url_index > -1 && !state.urls[state.url_index].always) {
+  //   //   remove_class();
+  //   // }
+  // } else if (msg.getCcBtnState) {
+  //   sendResponse(isCcBtnOn);
+  // } else if (msg.setCc) {
+  //   isCcBtnOn = msg.setCc;
+  // }
 }
 
 // function sendMessage(message, value) {
