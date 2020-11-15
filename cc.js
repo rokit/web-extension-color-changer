@@ -38,14 +38,21 @@ function remove_class() {
   observer.disconnect();
 }
 
-function notify(request, sender, sendResponse){
-  console.log('cc', request.message);
-  switch(request.message) {
+function notify(req, sender, res){
+  console.log('cc', req.message);
+  switch(req.message) {
     case 'toggleChangeColors': {
       changeColors = !changeColors;
+      console.log('changeColors', changeColors);
+      res(changeColors);
     }; break;
     case 'getChangeColors': {
-      sendResponse(changeColors);
+      console.log('get changeColors', changeColors);
+      if (bIsChrome) {
+        chrome.runtime.sendMessage({message: 'changeColors', changeColors});
+      } else {
+        browser.runtime.sendMessage({message: 'changeColors', changeColors});
+      }
     }
     default: break;
   }
@@ -80,13 +87,13 @@ function notify(request, sender, sendResponse){
 //   }
 // }
 
-function get_state() {
-  if (bIsChrome) {
-    chrome.runtime.sendMessage({content_request_state: true});
-  } else {
-    browser.runtime.sendMessage({content_request_state: true});
-  }
-}
+// function get_state() {
+//   if (bIsChrome) {
+//     chrome.runtime.sendMessage({content_request_state: true});
+//   } else {
+//     browser.runtime.sendMessage({content_request_state: true});
+//   }
+// }
 
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);
@@ -94,6 +101,6 @@ if (bIsChrome) {
   browser.runtime.onMessage.addListener(notify);
 }
 
-get_state();
+// get_state();
 
 document.onscroll = add_class();

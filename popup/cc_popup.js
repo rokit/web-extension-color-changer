@@ -1,4 +1,5 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
+var activeTabId = null;
 
 function ChosenColor(hue, saturation, lightness, chosenId) {
   this.hue = hue;
@@ -49,6 +50,8 @@ function updateSwatch(swatch, hue, saturation, lightness) {
 
 var state = {};
 
+var changeColors = false;
+
 var lightnessSlider = document.getElementById("lightness");
 var lightnessValue = document.getElementById("lightness-value");
 
@@ -76,7 +79,9 @@ var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
 ccBtn.onclick = function() {
-  toggleCcInTab({message: 'toggleChangeColors'});
+  toggleChangeColors();
+  // changeColors = !changeColors;
+  // setButtonActive(ccBtn, changeColors);
 };
 
 ccAlwaysBtn.onclick = function() {
@@ -88,12 +93,12 @@ ccAlwaysBtn.onclick = function() {
 };
 
 ccAlwaysBtn.onmouseover = function() {
-  if (!state.activeTab) {
+  if (!activeTabId) {
     return;
   }
-  let url = new URL(state.activeTab.url);
-  info_text.textContent = `Always change pages on host: ${url.hostname}`;
-  info.style.opacity = 1;
+  // let url = new URL(activeTabId);
+  // info_text.textContent = `Always change pages on host: ${url.hostname}`;
+  // info.style.opacity = 1;
 }
 
 ccAlwaysBtn.onmouseout = function() {
@@ -109,12 +114,12 @@ ccNeverBtn.onclick = function() {
 };
 
 ccNeverBtn.onmouseover = function() {
-  if (!state.activeTab) {
+  if (!activeTabId) {
     return;
   }
-  let url = new URL(state.activeTab.url);
-  info_text.textContent = `Never change pages on host: ${url.hostname}`;
-  info.style.opacity = 1;
+  // let url = new URL(activeTabId.url);
+  // info_text.textContent = `Never change pages on host: ${url.hostname}`;
+  // info.style.opacity = 1;
 }
 
 ccNeverBtn.onmouseout = function() {
@@ -127,6 +132,13 @@ clearBtn.onclick = function() {
   } else {
     browser.runtime.sendMessage({handle_clear_btn: state});
   }
+}
+
+function updateColorButtons() {
+  lightnessSlider.value = state.lightness;
+  lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
+  drawCanvas();
+  setActiveColorButton();
 }
 
 function handleFore() {
@@ -151,14 +163,6 @@ backSwatch.onclick = handleBack;
 backBtn.onclick = handleBack;
 linkSwatch.onclick = handleLink;
 linkBtn.onclick = handleLink;
-
-function updateColorButtons() {
-  lightnessSlider.value = state.lightness;
-  lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
-  drawCanvas();
-  setActiveColorButton();
-  saveState();
-}
 
 function setButtonActive(btn, bActive) {
   var check = " 🗸";
@@ -399,45 +403,83 @@ function updateUi() {
   backSwatch.style.background = state.bg.hsl;
   linkSwatch.style.background = state.li.hsl;
 
-  if (state.url_index > -1) {
-    let bAlways = state.urls[state.url_index].always;
-    setButtonActive(ccAlwaysBtn, bAlways);
-    setButtonActive(ccNeverBtn, !bAlways);
-  } else {
-    setButtonActive(ccAlwaysBtn, false);
-    setButtonActive(ccNeverBtn, false);
-  }
+  // if (state.url_index > -1) {
+  //   let bAlways = state.urls[state.url_index].always;
+  //   setButtonActive(ccAlwaysBtn, bAlways);
+  //   setButtonActive(ccNeverBtn, !bAlways);
+  // } else {
+  //   setButtonActive(ccAlwaysBtn, false);
+  //   setButtonActive(ccNeverBtn, false);
+  // }
 
-  function getCcBtnStateResponse(value) {
-    console.log('getCcBtnStateResponse', value);
-    state.cc_toggle = value;
-    setButtonActive(ccBtn, state.cc_toggle);
-  }
+  // function getCcBtnStateResponse(value) {
+  //   console.log('getCcBtnStateResponse', value);
+  //   state.cc_toggle = value;
+  //   setButtonActive(ccBtn, state.cc_toggle);
+  // }
 
-  if (state.activeTab) {
-    if (bIsChrome) {
-      console.log('init state getCcBtnState');
-      chrome.tabs.sendMessage(state.activeTab.id, {getCcBtnState: true}, getCcBtnStateResponse);
-    } else {
-      browser.tabs.sendMessage(state.activeTab.id, {getCcBtnState: true}, getCcBtnStateResponse);
-    }
-  }
+  // if (state.activeTabId) {
+  //   if (bIsChrome) {
+  //     console.log('init state getCcBtnState');
+  //     chrome.tabs.sendMessage(state.activeTabId.id, {getCcBtnState: true}, getCcBtnStateResponse);
+  //   } else {
+  //     browser.tabs.sendMessage(state.activeTabId.id, {getCcBtnState: true}, getCcBtnStateResponse);
+  //   }
+  // }
 
   updateColorButtons();
 }
 
-function toggleCcInTab(value) {
-  if (state.activeTab) {
+async function toggleChangeColors() {
+  function response(value) {
+    setButtonActive(ccBtn, value);
+  }
+
+  let tabInfo = await readStorage('tabInfo');
+  activeTabId = tabInfo.tabId;
+  console.log('tabInfo', tabInfo);
+
+  if (activeTabId) {
     if (bIsChrome) {
-      console.log('toggleCcInTab');
-      chrome.tabs.sendMessage(state.activeTab.id, {setCc: value});
+      console.log('toggleChangeColors');
+      chrome.tabs.sendMessage(activeTabId, {message: 'toggleChangeColors'}, response);
     } else {
-      browser.tabs.sendMessage(state.activeTab.id, {setCc: value});
+      browser.tabs.sendMessage(activeTabId, {message: 'toggleChangeColors'}, response);
     }
   }
 }
 
-async function saveState() {
+function readStorage(key) {
+  return new Promise((resolve, reject) => {
+    if (bIsChrome) {
+      chrome.storage.local.get(key, function(result) {
+        if (result != undefined) {
+            resolve(result);
+        } else {
+            reject(null);
+        }
+      });
+    } else {
+      browser.storage.local.get(key, function(result) {
+        if (result != undefined) {
+            resolve(result);
+        } else {
+            reject(null);
+        }
+      });
+    }
+  });
+}
+
+function getTabIdFromStorage() {
+  function res(result) {
+    console.log('result', result);
+    activeTabId = result.tabInfo.tabId;
+  }
+  chrome.storage.local.get(['tabInfo'], res);
+}
+
+function saveState() {
   if (bIsChrome) {
     chrome.storage.local.set({state});
   } else {
@@ -448,6 +490,8 @@ async function saveState() {
 function getState() {
   function getStateCallback(res) {
     state = res.state;
+    initState();
+    updateUi();
   }
 
   if (bIsChrome) {
@@ -457,18 +501,20 @@ function getState() {
   }
 }
 
-function notify(msg){
-  if (msg.popup_state) {
-    state = msg.popup_state;
-    updateUi();
+function notify(req){
+  switch (req.message) {
+    case 'changeColors': {
+      console.log('ccreq', req);
+      setButtonActive(ccBtn, req.changeColors)
+    }; break;
+    case 'tabActivated': {
+      getTabIdFromStorage();
+    }; break;
+    default: break;
   }
 }
 
-window.onload = () => {
-  getState();
-  initState();
-  updateUi();
-};
+window.onload = getState;
 
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);

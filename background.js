@@ -1,34 +1,7 @@
-// var bIsChrome = /Chrome/.test(navigator.userAgent);
+var bIsChrome = /Chrome/.test(navigator.userAgent);
 // var class_name = "color-changer-2";
 // var state = {};
 
-// function ChosenColor(hue, saturation, lightness, chosen_id) {
-//   this.hue = hue;
-//   this.saturation = saturation;
-//   this.lightness = lightness;
-//   this.chosen_id = chosen_id;
-//   create_strings(this);
-// }
-
-// function update_chosen_color(color, hue, saturation, lightness, chosen_id) {
-//   color.hue = hue;
-//   color.saturation = saturation;
-//   color.lightness = lightness;
-//   color.chosen_id = chosen_id;
-//   create_strings(color);
-// }
-
-// function create_strings(color) {
-//   color.hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
-//   if (color.lightness >= 50) {
-//     color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
-//   } else {
-//     color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
-//   }
-//   color.hue_hovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
-//   color.hue_visited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
-//   color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
-// }
 
 // function CC_URL (url, bAlways) {
 //   this.url = url;
@@ -172,26 +145,16 @@
 //   }
 // }
 
-// function get_active_tab() {
+// function getActiveTab(response) {
 //   console.log('getting active tab');
-//   function check_tabs(tabs) {
-//     if (tabs[0]) { // Sanity check
-//       state.active_tab = tabs[0];
-//     } else {
-//       state.active_tab = null;
-//     }
-
-//     state.url_index = contains_url();
-
-//     create_context_menu();
-//     update_popup();
-//     // update_content();
+//   function checkTabs(tabs) {
+//     response(tabs[0])
 //   }
 
 //   if (bIsChrome) {
-//     chrome.tabs.query({active: true, currentWindow: true}, check_tabs);
+//     chrome.tabs.query({active: true, currentWindow: true}, checkTabs);
 //   } else {
-//     browser.tabs.query({active: true, currentWindow: true}, check_tabs);
+//     browser.tabs.query({active: true, currentWindow: true}, checkTabs);
 //   }
 // }
 
@@ -389,59 +352,73 @@
 //   update_context_menu_item("change_colors", state.cc_toggle);
 // }
 
-// function notify(msg){
-//   if (msg.popup_request_state) {
-//     console.log('popup requesting state');
-//     get_state();
-//   }
-//   else if (msg.content_request_state) {
-//     get_state();
-//   }
-//   else if (msg.ccBtnState) {
-//     console.log('content returning btn state',msg.ccBtnState);
-//     state.cc_toggle = msg.ccBtnState;
-//     save_state();
-//   }
-//   if (msg.popup_new_state) {
-//     state = msg.popup_new_state;
-//     save_state();
-//     update_content();
-//   }
-//   else if (msg.save_state) {
-//     state = msg.save_state;
-//     save_state();
-//   }
+function notify(request, sender, response) {
+  switch (request.message) {
+    case 'getActiveTab': {
+      getActiveTab(response);
+    } break;
+    default: break;
+  }
 
-//   // buttons
-//   else if (msg.handle_cc_btn) {
-//     state = msg.handle_cc_btn;
-//     handle_cc_btn();
-//   }
-//   else if (msg.handle_cc_always_btn) {
-//     state = msg.handle_cc_always_btn;
-//     handle_cc_always_btn(null);
-//   }
-//   else if (msg.handle_cc_never_btn) {
-//     state = msg.handle_cc_never_btn;
-//     handle_cc_never_btn(null);
-//   }
-//   else if (msg.handle_clear_btn) {
-//     handle_clear_btn();
-//   }
-//   else if (msg.handle_swatch_btn) {
-//     state = msg.handle_swatch_btn;
-//     handle_swatch_btn(msg.swatch);
-//   }
-// }
+  // if (msg.popup_request_state) {
+  //   console.log('popup requesting state');
+  //   get_state();
+  // }
+  // else if (msg.content_request_state) {
+  //   get_state();
+  // }
+  // else if (msg.ccBtnState) {
+  //   console.log('content returning btn state',msg.ccBtnState);
+  //   state.cc_toggle = msg.ccBtnState;
+  //   save_state();
+  // }
+  // if (msg.popup_new_state) {
+  //   state = msg.popup_new_state;
+  //   save_state();
+  //   update_content();
+  // }
+  // else if (msg.save_state) {
+  //   state = msg.save_state;
+  //   save_state();
+  // }
 
-// async function tab_activated() {
-//   get_state();
-// }
+  // // buttons
+  // else if (msg.handle_cc_btn) {
+  //   state = msg.handle_cc_btn;
+  //   handle_cc_btn();
+  // }
+  // else if (msg.handle_cc_always_btn) {
+  //   state = msg.handle_cc_always_btn;
+  //   handle_cc_always_btn(null);
+  // }
+  // else if (msg.handle_cc_never_btn) {
+  //   state = msg.handle_cc_never_btn;
+  //   handle_cc_never_btn(null);
+  // }
+  // else if (msg.handle_clear_btn) {
+  //   handle_clear_btn();
+  // }
+  // else if (msg.handle_swatch_btn) {
+  //   state = msg.handle_swatch_btn;
+  //   handle_swatch_btn(msg.swatch);
+  // }
+}
 
-// if (bIsChrome) {
-//   chrome.runtime.onMessage.addListener(notify);
-//   chrome.tabs.onActivated.addListener(tab_activated);
-// } else {
-//   browser.runtime.onMessage.addListener(notify);
-//   browser.tabs.onActivated.addListener(tab_activated);
-// }
+async function tabActivated(tabInfo) {
+  console.log('tabInfo', tabInfo);
+  if (bIsChrome) {
+    chrome.storage.local.set({tabInfo});
+    chrome.runtime.sendMessage({message: 'tabActivated', tabId: tabInfo.tabId});
+  } else {
+    browser.storage.local.set({tabInfo});
+    browser.runtime.sendMessage({message: 'tabActivated', tabId: tabInfo.tabId});
+  }
+}
+
+if (bIsChrome) {
+  chrome.runtime.onMessage.addListener(notify);
+  chrome.tabs.onActivated.addListener(tabActivated);
+} else {
+  browser.runtime.onMessage.addListener(notify);
+  browser.tabs.onActivated.addListener(tabActivated);
+}
