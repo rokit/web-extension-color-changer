@@ -409,6 +409,16 @@ async function tabActivated(tabInfo) {
     browser.storage.local.set({ tabInfo });
     browser.tabs.sendMessage(tabInfo.tabId, { message: 'updateContent' });
   }
+
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    let currentTabHostname = new URL(tabs[0].url).hostname;
+    console.log('currentTabHostname', currentTabHostname);
+    if (bIsChrome) {
+      chrome.storage.local.set({ currentTabHostname });
+    } else {
+      browser.storage.local.set({ currentTabHostname });
+    }
+  });
 }
 
 if (bIsChrome) {

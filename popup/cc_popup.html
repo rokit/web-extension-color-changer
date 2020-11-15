@@ -12,9 +12,14 @@
 
     <div id="content">
       <div id="scope">
-        <button data-value="Change Colors" id="cc">Change Colors</button>
-        <button data-value="Always" id="cc-always">Always</button>
-        <button data-value="Never" id="cc-never">Never</button>
+        <div id="cc-div" class="checkbox-container">
+          <label for="cc">Change Colors</label>
+          <input type="checkbox" id="cc" name="cc">
+        </div>
+        <div id="always-div" class="checkbox-container">
+          <label for="always">Always</label>
+          <input type="checkbox" id="always" name="always">
+        </div>
       </div>
 
       <canvas></canvas>

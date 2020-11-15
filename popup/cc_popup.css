@@ -21,24 +21,34 @@ body, html {
 
 #scope {
   display: grid;
-  grid-template: [row1-start] "cc cc-always cc-never" auto [row1-end] / auto 1fr 1fr;
+  grid-template: [row1-start] "cc-div always-div" auto [row1-end] / 1fr 1fr;
   grid-gap: 10px;
 }
 
-#scope button {
+#scope label {
   font-size: 1.1rem;
+  align-self: center;
+  margin-bottom: 5px;
 }
 
-#cc {
-  grid-area: cc;
+#scope .checkbox-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
-#cc-always {
-  grid-area: cc-always;
+#scope input {
+  width: 40px;
+  height: 40px;
+  align-self: center;
 }
 
-#cc-never {
-  grid-area: cc-never;
+#cc-div {
+  grid-area: cc-div;
+}
+
+#always-div {
+  grid-area: always-div;
 }
 
 canvas {

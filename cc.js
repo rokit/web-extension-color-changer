@@ -123,19 +123,14 @@ async function updateContent() {
 
 async function notify(req, sender, res) {
   switch (req.message) {
-    case 'toggleChangeColors': {
-      changeColors = !changeColors;
-      res(changeColors);
+    case 'setChangeColors': {
+      changeColors = req.value;
       updateContent();
     }; break;
     case 'getChangeColors': {
       res(changeColors);
     } break;
     case 'updateContent': {
-      updateContent();
-    } break;
-    case 'updateContentViaSwatch': {
-      changeColors = true;
       updateContent();
     } break;
     default: break;
