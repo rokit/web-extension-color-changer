@@ -354,9 +354,6 @@ var bIsChrome = /Chrome/.test(navigator.userAgent);
 
 function notify(request, sender, response) {
   switch (request.message) {
-    case 'getActiveTab': {
-      getActiveTab(response);
-    } break;
     default: break;
   }
 
@@ -405,13 +402,10 @@ function notify(request, sender, response) {
 }
 
 async function tabActivated(tabInfo) {
-  console.log('tabInfo', tabInfo);
   if (bIsChrome) {
     chrome.storage.local.set({tabInfo});
-    chrome.runtime.sendMessage({message: 'tabActivated', tabId: tabInfo.tabId});
   } else {
     browser.storage.local.set({tabInfo});
-    browser.runtime.sendMessage({message: 'tabActivated', tabId: tabInfo.tabId});
   }
 }
 

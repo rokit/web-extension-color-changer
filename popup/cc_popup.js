@@ -435,9 +435,6 @@ async function toggleChangeColors() {
     setButtonActive(ccBtn, value);
   }
 
-  let result = await readStorage('tabInfo');
-  activeTabId = result.tabInfo.tabId;
-
   if (activeTabId) {
     if (bIsChrome) {
       chrome.tabs.sendMessage(activeTabId, {message: 'toggleChangeColors'}, response);
@@ -469,14 +466,6 @@ function readStorage(key) {
   });
 }
 
-function getTabIdFromStorage() {
-  function res(result) {
-    console.log('result', result);
-    activeTabId = result.tabInfo.tabId;
-  }
-  chrome.storage.local.get(['tabInfo'], res);
-}
-
 function saveState() {
   if (bIsChrome) {
     chrome.storage.local.set({state});
@@ -485,12 +474,15 @@ function saveState() {
   }
 }
 
-function getState() {
+async function getState() {
   function getStateCallback(res) {
     state = res.state;
     initState();
     updateUi();
   }
+
+  let result = await readStorage('tabInfo');
+  activeTabId = result.tabInfo.tabId;
 
   if (bIsChrome) {
     chrome.storage.local.get("state", getStateCallback);
@@ -504,9 +496,6 @@ function notify(req){
     case 'changeColors': {
       console.log('ccreq', req);
       setButtonActive(ccBtn, req.changeColors)
-    }; break;
-    case 'tabActivated': {
-      getTabIdFromStorage();
     }; break;
     default: break;
   }
