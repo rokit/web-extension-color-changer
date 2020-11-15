@@ -1,3 +1,2 @@
 check url for chrome://extensions, about:debugging etc
-fix link colors
 fix context menu

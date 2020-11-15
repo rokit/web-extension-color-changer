@@ -21,12 +21,12 @@ function updateChosenColor(color, hue, saturation, lightness, chosenId) {
 function createStrings(color) {
   color.hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
   if (color.lightness >= 50) {
-    color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
+    color.lightnessShift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
   } else {
-    color.lightness_shift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
+    color.lightnessShift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
   }
-  color.hue_hovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
-  color.hue_visited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
+  color.hueHovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
+  color.hueVisited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
   color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
 }
 
