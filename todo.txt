@@ -1,3 +1,3 @@
-fix youtube player div
 check url for chrome://extensions, about:debugging etc
-fix tab not updating content when new color is chosen
+fix link colors
+fix context menu
