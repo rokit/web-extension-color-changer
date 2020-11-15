@@ -1,5 +1,6 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 var activeTabId = null;
+var currentTabHostname = null;
 
 function ChosenColor(hue, saturation, lightness, chosenId) {
   this.hue = hue;
@@ -80,15 +81,24 @@ var foreSwatch = document.getElementById("fore-swatch");
 var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
-ccCheckbox.onclick = () => {
+ccCheckbox.onclick = async () => {
   if (!ccCheckbox.checked && alwaysCheckbox.checked) {
+    currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
+    if (!currentTabHostname) return;
+
+    let index = state.hosts.map(ccHost => ccHost.hostname).indexOf(currentTabHostname);
+    if (index > -1) {
+      // if always not checked and host is present
+      state.hosts.splice(index, 1);
+    }
     alwaysCheckbox.checked = false;
+    saveState();
   }
   setChangeColors(ccCheckbox.checked);
 };
 
 alwaysCheckbox.onclick = async function () {
-  let currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
+  currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
   if (!currentTabHostname) return;
 
   let index = state.hosts.map(ccHost => ccHost.hostname).indexOf(currentTabHostname);
@@ -97,7 +107,7 @@ alwaysCheckbox.onclick = async function () {
     // if checked and host not present
     let host = new CcHost(currentTabHostname, true);
     state.hosts.push(host);
-  } else if (alwaysCheckbox.checked && index > -1) {
+  } else if (!alwaysCheckbox.checked && index > -1) {
     // if not checked and host is present
     state.hosts.splice(index, 1);
   }
@@ -129,6 +139,7 @@ clearBtn.onclick = function () {
   state.li = null;
   state.hosts = null;
   state.activeBtn = null;
+  alwaysCheckbox.checked = false;
   initState();
   saveState();
   updateUi();
@@ -479,26 +490,22 @@ function saveState() {
 }
 
 async function getState() {
-  function getStateCallback(res) {
-    state = res.state;
+  async function getChangeColorsResponse(value) {
+    ccCheckbox.checked = value;
+    currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
+    state = (await getStorageValue('state')).state;
+    let index = state.hosts.map(ccHost => ccHost.hostname).indexOf(currentTabHostname);
+
+    if (index > -1) {
+      ccCheckbox.checked = true;
+      alwaysCheckbox.checked = true;
+    }
+
     initState();
     updateUi();
   }
 
-  function getChangeColorsResponse(value) {
-  }
-
-  let tiResult = await getStorageValue('tabInfo');
-  activeTabId = tiResult.tabInfo.tabId;
-
-  // st await getStorageValue('tabInfo');
-  // let 
-  if (bIsChrome) {
-    chrome.storage.local.get("state", getStateCallback);
-  } else {
-    browser.storage.local.get("state", getStateCallback);
-  }
-
+  activeTabId = (await getStorageValue('tabInfo')).tabInfo.tabId;
   if (activeTabId) {
     if (bIsChrome) {
       chrome.tabs.sendMessage(activeTabId, { message: 'getChangeColors' }, getChangeColorsResponse);
