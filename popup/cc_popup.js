@@ -78,6 +78,7 @@ var linkSwatch = document.getElementById("link-swatch");
 
 ccCheckbox.onclick = async () => {
   if (!ccCheckbox.checked && alwaysCheckbox.checked) {
+    // if we're unchecking change colors, but always is checked, remove the hostname and uncheck always
     currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
     if (!currentTabHostname) return;
 
@@ -347,7 +348,7 @@ canvas.onclick = function (e) {
 
   saveState();
   updateUi();
-  updateContentViaSwatch();
+  setChangeColorsViaSwatch();
   // updateContextMenuItem("change_colors", state.cc_toggle);
 }
 
@@ -386,7 +387,7 @@ function updateContent() {
   }
 }
 
-function updateContentViaSwatch() {
+function setChangeColorsViaSwatch() {
   if (activeTabId) {
     ccCheckbox.checked = true;
     if (bIsChrome) {
@@ -398,7 +399,6 @@ function updateContentViaSwatch() {
 }
 
 function initState() {
-  console.log('init state called');
   if (!state.fg) state.fg = new ChosenColor(0, 0, 80, "zero");
   if (!state.bg) state.bg = new ChosenColor(0, 0, 25, "zero");
   if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
@@ -419,25 +419,6 @@ function updateUi() {
   foreSwatch.style.background = state.fg.hsl;
   backSwatch.style.background = state.bg.hsl;
   linkSwatch.style.background = state.li.hsl;
-
-  // if (state.url_index > -1) {
-  //   let bAlways = state.urls[state.url_index].always;
-  // } else {
-  // }
-
-  // function getCcBtnStateResponse(value) {
-  //   console.log('getCcBtnStateResponse', value);
-  //   state.cc_toggle = value;
-  // }
-
-  // if (state.activeTabId) {
-  //   if (bIsChrome) {
-  //     console.log('init state getCcBtnState');
-  //     chrome.tabs.sendMessage(state.activeTabId.id, {getCcBtnState: true}, getCcBtnStateResponse);
-  //   } else {
-  //     browser.tabs.sendMessage(state.activeTabId.id, {getCcBtnState: true}, getCcBtnStateResponse);
-  //   }
-  // }
 
   // also calls drawCanvas
   updateColorButtons();
