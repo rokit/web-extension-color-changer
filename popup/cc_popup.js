@@ -48,6 +48,7 @@ var back_swatch = document.getElementById("back_swatch");
 var link_swatch = document.getElementById("link_swatch");
 
 cc_btn.onclick = function() {
+  // setCcInTab(!state.cc_toggle);
   if (bIsChrome) {
     chrome.runtime.sendMessage({handle_cc_btn: state});
   } else {
@@ -159,10 +160,9 @@ function set_active_swatch_button() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Canvas
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-//-------------------------------------------------------------------------------------------------Canvas
 var canvas = document.querySelector("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = document.querySelector("canvas").offsetWidth;
@@ -357,10 +357,35 @@ async function update_ui() {
     set_button_active(cc_always_btn, false);
     set_button_active(cc_never_btn, false);
   }
-  set_button_active(cc_btn, state.cc_toggle);
+
+  function getCcBtnStateResponse(value) {
+    console.log('getCcBtnStateResponse', value);
+    state.cc_toggle = value;
+    set_button_active(cc_btn, state.cc_toggle);
+  }
+
+  if (state.active_tab) {
+    if (bIsChrome) {
+      console.log('init state getCcBtnState');
+      chrome.tabs.sendMessage(state.active_tab.id, {getCcBtnState: true}, getCcBtnStateResponse);
+    } else {
+      browser.tabs.sendMessage(state.active_tab.id, {getCcBtnState: true}, getCcBtnStateResponse);
+    }
+  }
 
   update_color_buttons();
 }
+
+// function setCcInTab(value) {
+//   if (state.active_tab) {
+//     if (bIsChrome) {
+//       console.log('setCcInTab');
+//       chrome.tabs.sendMessage(state.active_tab.id, {setCc: value});
+//     } else {
+//       browser.tabs.sendMessage(state.active_tab.id, {setCc: value});
+//     }
+//   }
+// }
 
 async function save_state() {
   if (bIsChrome) {

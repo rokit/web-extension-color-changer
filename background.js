@@ -142,6 +142,8 @@ function compare_urls(aa, bb) {
 }
 
 async function save_state() {
+  console.log('save state called');
+  console.log('state.cc_toggle', state.cc_toggle);
   if (bIsChrome) {
     chrome.storage.local.set({state});
   } else {
@@ -150,6 +152,7 @@ async function save_state() {
 }
 
 function update_popup() {
+  console.log('updating popup');
   if (bIsChrome) {
     chrome.runtime.sendMessage({popup_state: state});
   } else {
@@ -170,6 +173,7 @@ function update_content() {
 }
 
 function get_active_tab() {
+  console.log('getting active tab');
   function check_tabs(tabs) {
     if (tabs[0]) { // Sanity check
       state.active_tab = tabs[0];
@@ -181,7 +185,6 @@ function get_active_tab() {
 
     create_context_menu();
     update_popup();
-    update_content();
   }
 
   if (bIsChrome) {
@@ -191,7 +194,8 @@ function get_active_tab() {
   }
 }
 
-function init_state() {
+async function init_state() {
+  console.log('init state called');
   if (!state.fg) state.fg = new ChosenColor(0,  0, 80,  "zero");
   if (!state.bg) state.bg = new ChosenColor(0,  0, 25,  "zero");
   if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
@@ -226,12 +230,13 @@ function init_state() {
   update_css();
 }
 
-function get_state() {	
-  function check_result(res) {
+async function get_state() {
+  console.log('get state called');
+  async function check_result(res) {
     if (res.state) {
       state = res.state;
     }
-    init_state();
+    await init_state();
     get_active_tab();
   }
 
@@ -299,7 +304,7 @@ function update_context_menu_item(item, checked) {
 
 function handle_cc_btn() {
   state.cc_toggle = !state.cc_toggle;
-  
+
   save_state();
   update_content();
   update_popup();
@@ -385,10 +390,16 @@ function handle_swatch_btn(swatch) {
 
 function notify(msg){
   if (msg.popup_request_state) {
+    console.log('popup requesting state');
     get_state();
   }
   else if (msg.content_request_state) {
     get_state();
+  }
+  else if (msg.ccBtnState) {
+    console.log('content returning btn state',msg.ccBtnState);
+    state.cc_toggle = msg.ccBtnState;
+    save_state();
   }
   if (msg.popup_new_state) {
     state = msg.popup_new_state;
