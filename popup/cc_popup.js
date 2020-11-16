@@ -78,7 +78,7 @@ var linkSwatch = document.getElementById("link-swatch");
 
 ccCheckbox.onclick = async () => {
   if (!ccCheckbox.checked && alwaysCheckbox.checked) {
-    // if we're unchecking change colors, but always is checked, remove the hostname and uncheck always
+    // if we're unchecking Change Colors, but Always is checked, remove the hostname and uncheck Always
     currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
     if (!currentTabHostname) return;
 
@@ -129,11 +129,7 @@ alwaysCheckbox.onmouseout = function () {
 }
 
 clearBtn.onclick = function () {
-  state.fg = null
-  state.bg = null
-  state.li = null;
-  state.hosts = null;
-  state.activeBtn = null;
+  state = null;
   alwaysCheckbox.checked = false;
   initState();
   saveState();
@@ -399,6 +395,7 @@ function setChangeColorsViaSwatch() {
 }
 
 function initState() {
+  if (!state) state = {};
   if (!state.fg) state.fg = new ChosenColor(0, 0, 80, "zero");
   if (!state.bg) state.bg = new ChosenColor(0, 0, 25, "zero");
   if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
@@ -413,12 +410,19 @@ function initState() {
     case "back": state.lightness = state.bg.lightness; break;
     case "link": state.lightness = state.li.lightness; break;
   }
+  saveState();
 }
 
 function updateUi() {
   foreSwatch.style.background = state.fg.hsl;
   backSwatch.style.background = state.bg.hsl;
   linkSwatch.style.background = state.li.hsl;
+
+  let index = state.hosts.indexOf(currentTabHostname);
+  if (index > -1) {
+    ccCheckbox.checked = true;
+    alwaysCheckbox.checked = true;
+  }
 
   // also calls drawCanvas
   updateColorButtons();
@@ -469,12 +473,6 @@ async function getState() {
     ccCheckbox.checked = value;
     currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
     state = (await getStorageValue('state')).state;
-    let index = state.hosts.indexOf(currentTabHostname);
-
-    if (index > -1) {
-      ccCheckbox.checked = true;
-      alwaysCheckbox.checked = true;
-    }
 
     initState();
     updateUi();
@@ -490,18 +488,4 @@ async function getState() {
   }
 }
 
-function notify(req) {
-  switch (req.message) {
-    case 'changeColors': {
-    }; break;
-    default: break;
-  }
-}
-
 window.onload = getState;
-
-if (bIsChrome) {
-  chrome.runtime.onMessage.addListener(notify);
-} else {
-  browser.runtime.onMessage.addListener(notify);
-}

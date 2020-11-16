@@ -123,6 +123,7 @@ async function notify(req, sender, res) {
     case 'setChangeColors': {
       changeColors = req.value;
       updateContent();
+      sendMessage('contextMenu', changeColors);
     }; break;
     case 'getChangeColors': {
       res(changeColors);
@@ -143,6 +144,15 @@ async function getState() {
     // if host is in list
     changeColors = true;
     updateContent();
+  }
+  sendMessage('contextMenu', changeColors);
+}
+
+function sendMessage(message, value) {
+  if (bIsChrome) {
+    chrome.runtime.sendMessage({ message, value });
+  } else {
+    browser.runtime.sendMessage({ message, value });
   }
 }
 
