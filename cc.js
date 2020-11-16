@@ -123,7 +123,7 @@ async function notify(req, sender, res) {
     case 'setChangeColors': {
       changeColors = req.value;
       updateContent();
-      sendMessage('contextMenu', changeColors);
+      sendMessage('contextMenu', {changeColors, state});
     }; break;
     case 'getChangeColors': {
       res(changeColors);
@@ -145,14 +145,14 @@ async function getState() {
     changeColors = true;
     updateContent();
   }
-  sendMessage('contextMenu', changeColors);
+  sendMessage('contextMenu', {changeColors, state});
 }
 
-function sendMessage(message, value) {
+function sendMessage(message, payload) {
   if (bIsChrome) {
-    chrome.runtime.sendMessage({ message, value });
+    chrome.runtime.sendMessage({ message, payload });
   } else {
-    browser.runtime.sendMessage({ message, value });
+    browser.runtime.sendMessage({ message, payload });
   }
 }
 

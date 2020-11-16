@@ -77,14 +77,14 @@ var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
 ccCheckbox.onclick = async () => {
-  if (!ccCheckbox.checked && alwaysCheckbox.checked) {
-    // if we're unchecking Change Colors, but Always is checked, remove the hostname and uncheck Always
+  if (!ccCheckbox.checked) {
+    // if we're unchecking Change Colors, remove the hostname if it exists
     currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
     if (!currentTabHostname) return;
 
     let index = state.hosts.indexOf(currentTabHostname);
     if (index > -1) {
-      // if always not checked and host is present
+      // if host is present
       state.hosts.splice(index, 1);
     }
     alwaysCheckbox.checked = false;

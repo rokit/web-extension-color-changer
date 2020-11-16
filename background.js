@@ -14,6 +14,14 @@ async function setChangeColors(value) {
   }
 }
 
+function saveState() {
+  if (bIsChrome) {
+    chrome.storage.local.set({ state });
+  } else {
+    browser.storage.local.set({ state });
+  }
+}
+
 function createContextMenu() {
   let ctxColorChanger = {
     id: "changeColors",
@@ -22,6 +30,15 @@ function createContextMenu() {
     type: "checkbox",
     checked: changeColors,
     onclick: async (evt) => {
+      if (!evt.checked) {
+        // if we're unchecking Change Colors, remove the hostname if it exists
+        let index = state.hosts.indexOf(currentTabHostname);
+        if (index > -1) {
+          // if host is present
+          state.hosts.splice(index, 1);
+        }
+        saveState();
+      }
       setChangeColors(evt.checked);
     },
   };
@@ -63,7 +80,8 @@ async function tabActivated(tabInfo) {
 async function notify(req, sender, res) {
   switch (req.message) {
     case 'contextMenu': {
-      changeColors = req.value;
+      changeColors = req.payload.changeColors;
+      state = req.payload.state;
       createContextMenu();
     }; break;
     default: break;
