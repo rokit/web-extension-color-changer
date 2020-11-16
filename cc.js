@@ -1,18 +1,20 @@
-var bIsChrome = /Chrome/.test(navigator.userAgent);
-var className = "color-changer-2";
+(async function () {
 
-var ccStyle = document.createElement('style');
-ccStyle.id = "color-changer-style";
+  var bIsChrome = /Chrome/.test(navigator.userAgent);
+  var className = "color-changer-2";
 
-var observer = new MutationObserver(classListChanged);
-var observerConfig = { attributes: true, attributeFilter: ["class"] };
+  var ccStyle = document.createElement('style');
+  ccStyle.id = "color-changer-style";
 
-var changeColors = false;
-var css = "";
-var state = null;
+  var observer = new MutationObserver(classListChanged);
+  var observerConfig = { attributes: true, attributeFilter: ["class"] };
 
-function updateCss() {
-  css = `
+  var changeColors = false;
+  var css = "";
+  var state = null;
+
+  function updateCss() {
+    css = `
   .${className} {
     background-color: ${state.bg.hsl} !important;
   }
@@ -54,115 +56,119 @@ function updateCss() {
     color: ${state.li.hueVisited} !important;
   }
 `;
-}
-
-function classListChanged(mutationList, obs) {
-  addClass();
-}
-
-function addClass() {
-  let html = document.documentElement;
-  if (!html) return;
-
-  if (!html.classList.contains(className)) {
-    html.classList.add(className);
   }
 
-  observer.observe(html, observerConfig);
-}
-
-function removeClass() {
-  let html = document.getElementsByTagName("HTML")[0];
-  if (!html) return;
-
-  html.classList.remove(className);
-  observer.disconnect();
-}
-
-function getStorageValue(key) {
-  return new Promise((resolve, reject) => {
-    if (bIsChrome) {
-      chrome.storage.local.get(key, function (result) {
-        if (result != undefined) {
-          resolve(result);
-        } else {
-          reject(null);
-        }
-      });
-    } else {
-      browser.storage.local.get(key, function (result) {
-        if (result != undefined) {
-          resolve(result);
-        } else {
-          reject(null);
-        }
-      });
-    }
-  });
-}
-
-async function updateContent() {
-  if (changeColors) {
-    state = (await getStorageValue('state')).state;
-    updateCss();
-
-    ccStyle.textContent = css;
-
-    if (!document.getElementById("color-changer-style")) {
-      document.head.appendChild(ccStyle);
-    }
-
+  function classListChanged(mutationList, obs) {
     addClass();
-  } else {
-    removeClass();
   }
-}
 
-async function notify(req, sender, res) {
-  switch (req.message) {
-    case 'setChangeColors': {
-      changeColors = req.value;
-      getState();
-      updateContent();
-      sendMessage('contextMenu', {changeColors, state});
-    }; break;
-    case 'getChangeColors': {
-      res(changeColors);
-    } break;
-    case 'updateContent': {
-      updateContent();
-    } break;
-    default: break;
+  function addClass() {
+    let html = document.documentElement;
+    if (!html) return;
+
+    if (!html.classList.contains(className)) {
+      html.classList.add(className);
+    }
+
+    observer.observe(html, observerConfig);
   }
-}
 
-async function getState() {
-  state = (await getStorageValue('state')).state;
-  let thisLocationHostname = new URL(window.location.href).hostname;
-  let index = state.hosts.indexOf(thisLocationHostname);
+  function removeClass() {
+    let html = document.getElementsByTagName("HTML")[0];
+    if (!html) return;
 
-  if (index > -1) {
-    // if host is in list
-    changeColors = true;
-    updateContent();
+    html.classList.remove(className);
+    observer.disconnect();
   }
-  sendMessage('contextMenu', {changeColors, state});
-}
 
-function sendMessage(message, payload) {
+  function getStorageValue(key) {
+    return new Promise((resolve, reject) => {
+      if (bIsChrome) {
+        chrome.storage.local.get(key, function (result) {
+          if (result != undefined) {
+            resolve(result);
+          } else {
+            reject(null);
+          }
+        });
+      } else {
+        browser.storage.local.get(key, function (result) {
+          if (result != undefined) {
+            resolve(result);
+          } else {
+            reject(null);
+          }
+        });
+      }
+    });
+  }
+
+  async function updateContent() {
+    if (changeColors) {
+      state = (await getStorageValue('state')).state;
+      updateCss();
+
+      ccStyle.textContent = css;
+
+      if (!document.getElementById("color-changer-style")) {
+        document.head.appendChild(ccStyle);
+      }
+
+      addClass();
+    } else {
+      removeClass();
+    }
+  }
+
+  async function notify(req, sender, res) {
+    switch (req.message) {
+      case 'setChangeColors': {
+        changeColors = req.value;
+        console.log('getting state');
+        getState();
+        
+        updateContent();
+        sendRuntimeMessage('contextMenu', { changeColors, state });
+      }; break;
+      case 'getChangeColors': {
+        res(changeColors);
+      } break;
+      case 'updateContent': {
+        updateContent();
+      } break;
+      default: break;
+    }
+  }
+
+  async function getState() {
+    state = (await getStorageValue('state')).state;
+    let thisLocationHostname = new URL(window.location.href).hostname;
+    let index = state.hosts.indexOf(thisLocationHostname);
+
+    if (index > -1) {
+      // if host is in list
+      changeColors = true;
+    }
+
+    sendRuntimeMessage('contextMenu', { changeColors, state });
+  }
+
+  function sendRuntimeMessage(message, payload) {
+    if (bIsChrome) {
+      chrome.runtime.sendMessage({ message, payload });
+    } else {
+      browser.runtime.sendMessage({ message, payload });
+    }
+  }
+
   if (bIsChrome) {
-    chrome.runtime.sendMessage({ message, payload });
+    chrome.runtime.onMessage.addListener(notify);
   } else {
-    browser.runtime.sendMessage({ message, payload });
+    browser.runtime.onMessage.addListener(notify);
   }
-}
 
-if (bIsChrome) {
-  chrome.runtime.onMessage.addListener(notify);
-} else {
-  browser.runtime.onMessage.addListener(notify);
-}
+  await getState();
+  updateContent();
 
-getState();
-
-document.onscroll = updateContent();
+  document.onscroll = updateContent();
+})();
