@@ -76,45 +76,15 @@ var foreSwatch = document.getElementById("fore-swatch");
 var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
-ccCheckbox.onclick = async () => {
-  if (!ccCheckbox.checked) {
-    // if we're unchecking Change Colors, remove the hostname if it exists
-    currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
-    if (!currentTabHostname) return;
-
-    let index = state.hosts.indexOf(currentTabHostname);
-    if (index > -1) {
-      // if host is present
-      state.hosts.splice(index, 1);
-    }
-    alwaysCheckbox.checked = false;
-    saveState();
-  }
-  setChangeColors(ccCheckbox.checked);
+ccCheckbox.onclick = () => {
+  sendRuntimeMessage('onClickCc', {checked: ccCheckbox.checked}, (alwaysChecked) => {
+    alwaysCheckbox.checked = alwaysChecked;
+  });
 };
 
-alwaysCheckbox.onclick = async function () {
-  currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
-  if (!currentTabHostname) return;
-
-  let index = state.hosts.indexOf(currentTabHostname);
-
-  if (alwaysCheckbox.checked && index === -1) {
-    // if checked and host not present
-    state.hosts.push(currentTabHostname);
-  } else if (!alwaysCheckbox.checked && index > -1) {
-    // if not checked and host is present
-    state.hosts.splice(index, 1);
-  }
-
-  saveState(() => {
-    if (alwaysCheckbox.checked) {
-      ccCheckbox.checked = true;
-      setChangeColors(true);
-    } else {
-      // triggers a state update in content script, which trigger rebuild of context menu
-      setChangeColors(ccCheckbox.checked);
-    }
+alwaysCheckbox.onclick = () => {
+  sendRuntimeMessage('onClickAlways', {checked: alwaysCheckbox.checked, ccChecked: ccCheckbox.checked}, ccChecked => {
+    ccCheckbox.checked = ccChecked;
   });
 };
 
@@ -488,6 +458,14 @@ async function getState() {
     } else {
       browser.tabs.sendMessage(activeTabId, { message: 'getChangeColors' }, getChangeColorsResponse);
     }
+  }
+}
+
+function sendRuntimeMessage(message, payload, response) {
+  if (bIsChrome) {
+    chrome.runtime.sendMessage({ message, payload }, response);
+  } else {
+    browser.runtime.sendMessage({ message, payload }, response);
   }
 }
 
