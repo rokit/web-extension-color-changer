@@ -122,6 +122,7 @@ async function notify(req, sender, res) {
   switch (req.message) {
     case 'setChangeColors': {
       changeColors = req.value;
+      getState();
       updateContent();
       sendMessage('contextMenu', {changeColors, state});
     }; break;

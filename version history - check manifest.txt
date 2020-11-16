@@ -1,4 +1,6 @@
-2.0.4
+3.0.0
+Change Colors now only applies to the current tab instead of all tabs
+Buttons replaced with checkboxes in the UI.
 Updated description
 Removed donate button
 

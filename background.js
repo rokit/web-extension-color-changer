@@ -14,41 +14,72 @@ async function setChangeColors(value) {
   }
 }
 
-function saveState() {
+function saveState(response) {
   if (bIsChrome) {
-    chrome.storage.local.set({ state });
+    chrome.storage.local.set({ state }, response);
   } else {
-    browser.storage.local.set({ state });
+    browser.storage.local.set({ state }, response);
   }
 }
 
 function createContextMenu() {
+  let index = state.hosts.indexOf(currentTabHostname);
+  let always = false;
+  if (index > -1) {
+    always = true;
+  }
+  console.log('always', always);
   let ctxColorChanger = {
     id: "changeColors",
     title: "Change Colors",
     contexts: ["all"],
     type: "checkbox",
     checked: changeColors,
-    onclick: async (evt) => {
+    onclick: evt => {
       if (!evt.checked) {
         // if we're unchecking Change Colors, remove the hostname if it exists
-        let index = state.hosts.indexOf(currentTabHostname);
-        if (index > -1) {
-          // if host is present
+        if (always) {
           state.hosts.splice(index, 1);
         }
-        saveState();
       }
-      setChangeColors(evt.checked);
+      saveState(() => setChangeColors(evt.checked));
+    },
+  };
+
+  let ctxAlways = {
+    id: "always",
+    title: "Always",
+    contexts: ["all"],
+    type: "checkbox",
+    checked: always,
+    onclick: evt => {
+      if (evt.checked && index === -1) {
+        // if checked and host not present
+        state.hosts.push(currentTabHostname);
+      } else if (!evt.checked && index > -1) {
+        // if not checked and host is present
+        state.hosts.splice(index, 1);
+      }
+
+      saveState(() => {
+        if (evt.checked) {
+          changeColors = true;
+          setChangeColors(true);
+        } else {
+          setChangeColors(changeColors);
+        }
+      });
     },
   };
 
   if (bIsChrome) {
     chrome.contextMenus.removeAll();
     chrome.contextMenus.create(ctxColorChanger);
+    chrome.contextMenus.create(ctxAlways);
   } else {
     browser.contextMenus.removeAll();
     browser.contextMenus.create(ctxColorChanger);
+    browser.contextMenus.create(ctxAlways);
   }
 }
 

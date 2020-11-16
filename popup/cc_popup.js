@@ -107,12 +107,15 @@ alwaysCheckbox.onclick = async function () {
     state.hosts.splice(index, 1);
   }
 
-  if (alwaysCheckbox.checked && !ccCheckbox.checked) {
-    ccCheckbox.checked = true;
-    setChangeColors(true);
-  }
-
-  saveState();
+  saveState(() => {
+    if (alwaysCheckbox.checked) {
+      ccCheckbox.checked = true;
+      setChangeColors(true);
+    } else {
+      // triggers a state update in content script, which trigger rebuild of context menu
+      setChangeColors(ccCheckbox.checked);
+    }
+  });
 };
 
 alwaysCheckbox.onmouseover = function () {
@@ -460,11 +463,11 @@ function getStorageValue(key) {
   });
 }
 
-function saveState() {
+function saveState(response) {
   if (bIsChrome) {
-    chrome.storage.local.set({ state });
+    chrome.storage.local.set({ state }, response);
   } else {
-    browser.storage.local.set({ state });
+    browser.storage.local.set({ state }, response);
   }
 }
 
