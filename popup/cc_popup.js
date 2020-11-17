@@ -1,34 +1,5 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
-var activeTabId = null;
-var currentTabHostname = null;
-
-function ChosenColor(hue, saturation, lightness, chosenId) {
-  this.hue = hue;
-  this.saturation = saturation;
-  this.lightness = lightness;
-  this.chosenId = chosenId;
-  createStrings(this);
-}
-
-function updateChosenColor(color, hue, saturation, lightness, chosenId) {
-  color.hue = hue;
-  color.saturation = saturation;
-  color.lightness = lightness;
-  color.chosenId = chosenId;
-  createStrings(color);
-}
-
-function createStrings(color) {
-  color.hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
-  if (color.lightness >= 50) {
-    color.lightnessShift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
-  } else {
-    color.lightnessShift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
-  }
-  color.hueHovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
-  color.hueVisited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
-  color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
-}
+var state = null;
 
 function Swatch(x, y, id, radius, hue, saturation, lightness) {
   this.x = x;
@@ -49,7 +20,11 @@ function updateSwatch(swatch, hue, saturation, lightness) {
   swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-var state = {};
+function onSwatchClick() {
+  
+}
+
+// var state = {};
 
 var lightnessSlider = document.getElementById("lightness");
 var lightnessValue = document.getElementById("lightness-value");
@@ -64,7 +39,7 @@ lightnessSlider.oninput = function () {
 var info = document.getElementById("info");
 var infoText = document.querySelector("#info p");
 
-var ccCheckbox = document.getElementById("cc");
+var changeColorsCheckbox = document.getElementById("cc");
 var alwaysCheckbox = document.getElementById("always");
 
 var foreBtn = document.getElementById("fore");
@@ -76,39 +51,39 @@ var foreSwatch = document.getElementById("fore-swatch");
 var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
-ccCheckbox.onclick = () => {
-  sendRuntimeMessage('onClickCc', {checked: ccCheckbox.checked}, (alwaysChecked) => {
-    alwaysCheckbox.checked = alwaysChecked;
-  });
-};
+// changeColorsCheckbox.onclick = () => {
+//   sendRuntimeMessage('onClickCc', {checked: changeColorsCheckbox.checked}, (alwaysChecked) => {
+//     alwaysCheckbox.checked = alwaysChecked;
+//   });
+// };
 
-alwaysCheckbox.onclick = () => {
-  sendRuntimeMessage('onClickAlways', {checked: alwaysCheckbox.checked, ccChecked: ccCheckbox.checked}, ccChecked => {
-    ccCheckbox.checked = ccChecked;
-  });
-};
+// alwaysCheckbox.onclick = () => {
+//   sendRuntimeMessage('onClickAlways', {checked: alwaysCheckbox.checked, ccChecked: changeColorsCheckbox.checked}, ccChecked => {
+//     changeColorsCheckbox.checked = ccChecked;
+//   });
+// };
 
-alwaysCheckbox.onmouseover = function () {
-  if (!activeTabId) {
-    return;
-  }
-  // let url = new URL(activeTabId);
-  // infoText.textContent = `Always change pages on host: ${url.hostname}`;
-  // info.style.opacity = 1;
-}
+// alwaysCheckbox.onmouseover = function () {
+//   if (!activeTabId) {
+//     return;
+//   }
+//   // let url = new URL(activeTabId);
+//   // infoText.textContent = `Always change pages on host: ${url.hostname}`;
+//   // info.style.opacity = 1;
+// }
 
-alwaysCheckbox.onmouseout = function () {
-  info.style.opacity = 0;
-}
+// alwaysCheckbox.onmouseout = function () {
+//   info.style.opacity = 0;
+// }
 
-clearBtn.onclick = function () {
-  state = null;
-  alwaysCheckbox.checked = false;
-  initState();
-  saveState();
-  updateUi();
-  updateContent();
-}
+// clearBtn.onclick = function () {
+//   state = null;
+//   alwaysCheckbox.checked = false;
+//   initState();
+//   saveState();
+//   updateUi();
+//   updateContent();
+// }
 
 function updateColorButtons() {
   lightnessSlider.value = state.lightness;
@@ -117,28 +92,28 @@ function updateColorButtons() {
   setActiveColorButton();
 }
 
-function handleFore() {
-  state.activeBtn = "fore";
-  state.lightness = state.fg.lightness;
-  updateColorButtons();
-}
-function handleBack() {
-  state.activeBtn = "back";
-  state.lightness = state.bg.lightness;
-  updateColorButtons();
-}
-function handleLink() {
-  state.activeBtn = "link";
-  state.lightness = state.li.lightness;
-  updateColorButtons();
-}
+// function handleFore() {
+//   state.activeBtn = "fore";
+//   state.lightness = state.fg.lightness;
+//   updateColorButtons();
+// }
+// function handleBack() {
+//   state.activeBtn = "back";
+//   state.lightness = state.bg.lightness;
+//   updateColorButtons();
+// }
+// function handleLink() {
+//   state.activeBtn = "link";
+//   state.lightness = state.li.lightness;
+//   updateColorButtons();
+// }
 
-foreSwatch.onclick = handleFore;
-foreBtn.onclick = handleFore;
-backSwatch.onclick = handleBack;
-backBtn.onclick = handleBack;
-linkSwatch.onclick = handleLink;
-linkBtn.onclick = handleLink;
+// foreSwatch.onclick = handleFore;
+// foreBtn.onclick = handleFore;
+// backSwatch.onclick = handleBack;
+// backBtn.onclick = handleBack;
+// linkSwatch.onclick = handleLink;
+// linkBtn.onclick = handleLink;
 
 function setActiveColorButton() {
   foreBtn.classList.remove("active-btn");
@@ -301,24 +276,7 @@ function checkCollision(swatches, x, y) {
 
 canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
-
-  switch (state.activeBtn) {
-    case "fore": {
-      updateChosenColor(state.fg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
-    } break;
-    case "back": {
-      updateChosenColor(state.bg, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
-    } break;
-    case "link": {
-      updateChosenColor(state.li, swatch.hue, swatch.saturation, swatch.lightness, swatch.id);
-    } break;
-    default: break;
-  }
-
-  saveState();
-  updateUi();
-  setChangeColorsViaSwatch();
-  // updateContextMenuItem("change_colors", state.cc_toggle);
+  sendRuntimeMessage('updateChoseColor', swatch);
 }
 
 canvas.onmouseout = function () {
@@ -346,119 +304,66 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function updateContent() {
-  if (activeTabId) {
-    if (bIsChrome) {
-      chrome.tabs.sendMessage(activeTabId, { message: 'updateContent' });
-    } else {
-      browser.tabs.sendMessage(activeTabId, { message: 'updateContent' });
-    }
-  }
-}
+// function updateContent() {
+//   if (activeTabId) {
+//     if (bIsChrome) {
+//       chrome.tabs.sendMessage(activeTabId, { message: 'updateContent' });
+//     } else {
+//       browser.tabs.sendMessage(activeTabId, { message: 'updateContent' });
+//     }
+//   }
+// }
 
-function setChangeColorsViaSwatch() {
-  if (activeTabId) {
-    ccCheckbox.checked = true;
-    if (bIsChrome) {
-      chrome.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value: true });
-    } else {
-      browser.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value: true });
-    }
-  }
-}
+// function setChangeColorsViaSwatch() {
+//   if (activeTabId) {
+//     changeColorsCheckbox.checked = true;
+//     if (bIsChrome) {
+//       chrome.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value: true });
+//     } else {
+//       browser.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value: true });
+//     }
+//   }
+// }
 
-function initState() {
-  if (!state) state = {};
-  if (!state.fg) state.fg = new ChosenColor(0, 0, 80, "zero");
-  if (!state.bg) state.bg = new ChosenColor(0, 0, 25, "zero");
-  if (!state.li) state.li = new ChosenColor(68, 80, 80, "2-6");
-
-  if (!state.hosts) {
-    state.hosts = [];
-  }
-
-  if (!state.activeBtn) state.activeBtn = "fore";
-  switch (state.activeBtn) {
-    case "fore": state.lightness = state.fg.lightness; break;
-    case "back": state.lightness = state.bg.lightness; break;
-    case "link": state.lightness = state.li.lightness; break;
-  }
-  saveState();
-}
-
-function updateUi() {
-  foreSwatch.style.background = state.fg.hsl;
-  backSwatch.style.background = state.bg.hsl;
-  linkSwatch.style.background = state.li.hsl;
-
-  let index = state.hosts.indexOf(currentTabHostname);
-  if (index > -1) {
-    ccCheckbox.checked = true;
-    alwaysCheckbox.checked = true;
-  }
-
-  // also calls drawCanvas
-  updateColorButtons();
-}
-
-async function setChangeColors(value) {
-  if (activeTabId) {
-    if (bIsChrome) {
-      chrome.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
-    } else {
-      browser.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
-    }
-  }
-}
-
-function getStorageValue(key) {
-  return new Promise((resolve, reject) => {
-    if (bIsChrome) {
-      chrome.storage.local.get(key, function (result) {
-        if (result != undefined) {
-          resolve(result);
-        } else {
-          reject(null);
-        }
-      });
-    } else {
-      browser.storage.local.get(key, function (result) {
-        if (result != undefined) {
-          resolve(result);
-        } else {
-          reject(null);
-        }
-      });
-    }
-  });
-}
+// async function setChangeColors(value) {
+//   if (activeTabId) {
+//     if (bIsChrome) {
+//       chrome.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
+//     } else {
+//       browser.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
+//     }
+//   }
+// }
 
 function saveState(response) {
   if (bIsChrome) {
-    chrome.storage.local.set({ state }, response);
+    chrome.storage.local.set({ ...state }, response);
   } else {
-    browser.storage.local.set({ state }, response);
+    browser.storage.local.set({ ...state }, response);
   }
 }
 
-async function getState() {
-  async function getChangeColorsResponse(value) {
-    ccCheckbox.checked = value;
-    currentTabHostname = (await getStorageValue('currentTabHostname')).currentTabHostname;
-    state = (await getStorageValue('state')).state;
-
-    initState();
-    updateUi();
+function getStorage(obj, response) {
+  if (bIsChrome) {
+    chrome.storage.local.get(obj, response);
+  } else {
+    browser.storage.local.get(obj, response);
   }
+}
 
-  activeTabId = (await getStorageValue('tabInfo')).tabInfo.tabId;
-  if (activeTabId) {
-    if (bIsChrome) {
-      chrome.tabs.sendMessage(activeTabId, { message: 'getChangeColors' }, getChangeColorsResponse);
-    } else {
-      browser.tabs.sendMessage(activeTabId, { message: 'getChangeColors' }, getChangeColorsResponse);
-    }
-  }
+function updateUi() {
+  getStorage(null, theState => {
+    state = theState;
+    foreSwatch.style.background = state.fg.hsl;
+    backSwatch.style.background = state.bg.hsl;
+    linkSwatch.style.background = state.li.hsl;
+
+    changeColorsCheckbox.checked = state.changeColors;
+    alwaysCheckbox.checked = state.always;
+  
+    // also calls drawCanvas
+    updateColorButtons();
+  });
 }
 
 function sendRuntimeMessage(message, payload, response) {
@@ -469,4 +374,21 @@ function sendRuntimeMessage(message, payload, response) {
   }
 }
 
-window.onload = getState;
+// async function notify(req, sender, res) {
+//   switch (req.message) {
+//     // case 'changeColors': {
+//     //   console.log('req.payload', req.payload);
+//     //   // createContextMenu(req.payload);
+//     // }; break;
+
+//     default: break;
+//   }
+// }
+
+if (bIsChrome) {
+  chrome.storage.onChanged.addListener(updateUi);
+} else {
+  browser.storage.onChanged.addListener(updateUi);
+}
+
+window.onload = updateUi;
