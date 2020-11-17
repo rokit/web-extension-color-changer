@@ -240,6 +240,7 @@ function sendTabMessage(activeTabId, message, payload, response) {
 function onStorageChanged(ch, areaName) {
   console.log('storage changed');
   console.log('ch', ch);
+
   if (ch.activeTabHostname) {
     // check if hostname is in hosts
     getStorage(null, state => {
@@ -252,11 +253,30 @@ function onStorageChanged(ch, areaName) {
     })
   }
 
-  // if (ch.fg || ch.bg || ch.li) {
-  //   sendRuntimeMessage('updatePopup');
-  // }
-  if (ch.hosts) {
+  if (ch.changeColors) {
+    console.log('changeColors changed');
+    // check if hostname is in hosts
+    getStorage(null, state => {
+      console.log('getting storage');
+      // let always = false;
+      // if (index > -1) {
+      //   always = true;
+      // }
+      
+      let index = state.hosts.indexOf(state.activeTabHostname);
+      if (!state.changeColors && index > -1) {
+        state.hosts.splice(index, 1);
+        always = false;
+        saveStorage({ always });
+      }
 
+      if (state.activeTabId) {
+        console.log('sending tab message for update');
+        sendTabMessage(state.activeTabId, 'update');
+      } else {
+        console.log('no active tab for change colors');
+      }
+    })
   }
 }
 

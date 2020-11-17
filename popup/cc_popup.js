@@ -51,26 +51,22 @@ var foreSwatch = document.getElementById("fore-swatch");
 var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
-// changeColorsCheckbox.onclick = () => {
-//   sendRuntimeMessage('onClickCc', {checked: changeColorsCheckbox.checked}, (alwaysChecked) => {
-//     alwaysCheckbox.checked = alwaysChecked;
-//   });
-// };
+changeColorsCheckbox.onclick = () => {
+  saveStorage({changeColors: changeColorsCheckbox.checked});
+};
 
-// alwaysCheckbox.onclick = () => {
-//   sendRuntimeMessage('onClickAlways', {checked: alwaysCheckbox.checked, ccChecked: changeColorsCheckbox.checked}, ccChecked => {
-//     changeColorsCheckbox.checked = ccChecked;
-//   });
-// };
+alwaysCheckbox.onclick = () => {
+  saveStorage({always: alwaysCheckbox.checked});
+};
 
-// alwaysCheckbox.onmouseover = function () {
-//   if (!activeTabId) {
-//     return;
-//   }
-//   // let url = new URL(activeTabId);
-//   // infoText.textContent = `Always change pages on host: ${url.hostname}`;
-//   // info.style.opacity = 1;
-// }
+alwaysCheckbox.onmouseover = function () {
+  if (!state.activeTabId) {
+    return;
+  }
+  // let url = new URL(activeTabId);
+  // infoText.textContent = `Always change pages on host: ${url.hostname}`;
+  // info.style.opacity = 1;
+}
 
 // alwaysCheckbox.onmouseout = function () {
 //   info.style.opacity = 0;
@@ -335,11 +331,11 @@ canvas.onmousemove = function (e) {
 //   }
 // }
 
-function saveState(response) {
+function saveStorage(obj, response) {
   if (bIsChrome) {
-    chrome.storage.local.set({ ...state }, response);
+    chrome.storage.local.set({ ...obj }, response);
   } else {
-    browser.storage.local.set({ ...state }, response);
+    browser.storage.local.set({ ...obj }, response);
   }
 }
 
