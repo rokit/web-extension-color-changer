@@ -1,5 +1,4 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
-// var state = {};
 var className = "color-changer-2";
 
 function ChosenColor(hue, saturation, lightness, chosenId) {
@@ -273,29 +272,25 @@ function onStorageChanged(ch, areaName) {
   }
 
   if (ch.changeColors) {
-    console.log('changeColors changed');
-    // check if hostname is in hosts
     getStorage(null, state => {
-      console.log('getting storage');
-      // let always = false;
-      // if (index > -1) {
-      //   always = true;
-      // }
-
+      // console.log('activeTabHostname', state.activeTabHostname);
+      // console.log('state.changeColors', state.changeColors);
       let index = state.hosts.indexOf(state.activeTabHostname);
       if (!state.changeColors && index > -1) {
+        console.log('should set always to false');
         state.hosts.splice(index, 1);
         always = false;
-        saveStorage({ always });
+        saveStorage({ always, hosts: state.hosts });
       }
 
       if (state.activeTabId) {
-        console.log('sending tab message for update');
         sendTabMessage(state.activeTabId, 'update');
-      } else {
-        console.log('no active tab for change colors');
       }
     })
+  }
+
+  if (ch.always) {
+    // todo
   }
 
   if (ch.fg || ch.bg || ch.li) {
