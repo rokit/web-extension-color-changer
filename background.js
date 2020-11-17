@@ -100,6 +100,7 @@ function tabActivated(tabInfo) {
 
     if (url && url.protocol !== 'chrome:') {
       saveStorage({ activeTabId: tabInfo.tabId });
+      watchTab(tabInfo.tabId);
       chrome.tabs.executeScript(tabInfo.tabId, {
         code: `document.documentElement.classList.contains('${className}')`
       }, (results) => {
@@ -110,6 +111,28 @@ function tabActivated(tabInfo) {
     }
   });
 }
+
+// watching tabs may not be necessary if 
+// content script gets state and looks for Always
+function watchTab(watchedTabId) {
+  function tabUpdated(tabId, changeInfo, tab) {
+    if (watchedTabId === tabId && tab.status === 'loading') {
+      getStorage(['always', 'changeColors'], obj => {
+        if (!obj.always && obj.changeColors) {
+          console.log('tab was loading and Always not checked');
+          saveStorage({changeColors: false})
+        }
+      })
+    }
+  }
+
+  if (bIsChrome) {
+    chrome.tabs.onUpdated.addListener(tabUpdated)
+  } else {
+    browser.tabs.onUpdated.addListener(tabUpdated)
+  }
+}
+
 
 async function onChangeColors(checked) {
   let hosts = (await getStorageValue('hosts')).hosts;
