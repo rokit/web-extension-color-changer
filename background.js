@@ -87,8 +87,6 @@ function createStrings(color) {
 
 // on tab activation get tabid and hostname
 function tabActivated(tabInfo) {
-  let activeTabId = tabInfo.tabId;
-
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     let url = null;
     let activeTabHostname = "";
@@ -98,19 +96,17 @@ function tabActivated(tabInfo) {
     } catch {
       activeTabHostname = "";
     }
-    saveStorage({ activeTabHostname, activeTabId });
+    saveStorage({ activeTabHostname });
 
-    console.log('url', url);
     if (url && url.protocol !== 'chrome:') {
-      console.log('activeTabHostname', activeTabHostname);
-      chrome.tabs.executeScript(activeTabId, {
+      saveStorage({ activeTabId: tabInfo.tabId });
+      chrome.tabs.executeScript(tabInfo.tabId, {
         code: `document.documentElement.classList.contains('${className}')`
       }, (results) => {
-        console.log('changeColors', results[0]);
         saveStorage({ changeColors: results[0] });
       });
     } else {
-      saveStorage({ changeColors: false });
+      saveStorage({ changeColors: false, activeTabId: null });
     }
   });
 }
@@ -262,7 +258,7 @@ function onStorageChanged(ch, areaName) {
       // if (index > -1) {
       //   always = true;
       // }
-      
+
       let index = state.hosts.indexOf(state.activeTabHostname);
       if (!state.changeColors && index > -1) {
         state.hosts.splice(index, 1);
@@ -275,6 +271,14 @@ function onStorageChanged(ch, areaName) {
         sendTabMessage(state.activeTabId, 'update');
       } else {
         console.log('no active tab for change colors');
+      }
+    })
+  }
+
+  if (ch.fg || ch.bg || ch.li) {
+    getStorage(null, state => {
+      if (state.activeTabId) {
+        sendTabMessage(state.activeTabId, 'update');
       }
     })
   }

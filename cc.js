@@ -104,10 +104,8 @@ function getStorage(obj, response) {
 }
 
 function notify(req, sender, res) {
-  console.log('notify.req', notify.req);
   switch (req.message) {
     case 'update': {
-      console.log('content update');
       getStorage(null, theState => {
         state = theState;
         updateContent();

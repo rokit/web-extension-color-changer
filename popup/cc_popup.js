@@ -272,6 +272,7 @@ function checkCollision(swatches, x, y) {
 
 canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
+  if (!swatch) return;
   sendRuntimeMessage('updateChoseColor', swatch);
 }
 
