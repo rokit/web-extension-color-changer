@@ -79,7 +79,7 @@ function removeClass() {
   observer.disconnect();
 }
 
-async function updateContent() {
+function updateContent() {
   if (state.changeColors) {
     updateCss();
 
@@ -106,6 +106,7 @@ function getStorage(obj, response) {
 function notify(req, sender, res) {
   switch (req.message) {
     case 'update': {
+      console.log('received update');
       getStorage(null, theState => {
         state = theState;
         updateContent();
@@ -117,8 +118,9 @@ function notify(req, sender, res) {
 
 function getState() {
   getStorage(null, theState => {
-    if (always) {
-      state = theState;
+    console.log('getState theState', theState);
+    state = theState;
+    if (state.changeColors) {
       updateContent();
     }
   })
@@ -132,4 +134,4 @@ if (bIsChrome) {
 
 getState();
 
-document.onscroll = updateContent();
+// document.onscroll = updateContent();

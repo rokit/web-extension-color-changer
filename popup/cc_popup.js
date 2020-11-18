@@ -46,11 +46,11 @@ var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
 changeColorsCheckbox.onclick = () => {
-  saveStorage({changeColors: changeColorsCheckbox.checked});
+  saveStorage({ changeColors: changeColorsCheckbox.checked });
 };
 
 alwaysCheckbox.onclick = () => {
-  saveStorage({always: alwaysCheckbox.checked});
+  saveStorage({ always: alwaysCheckbox.checked });
 };
 
 alwaysCheckbox.onmouseover = function () {
@@ -70,21 +70,14 @@ clearBtn.onclick = function () {
   sendRuntimeMessage('resetState');
 }
 
-function updateColorButtons() {
-  lightnessSlider.value = state.lightness;
-  lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
-  drawCanvas();
-  setActiveColorButton();
-}
-
 function handleFore() {
-  saveStorage({activeBtn: 'fore'});
+  saveStorage({ activeBtn: 'fore', lightness: state.fg.lightness });
 }
 function handleBack() {
-  saveStorage({activeBtn: 'back'});
+  saveStorage({ activeBtn: 'back', lightness: state.bg.lightness });
 }
 function handleLink() {
-  saveStorage({activeBtn: 'link'});
+  saveStorage({ activeBtn: 'link', lightness: state.li.lightness });
 }
 
 foreSwatch.onclick = handleFore;
@@ -340,9 +333,11 @@ function updateUi() {
 
     changeColorsCheckbox.checked = state.changeColors;
     alwaysCheckbox.checked = state.always;
-  
-    // also calls drawCanvas
-    updateColorButtons();
+    lightnessSlider.value = state.lightness;
+    lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
+
+    setActiveColorButton();
+    drawCanvas();
   });
 }
 
