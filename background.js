@@ -29,6 +29,18 @@ function createStrings(color) {
   color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
 }
 
+// defaults
+const changeColors = false;
+const always = false;
+const activeTabId = null;
+const activeTabHostname = null;
+const fg = new ChosenColor(0, 0, 80, 'zero');
+const bg = new ChosenColor(0, 0, 25, 'zero');
+const li = new ChosenColor(68, 80, 80, '2-6');
+const activeBtn = 'fore';
+const lightness = 80;
+const hosts = [];
+
 // async function setChangeColors(value) {
 //   if (activeTabId) {
 //     if (bIsChrome) {
@@ -289,16 +301,19 @@ function onUpdateChosenColor(payload) {
 }
 
 function onResetState() {
+  // don't reset:
+  // colorChanger
+  // activeTabId
+  // activeTabHostname
+
   getStorage(null, state => {
-    state.always = false;
-    // state.activeTabId = null;
-    // state.activeTabHostname = null;
-    state.fg = new ChosenColor(0, 0, 80, 'zero');
-    state.bg = new ChosenColor(0, 0, 25, 'zero');
-    state.li = new ChosenColor(68, 80, 80, '2-6');
-    state.activeBtn = 'fore';
-    state.lightness = 80;
-    state.hosts = [];
+    state.always = always;
+    state.fg = fg;
+    state.bg = bg;
+    state.li = li;
+    state.activeBtn = activeBtn;
+    state.lightness = lightness;
+    state.hosts = hosts;
     saveStorage({...state});
   });
 }
@@ -312,22 +327,29 @@ async function notify(req, sender, res) {
 }
 
 // get state, initialize defaults, then save state
+chrome.storage.local.clear();
 function initState() {
-  // chrome.storage.local.clear();
-  chrome.storage.local.get({
-    changeColors: false,
-    always: false,
-    activeTabId: null,
-    activeTabHostname: null,
-    fg: new ChosenColor(0, 0, 80, 'zero'),
-    bg: new ChosenColor(0, 0, 25, 'zero'),
-    li: new ChosenColor(68, 80, 80, '2-6'),
-    activeBtn: 'fore',
-    lightness: 80,
-    hosts: [],
-  }, (res) => {
-    saveStorage({ ...res });
-  });
+  let stateToGet = {
+    changeColors,
+    always,
+    hosts,
+    activeTabId,
+    activeTabHostname,
+    fg,
+    bg,
+    li,
+    activeBtn,
+    lightness,
+  };
+  if (bIsChrome) {
+    chrome.storage.local.get(stateToGet, state => {
+      saveStorage({ ...state });
+    });
+  } else {
+    browser.storage.local.get(stateToGet, state => {
+      saveStorage({ ...state });
+    });
+  }
 }
 
 initState();
