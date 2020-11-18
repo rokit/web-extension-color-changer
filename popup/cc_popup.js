@@ -62,18 +62,13 @@ alwaysCheckbox.onmouseover = function () {
   // info.style.opacity = 1;
 }
 
-// alwaysCheckbox.onmouseout = function () {
-//   info.style.opacity = 0;
-// }
+alwaysCheckbox.onmouseout = function () {
+  info.style.opacity = 0;
+}
 
-// clearBtn.onclick = function () {
-//   state = null;
-//   alwaysCheckbox.checked = false;
-//   initState();
-//   saveState();
-//   updateUi();
-//   updateContent();
-// }
+clearBtn.onclick = function () {
+  sendRuntimeMessage('resetState');
+}
 
 function updateColorButtons() {
   lightnessSlider.value = state.lightness;

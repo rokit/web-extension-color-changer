@@ -180,55 +180,6 @@ async function onChangeColors(checked) {
 //   return changeColors;
 // }
 
-async function notify(req, sender, res) {
-  switch (req.message) {
-    // case 'changeColors': {
-    //   console.log('req.payload', req.payload);
-    //   // createContextMenu(req.payload);
-    // }; break;
-    case 'updateChoseColor': {
-      console.log('n updateChosenColor', req.payload);
-      getStorage(null, state => {
-        switch (state.activeBtn) {
-          case "fore": {
-            updateChosenColor(state.fg, req.payload);
-            saveStorage({
-              fg: state.fg,
-              lightness: state.fg.lightness,
-              changeColors: true,
-            });
-          } break;
-          case "back": {
-            updateChosenColor(state.bg, req.payload);
-            saveStorage({
-              bg: state.bg,
-              lightness: state.bg.lightness,
-              changeColors: true,
-            });
-          } break;
-          case "link": {
-            updateChosenColor(state.li, req.payload);
-            saveStorage({
-              li: state.li,
-              lightness: state.li.lightness,
-              changeColors: true
-            });
-          } break;
-          default: break;
-        }
-      })
-      // createContextMenu(req.payload);
-    }; break;
-    // case 'onClickCc': {
-    //   res(onClickCc(req.payload));
-    // }; break;
-    // case 'onClickAlways': {
-    //   res(onClickAlways(req.payload));
-    // }; break;
-    default: break;
-  }
-}
-
 function saveStorage(obj, response) {
   if (bIsChrome) {
     chrome.storage.local.set({ ...obj }, response);
@@ -305,6 +256,61 @@ function onStorageChanged(ch, areaName) {
   }
 }
 
+function onUpdateChosenColor(payload) {
+  getStorage(null, state => {
+    switch (state.activeBtn) {
+      case "fore": {
+        updateChosenColor(state.fg, payload);
+        saveStorage({
+          fg: state.fg,
+          lightness: state.fg.lightness,
+          changeColors: true,
+        });
+      } break;
+      case "back": {
+        updateChosenColor(state.bg, payload);
+        saveStorage({
+          bg: state.bg,
+          lightness: state.bg.lightness,
+          changeColors: true,
+        });
+      } break;
+      case "link": {
+        updateChosenColor(state.li, payload);
+        saveStorage({
+          li: state.li,
+          lightness: state.li.lightness,
+          changeColors: true
+        });
+      } break;
+      default: break;
+    }
+  });
+}
+
+function onResetState() {
+  getStorage(null, state => {
+    state.always = false;
+    // state.activeTabId = null;
+    // state.activeTabHostname = null;
+    state.fg = new ChosenColor(0, 0, 80, 'zero');
+    state.bg = new ChosenColor(0, 0, 25, 'zero');
+    state.li = new ChosenColor(68, 80, 80, '2-6');
+    state.activeBtn = 'fore';
+    state.lightness = 80;
+    state.hosts = [];
+    saveStorage({...state});
+  });
+}
+
+async function notify(req, sender, res) {
+  switch (req.message) {
+    case 'updateChoseColor': onUpdateChosenColor(req.payload); break;
+    case 'resetState': onResetState(); break;
+    default: break;
+  }
+}
+
 // get state, initialize defaults, then save state
 function initState() {
   // chrome.storage.local.clear();
@@ -319,9 +325,7 @@ function initState() {
     activeBtn: 'fore',
     lightness: 80,
     hosts: [],
-    css: '',
   }, (res) => {
-    state = { ...res };
     saveStorage({ ...res });
   });
 }
