@@ -1,8 +1,11 @@
 3.0.0
-Change Colors now only applies to the current tab instead of all tabs
-Buttons replaced with checkboxes in the UI.
+Change Colors now only applies to the current tab instead of all tabs.
+  I never intended Color Changer to be a global themer, I just applied the color change to all tabs because it was actually easier to implement. Since I use Color Changer myself and prefer to apply it more selectively, I decided to fix the issue.
+Moving the Lightness slider now updates the page live
+Change Colors and Always buttons replaced with checkboxes.
 Updated description
 Removed donate button
+  Thank you to those who donated.
 
 2.0.3
 Changed the way link colors work. Hues shift up on hover and down on visited rather than changing lightness. Border colors will now be darker or lighter depending on the background lightness.

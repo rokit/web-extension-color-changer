@@ -25,9 +25,17 @@ var lightnessValue = document.getElementById("lightness-value");
 
 lightnessSlider.oninput = function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
-  state.lightness = parseInt(this.value);
+  let lightness = parseInt(this.value);
 
-  drawCanvas();
+  switch (state.activeBtn) {
+    case 'fore': saveStorage({lightness, fg: {...state.fg, lightness} },
+      () => sendRuntimeMessage('updateStrings')); break;
+    case 'back': saveStorage({lightness, bg: {...state.bg, lightness} },
+      () => sendRuntimeMessage('updateStrings')); break;
+    case 'link': saveStorage({lightness, li: {...state.li, lightness} },
+      () => sendRuntimeMessage('updateStrings')); break;
+    default: break;
+  }
 }
 
 var info = document.getElementById("info");
@@ -310,6 +318,9 @@ canvas.onmousemove = function (e) {
 // }
 
 function saveStorage(obj, response) {
+  console.log('save storage called');
+  console.log('obj', obj);
+  response = response || (() => {});
   if (bIsChrome) {
     chrome.storage.local.set({ ...obj }, response);
   } else {
@@ -347,6 +358,15 @@ function sendRuntimeMessage(message, payload, response) {
     chrome.runtime.sendMessage({ message, payload }, response);
   } else {
     browser.runtime.sendMessage({ message, payload }, response);
+  }
+}
+
+function sendTabMessage(activeTabId, message, payload, response) {
+  if (!activeTabId) return;
+  if (bIsChrome) {
+    chrome.tabs.sendMessage(activeTabId, { message, payload }, response);
+  } else {
+    browser.tabs.sendMessage(activeTabId, { message, payload }, response);
   }
 }
 

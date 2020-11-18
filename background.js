@@ -165,10 +165,10 @@ async function onChangeColors(checked) {
 
 // ch = changes
 function onStorageChanged(ch, areaName) {
+  console.log('---- storage changed', ch);
   getStorage(null, state => {
-    console.log('---- storage changed');
-    console.log('state', state);
-    console.log('ch', ch);
+    // console.log('state', state);
+    // console.log('ch', ch);
 
     // if state is empty, return
     // state can be empty when clearing storage
@@ -239,6 +239,35 @@ function onUpdateChosenColor(payload) {
         saveStorage({
           li: state.li,
           lightness: state.li.lightness,
+          changeColors: true
+        });
+      } break;
+      default: break;
+    }
+  });
+}
+
+function onUpdateStrings() {
+  getStorage(null, state => {
+    switch (state.activeBtn) {
+      case "fore": {
+        createStrings(state.fg);
+        saveStorage({
+          fg: state.fg,
+          changeColors: true,
+        });
+      } break;
+      case "back": {
+        createStrings(state.bg);
+        saveStorage({
+          bg: state.bg,
+          changeColors: true,
+        });
+      } break;
+      case "link": {
+        createStrings(state.li);
+        saveStorage({
+          li: state.li,
           changeColors: true
         });
       } break;
@@ -318,6 +347,7 @@ function sendTabMessage(activeTabId, message, payload, response) {
 async function notify(req, sender, res) {
   switch (req.message) {
     case 'updateChosenColor': onUpdateChosenColor(req.payload); break;
+    case 'updateStrings': onUpdateStrings(); break;
     case 'resetState': onResetState(); break;
     default: break;
   }
