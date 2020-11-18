@@ -273,14 +273,8 @@ function onStorageChanged(ch, areaName) {
 
   if (ch.changeColors) {
     getStorage(null, state => {
-      // console.log('activeTabHostname', state.activeTabHostname);
-      // console.log('state.changeColors', state.changeColors);
-      let index = state.hosts.indexOf(state.activeTabHostname);
-      if (!state.changeColors && index > -1) {
-        console.log('should set always to false');
-        state.hosts.splice(index, 1);
-        always = false;
-        saveStorage({ always, hosts: state.hosts });
+      if (!state.changeColors) {
+        saveStorage({ always: false });
       }
 
       if (state.activeTabId) {
@@ -291,18 +285,13 @@ function onStorageChanged(ch, areaName) {
 
   if (ch.always) {
     getStorage(null, state => {
-      // console.log('activeTabHostname', state.activeTabHostname);
-      // console.log('state.changeColors', state.changeColors);
       let index = state.hosts.indexOf(state.activeTabHostname);
-      if (!state.changeColors && index > -1) {
-        console.log('should set always to false');
+      if (state.always && index === -1) {
+        state.hosts.push(state.activeTabHostname);
+        saveStorage({ changeColors: true, hosts: [...state.hosts] });
+      } else if (!state.always && index > -1) {
         state.hosts.splice(index, 1);
-        always = false;
-        saveStorage({ always, hosts: state.hosts });
-      }
-
-      if (state.activeTabId) {
-        sendTabMessage(state.activeTabId, 'update');
+        saveStorage({ hosts: [...state.hosts] });
       }
     })
   }
