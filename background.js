@@ -13,7 +13,7 @@ function updateChosenColor(color, swatch) {
   color.hue = swatch.hue;
   color.saturation = swatch.saturation;
   color.lightness = swatch.lightness;
-  color.chosenId = swatch.chosenId;
+  color.chosenId = swatch.id;
   createStrings(color);
 }
 

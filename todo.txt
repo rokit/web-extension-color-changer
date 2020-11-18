@@ -1,2 +1,2 @@
 fix context menu
-fix chosen color appearing on button click
+fix banner message

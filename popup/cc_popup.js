@@ -189,7 +189,7 @@ function drawCanvas() {
       let hue = angle * i;
       let saturation = (j * saturationSteps + (100 - (saturationSteps * (rings - 1))));
 
-      let = id = `${j}-${i}`;
+      let id = `${j}-${i}`;
 
       ctx.beginPath();
       ctx.ellipse(x, y, littleRadius, littleRadius * ellipseLength, toRads(hue - 45), 0, 2 * Math.PI, false);
@@ -243,11 +243,12 @@ function checkCollision(swatches, x, y) {
       return swatches[s];
     }
   }
-  return false;
+  return null;
 }
 
 canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
+  console.log('swatch', swatch);
   if (!swatch) return;
   sendRuntimeMessage('updateChosenColor', swatch);
 }
