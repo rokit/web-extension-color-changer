@@ -111,7 +111,6 @@ function tabActivated(tabInfo) {
 
     if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
       saveStorage({ activeTabId: tabInfo.tabId });
-      watchTab(tabInfo.tabId);
       chrome.tabs.executeScript(tabInfo.tabId, {
         code: `document.documentElement.classList.contains('${className}')`
       }, (results) => {
@@ -123,26 +122,26 @@ function tabActivated(tabInfo) {
   });
 }
 
-// watching tabs may not be necessary if 
-// content script gets state and looks for Always
-function watchTab(watchedTabId) {
-  function tabUpdated(tabId, changeInfo, tab) {
-    if (watchedTabId === tabId && tab.status === 'loading') {
-      getStorage(['always', 'changeColors'], obj => {
-        if (!obj.always && obj.changeColors) {
-          console.log('tab was loading and Always not checked');
-          saveStorage({changeColors: false})
-        }
-      })
-    }
-  }
+// // watching tabs may not be necessary if 
+// // content script gets state and looks for Always
+// function watchTab(watchedTabId) {
+//   function tabUpdated(tabId, changeInfo, tab) {
+//     if (watchedTabId === tabId && tab.status === 'loading') {
+//       getStorage(['always', 'changeColors'], obj => {
+//         if (!obj.always && obj.changeColors) {
+//           console.log('tab was loading and Always not checked');
+//           saveStorage({changeColors: false})
+//         }
+//       })
+//     }
+//   }
 
-  if (bIsChrome) {
-    chrome.tabs.onUpdated.addListener(tabUpdated)
-  } else {
-    browser.tabs.onUpdated.addListener(tabUpdated)
-  }
-}
+//   if (bIsChrome) {
+//     chrome.tabs.onUpdated.addListener(tabUpdated)
+//   } else {
+//     browser.tabs.onUpdated.addListener(tabUpdated)
+//   }
+// }
 
 
 async function onChangeColors(checked) {
@@ -165,33 +164,6 @@ async function onChangeColors(checked) {
   saveStorage({ always });
 }
 
-// // cbs = checkboxes
-// function onClickAlways(payload) {
-//   let index = state.hosts.indexOf(activeTabHostname);
-
-//   if (payload.checked && index === -1) {
-//     // if checked and host not present
-//     state.hosts.push(activeTabHostname);
-//   } else if (!payload.checked && index > -1) {
-//     // if not checked and host is present
-//     state.hosts.splice(index, 1);
-//   }
-
-//   if (payload.checked) {
-//     changeColors = true;
-//   }
-
-//   saveState(() => {
-//     if (payload.checked) {
-//       setChangeColors(true);
-//     } else {
-//       // triggers a state update in content script, which triggers rebuild of context menu
-//       setChangeColors(payload.ccChecked);
-//     }
-//   });
-//   return changeColors;
-// }
-
 function saveStorage(obj, response) {
   if (bIsChrome) {
     chrome.storage.local.set({ ...obj }, response);
@@ -202,9 +174,9 @@ function saveStorage(obj, response) {
 
 function getStorage(obj, response) {
   if (bIsChrome) {
-    chrome.storage.local.get(obj, response);
+    chrome.storage.local.get({ ...obj }, response);
   } else {
-    browser.storage.local.get(obj, response);
+    browser.storage.local.get({ ...obj }, response);
   }
 }
 
@@ -248,6 +220,7 @@ function onStorageChanged(ch, areaName) {
 
   if (ch.always) {
     getStorage(null, state => {
+      console.log('state', state);
       let index = state.hosts.indexOf(state.activeTabHostname);
       if (state.always && index === -1) {
         state.hosts.push(state.activeTabHostname);
@@ -306,16 +279,19 @@ function onResetState() {
   // activeTabId
   // activeTabHostname
 
-  getStorage(null, state => {
-    state.always = always;
-    state.fg = fg;
-    state.bg = bg;
-    state.li = li;
-    state.activeBtn = activeBtn;
-    state.lightness = lightness;
-    state.hosts = hosts;
-    saveStorage({...state});
-  });
+  const stateToReset = {
+    always,
+    fg,
+    bg,
+    li,
+    activeBtn,
+    lightness,
+  };
+
+  // reset hosts before anything else
+  // because onChangeHandler depends on it
+  saveStorage({ hosts });
+  saveStorage({ ...stateToReset });
 }
 
 async function notify(req, sender, res) {
@@ -326,13 +302,13 @@ async function notify(req, sender, res) {
   }
 }
 
-// get state, initialize defaults, then save state
-chrome.storage.local.clear();
+// if a state property isn't present,
+// this will initialize it with the proper value.
+// we then save these values back to state
 function initState() {
-  let stateToGet = {
+  let stateToGetOrInitialize = {
     changeColors,
     always,
-    hosts,
     activeTabId,
     activeTabHostname,
     fg,
@@ -341,17 +317,11 @@ function initState() {
     activeBtn,
     lightness,
   };
-  if (bIsChrome) {
-    chrome.storage.local.get(stateToGet, state => {
-      saveStorage({ ...state });
-    });
-  } else {
-    browser.storage.local.get(stateToGet, state => {
-      saveStorage({ ...state });
-    });
-  }
+  getStorage({ hosts });
+  getStorage({ stateToGetOrInitialize });
 }
 
+chrome.storage.local.clear();
 initState();
 
 if (bIsChrome) {

@@ -115,12 +115,21 @@ function notify(req, sender, res) {
   }
 }
 
+function getState() {
+  getStorage(null, theState => {
+    if (always) {
+      state = theState;
+      updateContent();
+    }
+  })
+}
+
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);
 } else {
   browser.runtime.onMessage.addListener(notify);
 }
 
-// await getState();
-// updateContent();
-// document.onscroll = updateContent();
+getState();
+
+document.onscroll = updateContent();
