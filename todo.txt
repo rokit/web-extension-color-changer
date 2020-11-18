@@ -1,2 +1,2 @@
-check url for chrome://extensions, about:debugging etc
 fix context menu
+fix chosen color appearing on button click

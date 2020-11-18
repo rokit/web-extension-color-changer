@@ -20,12 +20,6 @@ function updateSwatch(swatch, hue, saturation, lightness) {
   swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-function onSwatchClick() {
-  
-}
-
-// var state = {};
-
 var lightnessSlider = document.getElementById("lightness");
 var lightnessValue = document.getElementById("lightness-value");
 
@@ -88,28 +82,22 @@ function updateColorButtons() {
   setActiveColorButton();
 }
 
-// function handleFore() {
-//   state.activeBtn = "fore";
-//   state.lightness = state.fg.lightness;
-//   updateColorButtons();
-// }
-// function handleBack() {
-//   state.activeBtn = "back";
-//   state.lightness = state.bg.lightness;
-//   updateColorButtons();
-// }
-// function handleLink() {
-//   state.activeBtn = "link";
-//   state.lightness = state.li.lightness;
-//   updateColorButtons();
-// }
+function handleFore() {
+  saveStorage({activeBtn: 'fore'});
+}
+function handleBack() {
+  saveStorage({activeBtn: 'back'});
+}
+function handleLink() {
+  saveStorage({activeBtn: 'link'});
+}
 
-// foreSwatch.onclick = handleFore;
-// foreBtn.onclick = handleFore;
-// backSwatch.onclick = handleBack;
-// backBtn.onclick = handleBack;
-// linkSwatch.onclick = handleLink;
-// linkBtn.onclick = handleLink;
+foreSwatch.onclick = handleFore;
+foreBtn.onclick = handleFore;
+backSwatch.onclick = handleBack;
+backBtn.onclick = handleBack;
+linkSwatch.onclick = handleLink;
+linkBtn.onclick = handleLink;
 
 function setActiveColorButton() {
   foreBtn.classList.remove("active-btn");

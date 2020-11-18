@@ -97,7 +97,7 @@ function tabActivated(tabInfo) {
     }
     saveStorage({ activeTabHostname });
 
-    if (url && url.protocol !== 'chrome:') {
+    if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
       saveStorage({ activeTabId: tabInfo.tabId });
       watchTab(tabInfo.tabId);
       chrome.tabs.executeScript(tabInfo.tabId, {
@@ -290,7 +290,21 @@ function onStorageChanged(ch, areaName) {
   }
 
   if (ch.always) {
-    // todo
+    getStorage(null, state => {
+      // console.log('activeTabHostname', state.activeTabHostname);
+      // console.log('state.changeColors', state.changeColors);
+      let index = state.hosts.indexOf(state.activeTabHostname);
+      if (!state.changeColors && index > -1) {
+        console.log('should set always to false');
+        state.hosts.splice(index, 1);
+        always = false;
+        saveStorage({ always, hosts: state.hosts });
+      }
+
+      if (state.activeTabId) {
+        sendTabMessage(state.activeTabId, 'update');
+      }
+    })
   }
 
   if (ch.fg || ch.bg || ch.li) {
