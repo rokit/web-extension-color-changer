@@ -143,7 +143,6 @@ function tabActivated(tabInfo) {
 //   }
 // }
 
-
 async function onChangeColors(checked) {
   let hosts = (await getStorageValue('hosts')).hosts;
   let activeTabHostname = (await getStorageValue('activeTabHostname')).activeTabHostname;
@@ -164,50 +163,30 @@ async function onChangeColors(checked) {
   saveStorage({ always });
 }
 
-function saveStorage(obj, response) {
-  if (bIsChrome) {
-    chrome.storage.local.set({ ...obj }, response);
-  } else {
-    browser.storage.local.set({ ...obj }, response);
-  }
-}
-
-function getStorage(obj, response) {
-  if (bIsChrome) {
-    chrome.storage.local.get({ ...obj }, response);
-  } else {
-    browser.storage.local.get({ ...obj }, response);
-  }
-}
-
-function sendTabMessage(activeTabId, message, payload, response) {
-  if (!activeTabId) return;
-  if (bIsChrome) {
-    chrome.tabs.sendMessage(activeTabId, { message, payload }, response);
-  } else {
-    browser.tabs.sendMessage(activeTabId, { message, payload }, response);
-  }
-}
-
 // ch = changes
 function onStorageChanged(ch, areaName) {
-  console.log('storage changed');
-  console.log('ch', ch);
+  getStorage(null, state => {
+    console.log('---- storage changed');
+    console.log('state', state);
+    console.log('ch', ch);
 
-  if (ch.activeTabHostname) {
-    // check if hostname is in hosts
-    getStorage(null, state => {
+    // if state is empty, return
+    // state can be empty when clearing storage
+    if (Object.keys(state).length === 0 && state.constructor === Object) {
+      return;
+    }
+
+    if (ch.activeTabHostname) {
+      // check if hostname is in hosts
       let index = state.hosts.indexOf(state.activeTabHostname);
       let always = false;
       if (index > -1) {
         always = true;
       }
       saveStorage({ always });
-    })
-  }
+    }
 
-  if (ch.changeColors) {
-    getStorage(null, state => {
+    if (ch.changeColors) {
       if (!state.changeColors) {
         saveStorage({ always: false });
       }
@@ -215,12 +194,9 @@ function onStorageChanged(ch, areaName) {
       if (state.activeTabId) {
         sendTabMessage(state.activeTabId, 'update');
       }
-    })
-  }
+    }
 
-  if (ch.always) {
-    getStorage(null, state => {
-      console.log('state', state);
+    if (ch.always) {
       let index = state.hosts.indexOf(state.activeTabHostname);
       if (state.always && index === -1) {
         state.hosts.push(state.activeTabHostname);
@@ -229,16 +205,14 @@ function onStorageChanged(ch, areaName) {
         state.hosts.splice(index, 1);
         saveStorage({ hosts: [...state.hosts] });
       }
-    })
-  }
+    }
 
-  if (ch.fg || ch.bg || ch.li) {
-    getStorage(null, state => {
+    if (ch.fg || ch.bg || ch.li) {
       if (state.activeTabId) {
         sendTabMessage(state.activeTabId, 'update');
       }
-    })
-  }
+    }
+  });
 }
 
 function onUpdateChosenColor(payload) {
@@ -273,6 +247,7 @@ function onUpdateChosenColor(payload) {
   });
 }
 
+// saves defaults
 function onResetState() {
   // don't reset:
   // colorChanger
@@ -281,6 +256,7 @@ function onResetState() {
 
   const stateToReset = {
     always,
+    hosts,
     fg,
     bg,
     li,
@@ -288,27 +264,15 @@ function onResetState() {
     lightness,
   };
 
-  // reset hosts before anything else
-  // because onChangeHandler depends on it
-  saveStorage({ hosts });
-  saveStorage({ ...stateToReset });
+  saveStorage(stateToReset);
 }
 
-async function notify(req, sender, res) {
-  switch (req.message) {
-    case 'updateChoseColor': onUpdateChosenColor(req.payload); break;
-    case 'resetState': onResetState(); break;
-    default: break;
-  }
-}
-
-// if a state property isn't present,
-// this will initialize it with the proper value.
-// we then save these values back to state
+// gets or initializes a property, then saves
 function initState() {
   let stateToGetOrInitialize = {
     changeColors,
     always,
+    hosts,
     activeTabId,
     activeTabHostname,
     fg,
@@ -317,12 +281,47 @@ function initState() {
     activeBtn,
     lightness,
   };
-  getStorage({ hosts });
-  getStorage({ stateToGetOrInitialize });
+
+  // set hosts before the rest
+  getStorage(stateToGetOrInitialize, state => {
+    saveStorage(state);
+  });
 }
 
-chrome.storage.local.clear();
-initState();
+function getStorage(obj, response) {
+  response = response || (() => { });
+  if (bIsChrome) {
+    chrome.storage.local.get(obj, response);
+  } else {
+    browser.storage.local.get(obj, response);
+  }
+}
+
+function saveStorage(obj, response) {
+  response = response || (() => { });
+  if (bIsChrome) {
+    chrome.storage.local.set({ ...obj }, response);
+  } else {
+    browser.storage.local.set({ ...obj }, response);
+  }
+}
+
+function sendTabMessage(activeTabId, message, payload, response) {
+  if (!activeTabId) return;
+  if (bIsChrome) {
+    chrome.tabs.sendMessage(activeTabId, { message, payload }, response);
+  } else {
+    browser.tabs.sendMessage(activeTabId, { message, payload }, response);
+  }
+}
+
+async function notify(req, sender, res) {
+  switch (req.message) {
+    case 'updateChosenColor': onUpdateChosenColor(req.payload); break;
+    case 'resetState': onResetState(); break;
+    default: break;
+  }
+}
 
 if (bIsChrome) {
   chrome.tabs.onActivated.addListener(tabActivated);
@@ -333,3 +332,6 @@ if (bIsChrome) {
   browser.runtime.onMessage.addListener(notify);
   browser.storage.onChanged.addListener(onStorageChanged);
 }
+
+chrome.storage.local.clear(); // will also trigger a storage.onChanged event
+initState();
