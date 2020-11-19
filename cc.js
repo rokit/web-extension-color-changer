@@ -116,15 +116,31 @@ function notify(req, sender, res) {
   }
 }
 
-// function getState() {
-//   getStorage(null, theState => {
-//     console.log('getState theState', theState);
-//     state = theState;
-//     if (state.changeColors) {
-//       updateContent();
-//     }
-//   })
-// }
+function getState() {
+  getStorage(null, theState => {
+    console.log('getting state');
+    state = theState;
+    let index = state.hosts.indexOf(state.activeTabHostname);
+  
+    if (index > -1) {
+      state.changeColors = true;
+      updateContent();
+      saveStorage({ changeColors: true, always: true });
+    } else {
+      saveStorage({ changeColors: false, always: false });
+    }
+  })
+}
+
+function saveStorage(obj, response) {
+  response = response || (() => { });
+  console.log('response', response);
+  if (bIsChrome) {
+    chrome.storage.local.set({ ...obj }, response);
+  } else {
+    browser.storage.local.set({ ...obj }, response);
+  }
+}
 
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);
@@ -132,6 +148,6 @@ if (bIsChrome) {
   browser.runtime.onMessage.addListener(notify);
 }
 
-// getState();
+getState();
 
 // document.onscroll = updateContent();

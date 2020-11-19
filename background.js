@@ -99,65 +99,70 @@ function tabActivated(tabInfo) {
     }
 
     if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
+      console.log('url', url);
       saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId });
-      watchTab(tabInfo.tabId);
-      chrome.tabs.executeScript(tabInfo.tabId, {
-        code: `document.documentElement.classList.contains('${className}')`
-      }, (results) => {
-        saveStorage({ changeColors: results[0] });
-      });
     } else {
       saveStorage({ activeTabHostname: null, activeTabId: null });
     }
   });
 }
 
+// // watching tabs may not be necessary if 
+// // content script gets state and looks for Always
+// function tabUpdated(tabId, changeInfo, tab) {
+//   getStorage(null, state => {
+//     console.log('tabUpdated');
+//     if (tabId === state.activeTabId && tab.status === 'loading') {
+//       onTabLoading();
+//     }
+//   });
+// }
 
-// watching tabs may not be necessary if 
-// content script gets state and looks for Always
-function tabUpdated(tabId, changeInfo, tab) {
+// function onTabLoading() {
+//   console.log('onTabLoading');
+//   // getStorage(null, state => {
+//   //   let index = state.hosts.indexOf(state.activeTabHostname);
+  
+//   //   if (index > -1) {
+//   //     saveStorage({ changeColors: true, always: true }, () => {
+//   //       sendTabMessage(state.activeTabId, 'update');
+//   //     });
+//   //   } else {
+//   //     saveStorage({ changeColors: false, always: false }, () => {
+//   //       sendTabMessage(state.activeTabId, 'update');
+//   //     });
+//   //   }
+//   // })
+// }
+
+function onTabSwitch() {
   getStorage(null, state => {
-    console.log('tabUpdated');
-    if (tabId === state.activeTabId && tab.status === 'loading') {
-      checkActiveTabHostnameInHosts();
-      // getStorage(['always', 'changeColors'], obj => {
-      //   if (!obj.always && obj.changeColors) {
-      //     console.log('tab was loading and Always not checked');
-      //     saveStorage({changeColors: false})
-      //   }
-      // })
-    }
+    console.log('tab switch state', state);
+    if (!state.activeTabId) return;
+    chrome.tabs.executeScript(state.activeTabId, {
+      code: `document.documentElement.classList.contains('${className}')`
+    }, (results) => {
+      console.log('results[0]', results[0]);
+      let index = state.hosts.indexOf(state.activeTabHostname);
+  
+      if (index > -1) {
+        saveStorage({ changeColors: true, always: true });
+      } else {
+        saveStorage({ changeColors: results[0] });
+      }
+    });
   });
 }
 
-function watchTab() {
-  if (bIsChrome) {
-    chrome.tabs.onUpdated.removeListener(tabUpdated);
-    chrome.tabs.onUpdated.addListener(tabUpdated);
-  } else {
-    chrome.tabs.onUpdated.removeListener(tabUpdated);
-    browser.tabs.onUpdated.addListener(tabUpdated);
-  }
-}
-
-function checkActiveTabHostnameInHosts() {
-  getStorage(null, state => {
-    let index = state.hosts.indexOf(state.activeTabHostname);
-
-    console.log('state.activeTabHostname', state.activeTabHostname);
-    console.log('index', index);
-
-    if (index > -1) {
-      saveStorage({ changeColors: true, always: true }, () => {
-        sendTabMessage(state.activeTabId, 'update');
-      });
-    } else {
-      saveStorage({ changeColors: false, always: false }, () => {
-        sendTabMessage(state.activeTabId, 'update');
-      });
-    }
-  })
-}
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+// On storage changed
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 // ch = changes
 function onStorageChanged(ch, areaName) {
   console.log('---- storage changed', ch);
@@ -172,12 +177,14 @@ function onStorageChanged(ch, areaName) {
     }
     if (ch.activeTabHostname) {
       // check if hostname is in hosts
-      checkActiveTabHostnameInHosts();
+      onTabSwitch();
+      // watchTab();
     }
 
     if (ch.changeColors) {
       updateContextMenu(state.changeColors, state.always);
       if (!state.changeColors) {
+        console.log('cc.changeColors always = false');
         saveStorage({ always: false });
       }
 
@@ -191,6 +198,7 @@ function onStorageChanged(ch, areaName) {
       let index = state.hosts.indexOf(state.activeTabHostname);
       if (state.always && index === -1) {
         state.hosts.push(state.activeTabHostname);
+        console.log('ch.always cc true');
         saveStorage({ changeColors: true, hosts: [...state.hosts] });
       } else if (!state.always && index > -1) {
         state.hosts.splice(index, 1);
@@ -208,6 +216,7 @@ function onStorageChanged(ch, areaName) {
 }
 
 function onUpdateChosenColor(payload) {
+  console.log('onUpdateChoseColor cc true');
   getStorage(null, state => {
     switch (state.activeBtn) {
       case "fore": {
@@ -240,6 +249,7 @@ function onUpdateChosenColor(payload) {
 }
 
 function onUpdateStrings() {
+  console.log('onupdatestrings cc true');
   getStorage(null, state => {
     switch (state.activeBtn) {
       case "fore": {
@@ -312,7 +322,8 @@ function onUpdateLightness(lightness) {
 }
 
 // gets or initializes a property, then saves
-async function initState() {
+function initState() {
+  console.log('init state cc false');
   let stateToGetOrInitialize = {
     changeColors,
     always,
@@ -359,7 +370,17 @@ function sendTabMessage(activeTabId, message, payload, response) {
   }
 }
 
-async function notify(req, sender, res) {
+// function watchTab() {
+//   if (bIsChrome) {
+//     chrome.tabs.onUpdated.removeListener(tabUpdated);
+//     chrome.tabs.onUpdated.addListener(tabUpdated);
+//   } else {
+//     chrome.tabs.onUpdated.removeListener(tabUpdated);
+//     browser.tabs.onUpdated.addListener(tabUpdated);
+//   }
+// }
+
+function notify(req, sender, res) {
   switch (req.message) {
     case 'updateChosenColor': onUpdateChosenColor(req.payload); break;
     case 'updateStrings': onUpdateStrings(); break;
