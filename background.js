@@ -1,5 +1,6 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 var className = "color-changer-2";
+var contextMenuCreated = false;
 
 function ChosenColor(hue, saturation, lightness, chosenId) {
   this.hue = hue;
@@ -41,60 +42,49 @@ const activeBtn = 'fore';
 const lightness = 80;
 const hosts = [];
 
-// async function setChangeColors(value) {
-//   if (activeTabId) {
-//     if (bIsChrome) {
-//       chrome.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
-//     } else {
-//       browser.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
-//     }
-//   }
-// }
+function createContextMenu() {
+  getStorage(null, state => {
+    let ctxColorChanger = {
+      id: "changeColors",
+      title: "Change Colors",
+      contexts: ["all"],
+      type: "checkbox",
+      checked: state.changeColors,
+      onclick: evt => saveStorage({ changeColors: evt.checked }),
+    };
+  
+    let ctxAlways = {
+      id: "always",
+      title: "Always",
+      contexts: ["all"],
+      type: "checkbox",
+      checked: state.always,
+      onclick: evt => saveStorage({always: evt.checked}),
+    };
 
-// async function createContextMenu() {
-//   let state = (await getStorageValue('state')).state;
-//   let activeTabHostname = (await getStorageValue('activeTabHostname')).activeTabHostname;
-//   let index = state.hosts.indexOf(activeTabHostname);
-//   let always = false;
-//   if (index > -1) {
-//     always = true;
-//   }
+    if (bIsChrome) {
+      chrome.contextMenus.removeAll();
+      chrome.contextMenus.create(ctxColorChanger);
+      chrome.contextMenus.create(ctxAlways);
+    } else {
+      browser.contextMenus.removeAll();
+      browser.contextMenus.create(ctxColorChanger);
+      browser.contextMenus.create(ctxAlways);
+    }
+    contextMenuCreated = true;
+  });
+}
 
-//   let ctxColorChanger = {
-//     id: "changeColors",
-//     title: "Change Colors",
-//     contexts: ["all"],
-//     type: "checkbox",
-//     checked: changeColors,
-//     onclick: evt => {
-//       onClickCc(evt.checked);
-//     },
-//   };
-
-//   let ctxAlways = {
-//     id: "always",
-//     title: "Always",
-//     contexts: ["all"],
-//     type: "checkbox",
-//     checked: always,
-//     onclick: evt => {
-//       onClickAlways({checked: evt.checked, ccChecked: changeColors});
-//     },
-//   };
-
-//   if (bIsChrome) {
-//     chrome.contextMenus.removeAll();
-//     chrome.contextMenus.create(ctxColorChanger);
-//     chrome.contextMenus.create(ctxAlways);
-//   } else {
-//     browser.contextMenus.removeAll();
-//     browser.contextMenus.create(ctxColorChanger);
-//     browser.contextMenus.create(ctxAlways);
-//   }
-// }
-
-// // chrome.tabs.sendMessage(tabInfo.tabId, { message: 'updateContent' });
-// // browser.tabs.sendMessage(tabInfo.tabId, { message: 'updateContent' });
+function updateContextMenu(changeColors, always) {
+  if (!contextMenuCreated) return;
+  if (bIsChrome) {
+    chrome.contextMenus.update('changeColors', {checked: changeColors});
+    chrome.contextMenus.update('always', {checked: always});
+  } else {
+    browser.contextMenus.update('changeColors', {checked: changeColors});
+    browser.contextMenus.update('always', {checked: always});
+  }
+}
 
 // on tab activation get tabid and hostname
 function tabActivated(tabInfo) {
@@ -122,47 +112,6 @@ function tabActivated(tabInfo) {
   });
 }
 
-// // watching tabs may not be necessary if 
-// // content script gets state and looks for Always
-// function watchTab(watchedTabId) {
-//   function tabUpdated(tabId, changeInfo, tab) {
-//     if (watchedTabId === tabId && tab.status === 'loading') {
-//       getStorage(['always', 'changeColors'], obj => {
-//         if (!obj.always && obj.changeColors) {
-//           console.log('tab was loading and Always not checked');
-//           saveStorage({changeColors: false})
-//         }
-//       })
-//     }
-//   }
-
-//   if (bIsChrome) {
-//     chrome.tabs.onUpdated.addListener(tabUpdated)
-//   } else {
-//     browser.tabs.onUpdated.addListener(tabUpdated)
-//   }
-// }
-
-async function onChangeColors(checked) {
-  let hosts = (await getStorageValue('hosts')).hosts;
-  let activeTabHostname = (await getStorageValue('activeTabHostname')).activeTabHostname;
-  let index = hosts.indexOf(activeTabHostname);
-  let always = false;
-  if (index > -1) {
-    always = true;
-  }
-
-  if (!checked) {
-    // if we're unchecking Change Colors, remove the hostname if it exists
-    if (always) {
-      // state.hosts.splice(index, 1);
-      always = false;
-    }
-  }
-
-  saveStorage({ always });
-}
-
 // ch = changes
 function onStorageChanged(ch, areaName) {
   console.log('---- storage changed', ch);
@@ -175,7 +124,6 @@ function onStorageChanged(ch, areaName) {
     if (Object.keys(state).length === 0 && state.constructor === Object) {
       return;
     }
-
     if (ch.activeTabHostname) {
       // check if hostname is in hosts
       let index = state.hosts.indexOf(state.activeTabHostname);
@@ -187,6 +135,7 @@ function onStorageChanged(ch, areaName) {
     }
 
     if (ch.changeColors) {
+      updateContextMenu(state.changeColors, state.always);
       if (!state.changeColors) {
         saveStorage({ always: false });
       }
@@ -197,6 +146,7 @@ function onStorageChanged(ch, areaName) {
     }
 
     if (ch.always) {
+      updateContextMenu(state.changeColors, state.always);
       let index = state.hosts.indexOf(state.activeTabHostname);
       if (state.always && index === -1) {
         state.hosts.push(state.activeTabHostname);
@@ -320,7 +270,7 @@ function onUpdateLightness(lightness) {
 }
 
 // gets or initializes a property, then saves
-function initState() {
+async function initState() {
   let stateToGetOrInitialize = {
     changeColors,
     always,
@@ -334,9 +284,8 @@ function initState() {
     lightness,
   };
 
-  // set hosts before the rest
   getStorage(stateToGetOrInitialize, state => {
-    saveStorage(state);
+    saveStorage(state, createContextMenu);
   });
 }
 
@@ -351,6 +300,7 @@ function getStorage(obj, response) {
 
 function saveStorage(obj, response) {
   response = response || (() => { });
+  console.log('response', response);
   if (bIsChrome) {
     chrome.storage.local.set({ ...obj }, response);
   } else {
