@@ -296,6 +296,29 @@ function onResetState() {
   saveStorage(stateToReset);
 }
 
+function onUpdateLightness(lightness) {
+  getStorage(null, state => {
+    switch (state.activeBtn) {
+      case 'fore': {
+        state.fg.lightness = lightness;
+        createStrings(state.fg);
+        saveStorage({lightness, fg: state.fg});
+      } break;
+      case 'back': {
+        state.bg.lightness = lightness;
+        createStrings(state.bg);
+        saveStorage({lightness, bg: state.bg});
+      } break;
+      case 'link': {
+        state.li.lightness = lightness;
+        createStrings(state.li);
+        saveStorage({lightness, li: state.li});
+      } break;
+      default: break;
+    }
+  });
+}
+
 // gets or initializes a property, then saves
 function initState() {
   let stateToGetOrInitialize = {
@@ -349,6 +372,7 @@ async function notify(req, sender, res) {
     case 'updateChosenColor': onUpdateChosenColor(req.payload); break;
     case 'updateStrings': onUpdateStrings(); break;
     case 'resetState': onResetState(); break;
+    case 'updateLightness': onUpdateLightness(req.payload); break;
     default: break;
   }
 }

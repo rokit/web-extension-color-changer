@@ -26,16 +26,7 @@ var lightnessValue = document.getElementById("lightness-value");
 lightnessSlider.oninput = function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
   let lightness = parseInt(this.value);
-
-  switch (state.activeBtn) {
-    case 'fore': saveStorage({lightness, fg: {...state.fg, lightness} },
-      () => sendRuntimeMessage('updateStrings')); break;
-    case 'back': saveStorage({lightness, bg: {...state.bg, lightness} },
-      () => sendRuntimeMessage('updateStrings')); break;
-    case 'link': saveStorage({lightness, li: {...state.li, lightness} },
-      () => sendRuntimeMessage('updateStrings')); break;
-    default: break;
-  }
+  sendRuntimeMessage('updateLightness', lightness);
 }
 
 var info = document.getElementById("info");
