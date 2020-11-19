@@ -56,9 +56,8 @@ alwaysCheckbox.onmouseover = function () {
   if (!state.activeTabId) {
     return;
   }
-  // let url = new URL(activeTabId);
-  // infoText.textContent = `Always change pages on host: ${url.hostname}`;
-  // info.style.opacity = 1;
+  infoText.textContent = `Always change colors on host: ${state.activeTabHostname}`;
+  info.style.opacity = 1;
 }
 
 alwaysCheckbox.onmouseout = function () {
