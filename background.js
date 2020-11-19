@@ -137,7 +137,6 @@ function tabActivated(tabInfo) {
 
 function onTabSwitch() {
   getStorage(null, state => {
-    console.log('tab switch state', state);
     if (!state.activeTabId) return;
     chrome.tabs.executeScript(state.activeTabId, {
       code: `document.documentElement.classList.contains('${className}')`
@@ -146,9 +145,13 @@ function onTabSwitch() {
       let index = state.hosts.indexOf(state.activeTabHostname);
   
       if (index > -1) {
-        saveStorage({ changeColors: true, always: true });
+        saveStorage({ changeColors: true, always: true }, () => {
+          sendTabMessage(state.activeTabId, 'update');
+        });
       } else {
-        saveStorage({ changeColors: results[0] });
+        saveStorage({ changeColors: results[0] }, () => {
+          sendTabMessage(state.activeTabId, 'update');
+        });
       }
     });
   });
@@ -175,7 +178,8 @@ function onStorageChanged(ch, areaName) {
     if (Object.keys(state).length === 0 && state.constructor === Object) {
       return;
     }
-    if (ch.activeTabHostname) {
+
+    if (ch.activeTabId) {
       // check if hostname is in hosts
       onTabSwitch();
       // watchTab();

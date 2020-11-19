@@ -1,5 +1,5 @@
 Summary:
-Some sites have good information, but display bad colors that make them hard to use or hurt your eyes. With this extension, you can change a page's text, background, and link colors to make it more accessible. This extension isn't meant to be a global themer for the web and will not work well on all sites. If you want a specific site to have a dark theme, for example, you'll probably want to use something else.
+Some sites have good information, but display bad colors that make them hard to use or hurt your eyes. With this extension, you can change a page's colors to make it more accessible. This extension isn't meant to be a global themer for the web and will not work well on all sites. If you want a specific site to have a dark theme, for example, you'll probably want to use something else.
 
 How to use:
 When you first install the extension, please refresh any tabs you have open so that the CSS styles from the extension are loaded in the page.
