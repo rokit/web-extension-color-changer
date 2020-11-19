@@ -1,1 +1,0 @@
-update hostname when clicking different link in same tab

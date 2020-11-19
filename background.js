@@ -90,12 +90,12 @@ function updateContextMenu(changeColors, always) {
 function tabActivated(tabInfo) {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     let url = null;
-    let activeTabHostname = "";
+    let activeTabHostname = null;
     try {
       url = new URL(tabs[0].url);
       activeTabHostname = url.hostname;
     } catch {
-      activeTabHostname = "";
+      activeTabHostname = null;
     }
 
     if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {

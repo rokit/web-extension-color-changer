@@ -118,16 +118,23 @@ function notify(req, sender, res) {
 
 function getState() {
   getStorage(null, theState => {
-    console.log('getting state');
     state = theState;
-    let index = state.hosts.indexOf(state.activeTabHostname);
-  
+    let url = null;
+    let activeTabHostname = null;
+    try {
+      url = new URL(document.location.href);
+      activeTabHostname = url.hostname;
+    } catch {
+      activeTabHostname = null;
+    }
+    let index = state.hosts.indexOf(activeTabHostname);
+
     if (index > -1) {
       state.changeColors = true;
       updateContent();
-      saveStorage({ changeColors: true, always: true });
+      saveStorage({ changeColors: true, always: true, activeTabHostname });
     } else {
-      saveStorage({ changeColors: false, always: false });
+      saveStorage({ changeColors: false, always: false, activeTabHostname });
     }
   })
 }
