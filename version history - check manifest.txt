@@ -5,7 +5,6 @@ Moving the Lightness slider now updates the page live.
 Change Colors and Always buttons replaced with checkboxes.
 Updated description.
 Removed the Clear Data button from the context menu.
-  Should be a more deliberate action instead of possibly misclicking it.
 Removed donate button.
   Thank you to those who donated.
 

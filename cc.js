@@ -116,15 +116,15 @@ function notify(req, sender, res) {
   }
 }
 
-function getState() {
-  getStorage(null, theState => {
-    console.log('getState theState', theState);
-    state = theState;
-    if (state.changeColors) {
-      updateContent();
-    }
-  })
-}
+// function getState() {
+//   getStorage(null, theState => {
+//     console.log('getState theState', theState);
+//     state = theState;
+//     if (state.changeColors) {
+//       updateContent();
+//     }
+//   })
+// }
 
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);
@@ -132,6 +132,6 @@ if (bIsChrome) {
   browser.runtime.onMessage.addListener(notify);
 }
 
-getState();
+// getState();
 
 // document.onscroll = updateContent();

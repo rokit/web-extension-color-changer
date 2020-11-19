@@ -52,14 +52,14 @@ function createContextMenu() {
       checked: state.changeColors,
       onclick: evt => saveStorage({ changeColors: evt.checked }),
     };
-  
+
     let ctxAlways = {
       id: "always",
       title: "Always",
       contexts: ["all"],
       type: "checkbox",
       checked: state.always,
-      onclick: evt => saveStorage({always: evt.checked}),
+      onclick: evt => saveStorage({ always: evt.checked }),
     };
 
     if (bIsChrome) {
@@ -78,11 +78,11 @@ function createContextMenu() {
 function updateContextMenu(changeColors, always) {
   if (!contextMenuCreated) return;
   if (bIsChrome) {
-    chrome.contextMenus.update('changeColors', {checked: changeColors});
-    chrome.contextMenus.update('always', {checked: always});
+    chrome.contextMenus.update('changeColors', { checked: changeColors });
+    chrome.contextMenus.update('always', { checked: always });
   } else {
-    browser.contextMenus.update('changeColors', {checked: changeColors});
-    browser.contextMenus.update('always', {checked: always});
+    browser.contextMenus.update('changeColors', { checked: changeColors });
+    browser.contextMenus.update('always', { checked: always });
   }
 }
 
@@ -97,21 +97,67 @@ function tabActivated(tabInfo) {
     } catch {
       activeTabHostname = "";
     }
-    saveStorage({ activeTabHostname });
 
     if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
-      saveStorage({ activeTabId: tabInfo.tabId });
+      saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId });
+      watchTab(tabInfo.tabId);
       chrome.tabs.executeScript(tabInfo.tabId, {
         code: `document.documentElement.classList.contains('${className}')`
       }, (results) => {
         saveStorage({ changeColors: results[0] });
       });
     } else {
-      saveStorage({ changeColors: false, activeTabId: null });
+      saveStorage({ activeTabHostname: null, activeTabId: null });
     }
   });
 }
 
+
+// watching tabs may not be necessary if 
+// content script gets state and looks for Always
+function tabUpdated(tabId, changeInfo, tab) {
+  getStorage(null, state => {
+    console.log('tabUpdated');
+    if (tabId === state.activeTabId && tab.status === 'loading') {
+      checkActiveTabHostnameInHosts();
+      // getStorage(['always', 'changeColors'], obj => {
+      //   if (!obj.always && obj.changeColors) {
+      //     console.log('tab was loading and Always not checked');
+      //     saveStorage({changeColors: false})
+      //   }
+      // })
+    }
+  });
+}
+
+function watchTab() {
+  if (bIsChrome) {
+    chrome.tabs.onUpdated.removeListener(tabUpdated);
+    chrome.tabs.onUpdated.addListener(tabUpdated);
+  } else {
+    chrome.tabs.onUpdated.removeListener(tabUpdated);
+    browser.tabs.onUpdated.addListener(tabUpdated);
+  }
+}
+
+function checkActiveTabHostnameInHosts() {
+  getStorage(null, state => {
+    let index = state.hosts.indexOf(state.activeTabHostname);
+
+    console.log('state.activeTabHostname', state.activeTabHostname);
+    console.log('index', index);
+
+    if (index > -1) {
+      saveStorage({ changeColors: true, always: true }, () => {
+        sendTabMessage(state.activeTabId, 'update');
+      });
+    } else {
+      saveStorage({ changeColors: false, always: false }, () => {
+        sendTabMessage(state.activeTabId, 'update');
+      });
+    }
+  })
+}
 // ch = changes
 function onStorageChanged(ch, areaName) {
   console.log('---- storage changed', ch);
@@ -126,12 +172,7 @@ function onStorageChanged(ch, areaName) {
     }
     if (ch.activeTabHostname) {
       // check if hostname is in hosts
-      let index = state.hosts.indexOf(state.activeTabHostname);
-      let always = false;
-      if (index > -1) {
-        always = true;
-      }
-      saveStorage({ always });
+      checkActiveTabHostnameInHosts();
     }
 
     if (ch.changeColors) {
@@ -155,6 +196,7 @@ function onStorageChanged(ch, areaName) {
         state.hosts.splice(index, 1);
         saveStorage({ hosts: [...state.hosts] });
       }
+      // sendTabMessage(state.activeTabId, 'update');
     }
 
     if (ch.fg || ch.bg || ch.li) {
@@ -252,17 +294,17 @@ function onUpdateLightness(lightness) {
       case 'fore': {
         state.fg.lightness = lightness;
         createStrings(state.fg);
-        saveStorage({lightness, fg: state.fg});
+        saveStorage({ lightness, fg: state.fg });
       } break;
       case 'back': {
         state.bg.lightness = lightness;
         createStrings(state.bg);
-        saveStorage({lightness, bg: state.bg});
+        saveStorage({ lightness, bg: state.bg });
       } break;
       case 'link': {
         state.li.lightness = lightness;
         createStrings(state.li);
-        saveStorage({lightness, li: state.li});
+        saveStorage({ lightness, li: state.li });
       } break;
       default: break;
     }
