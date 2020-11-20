@@ -45,7 +45,7 @@ var backSwatch = document.getElementById("back-swatch");
 var linkSwatch = document.getElementById("link-swatch");
 
 changeColorsCheckbox.onclick = () => {
-  saveStorage({ changeColors: changeColorsCheckbox.checked });
+  sendRuntimeMessage('changeColors', changeColorsCheckbox.checked);
 };
 
 alwaysCheckbox.onclick = () => {
@@ -275,37 +275,6 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// function updateContent() {
-//   if (activeTabId) {
-//     if (bIsChrome) {
-//       chrome.tabs.sendMessage(activeTabId, { message: 'updateContent' });
-//     } else {
-//       browser.tabs.sendMessage(activeTabId, { message: 'updateContent' });
-//     }
-//   }
-// }
-
-// function setChangeColorsViaSwatch() {
-//   if (activeTabId) {
-//     changeColorsCheckbox.checked = true;
-//     if (bIsChrome) {
-//       chrome.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value: true });
-//     } else {
-//       browser.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value: true });
-//     }
-//   }
-// }
-
-// async function setChangeColors(value) {
-//   if (activeTabId) {
-//     if (bIsChrome) {
-//       chrome.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
-//     } else {
-//       browser.tabs.sendMessage(activeTabId, { message: 'setChangeColors', value });
-//     }
-//   }
-// }
 
 function saveStorage(obj, response) {
   console.log('save storage called');

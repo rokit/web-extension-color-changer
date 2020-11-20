@@ -130,11 +130,12 @@ function getState() {
     let index = state.hosts.indexOf(activeTabHostname);
 
     if (index > -1) {
-      state.changeColors = true;
+      sendRuntimeMessage('changeColors', true);
       updateContent();
-      saveStorage({ changeColors: true, always: true, activeTabHostname });
+      saveStorage({always: true, activeTabHostname });
     } else {
-      saveStorage({ changeColors: false, always: false, activeTabHostname });
+      sendRuntimeMessage('changeColors', false);
+      saveStorage({ always: false, activeTabHostname });
     }
   })
 }
@@ -146,6 +147,14 @@ function saveStorage(obj, response) {
     chrome.storage.local.set({ ...obj }, response);
   } else {
     browser.storage.local.set({ ...obj }, response);
+  }
+}
+
+function sendRuntimeMessage(message, payload, response) {
+  if (bIsChrome) {
+    chrome.runtime.sendMessage({ message, payload }, response);
+  } else {
+    browser.runtime.sendMessage({ message, payload }, response);
   }
 }
 

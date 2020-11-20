@@ -42,6 +42,17 @@ const activeBtn = 'fore';
 const lightness = 80;
 const hosts = [];
 
+function onChangeColors(changeColors) {
+  if (!changeColors) {
+    saveStorage({always: false});
+  }
+  saveStorage({changeColors}, () => {
+    getStorage(null, state => {
+      sendTabMessage(state.activeTabId, 'update');
+    });
+  })
+} 
+
 function createContextMenu() {
   getStorage(null, state => {
     let ctxColorChanger = {
@@ -50,7 +61,7 @@ function createContextMenu() {
       contexts: ["all"],
       type: "checkbox",
       checked: state.changeColors,
-      onclick: evt => saveStorage({ changeColors: evt.checked }),
+      onclick: evt => onChangeColors(evt.changeColors),
     };
 
     let ctxAlways = {
@@ -122,7 +133,7 @@ function tabActivated(tabInfo) {
 //   console.log('onTabLoading');
 //   // getStorage(null, state => {
 //   //   let index = state.hosts.indexOf(state.activeTabHostname);
-  
+
 //   //   if (index > -1) {
 //   //     saveStorage({ changeColors: true, always: true }, () => {
 //   //       sendTabMessage(state.activeTabId, 'update');
@@ -143,15 +154,11 @@ function onTabSwitch() {
     }, (results) => {
       console.log('results[0]', results[0]);
       let index = state.hosts.indexOf(state.activeTabHostname);
-  
+
       if (index > -1) {
-        saveStorage({ changeColors: true, always: true }, () => {
-          sendTabMessage(state.activeTabId, 'update');
-        });
+        onChangeColors(true);
       } else {
-        saveStorage({ changeColors: results[0] }, () => {
-          sendTabMessage(state.activeTabId, 'update');
-        });
+        onChangeColors(results[0]);
       }
     });
   });
@@ -178,23 +185,13 @@ function onStorageChanged(ch, areaName) {
     if (Object.keys(state).length === 0 && state.constructor === Object) {
       return;
     }
+    // on every change of state, update the context menu
+    updateContextMenu(state.changeColors, state.always);
 
     if (ch.activeTabId) {
       // check if hostname is in hosts
       onTabSwitch();
       // watchTab();
-    }
-
-    if (ch.changeColors) {
-      updateContextMenu(state.changeColors, state.always);
-      if (!state.changeColors) {
-        console.log('cc.changeColors always = false');
-        saveStorage({ always: false });
-      }
-
-      if (state.activeTabId) {
-        sendTabMessage(state.activeTabId, 'update');
-      }
     }
 
     if (ch.always) {
@@ -203,12 +200,12 @@ function onStorageChanged(ch, areaName) {
       if (state.always && index === -1) {
         state.hosts.push(state.activeTabHostname);
         console.log('ch.always cc true');
-        saveStorage({ changeColors: true, hosts: [...state.hosts] });
+        saveStorage({ hosts: [...state.hosts] });
+        onChangeColors(true);
       } else if (!state.always && index > -1) {
         state.hosts.splice(index, 1);
         saveStorage({ hosts: [...state.hosts] });
       }
-      // sendTabMessage(state.activeTabId, 'update');
     }
 
     if (ch.fg || ch.bg || ch.li) {
@@ -228,24 +225,24 @@ function onUpdateChosenColor(payload) {
         saveStorage({
           fg: state.fg,
           lightness: state.fg.lightness,
-          changeColors: true,
         });
+        onChangeColors(true);
       } break;
       case "back": {
         updateChosenColor(state.bg, payload);
         saveStorage({
           bg: state.bg,
           lightness: state.bg.lightness,
-          changeColors: true,
         });
+        onChangeColors(true);
       } break;
       case "link": {
         updateChosenColor(state.li, payload);
         saveStorage({
           li: state.li,
           lightness: state.li.lightness,
-          changeColors: true
         });
+        onChangeColors(true);
       } break;
       default: break;
     }
@@ -260,22 +257,22 @@ function onUpdateStrings() {
         createStrings(state.fg);
         saveStorage({
           fg: state.fg,
-          changeColors: true,
         });
+        onChangeColors(true);
       } break;
       case "back": {
         createStrings(state.bg);
         saveStorage({
           bg: state.bg,
-          changeColors: true,
         });
+        onChangeColors(true);
       } break;
       case "link": {
         createStrings(state.li);
         saveStorage({
           li: state.li,
-          changeColors: true
         });
+        onChangeColors(true);
       } break;
       default: break;
     }
@@ -390,6 +387,7 @@ function notify(req, sender, res) {
     case 'updateStrings': onUpdateStrings(); break;
     case 'resetState': onResetState(); break;
     case 'updateLightness': onUpdateLightness(req.payload); break;
+    case 'changeColors': onChangeColors(req.payload); break;
     default: break;
   }
 }
