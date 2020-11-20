@@ -25,22 +25,24 @@ body, html {
   grid-gap: 10px;
 }
 
+#scope .checkbox-container {
+  display: flex;
+  background-color: #eee;
+  border: 2px solid white;
+}
+
 #scope label {
+  flex: 1;
   font-size: 1.1rem;
   align-self: center;
-  margin-bottom: 5px;
+  padding-left: 10px;
 }
 
-#scope .checkbox-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-#scope input {
-  width: 40px;
-  height: 40px;
+#scope input[type="checkbox"] {
+  width: 30px;
+  height: 30px;
   align-self: center;
+  margin: 10px;
 }
 
 #cc-div {
@@ -100,7 +102,6 @@ button {
   font-size: 1.2rem;
   text-align: center;
   cursor: pointer;
-  border: none;
   background-color: #eee;
   border: 2px solid white;
 }
