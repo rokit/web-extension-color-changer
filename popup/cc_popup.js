@@ -23,12 +23,6 @@ function updateSwatch(swatch, hue, saturation, lightness) {
 var lightnessSlider = document.getElementById("lightness");
 var lightnessValue = document.getElementById("lightness-value");
 
-lightnessSlider.oninput = function () {
-  lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
-  let lightness = parseInt(this.value);
-  sendRuntimeMessage('updateLightness', lightness);
-}
-
 var info = document.getElementById("info");
 var infoText = document.querySelector("#info p");
 
@@ -66,6 +60,12 @@ alwaysCheckbox.onmouseout = function () {
 
 clearBtn.onclick = function () {
   sendRuntimeMessage('resetState');
+}
+
+lightnessSlider.oninput = function () {
+  lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
+  let lightness = parseInt(this.value);
+  sendRuntimeMessage('updateLightness', lightness);
 }
 
 function handleFore() {

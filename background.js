@@ -252,17 +252,17 @@ function onUpdateLightness(lightness) {
       case 'fore': {
         state.fg.lightness = lightness;
         createStrings(state.fg);
-        saveStorage({ lightness, fg: state.fg });
+        saveStorage({ lightness, fg: state.fg }, () => onChangeColors(true));
       } break;
       case 'back': {
         state.bg.lightness = lightness;
         createStrings(state.bg);
-        saveStorage({ lightness, bg: state.bg });
+        saveStorage({ lightness, bg: state.bg }, () => onChangeColors(true));
       } break;
       case 'link': {
         state.li.lightness = lightness;
         createStrings(state.li);
-        saveStorage({ lightness, li: state.li });
+        saveStorage({ lightness, li: state.li }, () => onChangeColors(true));
       } break;
       default: break;
     }
