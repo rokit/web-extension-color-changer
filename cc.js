@@ -96,6 +96,7 @@ function updateContent() {
 }
 
 function getStorage(obj, response) {
+  response = response || (() => { });
   if (bIsChrome) {
     chrome.storage.local.get(obj, response);
   } else {
@@ -106,7 +107,6 @@ function getStorage(obj, response) {
 function notify(req, sender, res) {
   switch (req.message) {
     case 'update': {
-      console.log('received update');
       getStorage(null, theState => {
         state = theState;
         updateContent();
@@ -152,14 +152,6 @@ function saveStorage(obj, response) {
   }
 }
 
-function sendRuntimeMessage(message, payload, response) {
-  if (bIsChrome) {
-    chrome.runtime.sendMessage({ message, payload }, response);
-  } else {
-    browser.runtime.sendMessage({ message, payload }, response);
-  }
-}
-
 if (bIsChrome) {
   chrome.runtime.onMessage.addListener(notify);
 } else {
@@ -167,5 +159,3 @@ if (bIsChrome) {
 }
 
 getState();
-
-// document.onscroll = updateContent();

@@ -89,16 +89,11 @@ function setActiveColorButton() {
   foreBtn.classList.remove("active-btn");
   backBtn.classList.remove("active-btn");
   linkBtn.classList.remove("active-btn");
-
   document.getElementById(state.activeBtn).classList.add("active-btn");
-  setActiveSwatchButton();
-}
 
-function setActiveSwatchButton() {
   foreSwatch.classList.remove("active-swatch");
   backSwatch.classList.remove("active-swatch");
   linkSwatch.classList.remove("active-swatch");
-
   document.getElementById(`${state.activeBtn}-swatch`).classList.add("active-swatch");
 }
 
@@ -246,7 +241,6 @@ function checkCollision(swatches, x, y) {
 
 canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
-  console.log('swatch', swatch);
   if (!swatch) return;
   sendRuntimeMessage('updateChosenColor', swatch);
 }
@@ -277,8 +271,6 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function saveStorage(obj, response) {
-  console.log('save storage called');
-  console.log('obj', obj);
   response = response || (() => {});
   if (bIsChrome) {
     chrome.storage.local.set({ ...obj }, response);
@@ -288,6 +280,7 @@ function saveStorage(obj, response) {
 }
 
 function getStorage(obj, response) {
+  response = response || (() => { });
   if (bIsChrome) {
     chrome.storage.local.get(obj, response);
   } else {
@@ -319,26 +312,6 @@ function sendRuntimeMessage(message, payload, response) {
     browser.runtime.sendMessage({ message, payload }, response);
   }
 }
-
-function sendTabMessage(activeTabId, message, payload, response) {
-  if (!activeTabId) return;
-  if (bIsChrome) {
-    chrome.tabs.sendMessage(activeTabId, { message, payload }, response);
-  } else {
-    browser.tabs.sendMessage(activeTabId, { message, payload }, response);
-  }
-}
-
-// async function notify(req, sender, res) {
-//   switch (req.message) {
-//     // case 'changeColors': {
-//     //   console.log('req.payload', req.payload);
-//     //   // createContextMenu(req.payload);
-//     // }; break;
-
-//     default: break;
-//   }
-// }
 
 if (bIsChrome) {
   chrome.storage.onChanged.addListener(updateUi);

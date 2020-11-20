@@ -133,61 +133,24 @@ function tabActivated(tabInfo) {
   });
 }
 
-// // watching tabs may not be necessary if 
-// // content script gets state and looks for Always
-// function tabUpdated(tabId, changeInfo, tab) {
-//   getStorage(null, state => {
-//     console.log('tabUpdated');
-//     if (tabId === state.activeTabId && tab.status === 'loading') {
-//       onTabLoading();
-//     }
-//   });
-// }
-
-// function onTabLoading() {
-//   console.log('onTabLoading');
-//   // getStorage(null, state => {
-//   //   let index = state.hosts.indexOf(state.activeTabHostname);
-
-//   //   if (index > -1) {
-//   //     saveStorage({ changeColors: true, always: true }, () => {
-//   //       sendTabMessage(state.activeTabId, 'update');
-//   //     });
-//   //   } else {
-//   //     saveStorage({ changeColors: false, always: false }, () => {
-//   //       sendTabMessage(state.activeTabId, 'update');
-//   //     });
-//   //   }
-//   // })
-// }
-
 function onTabSwitch() {
   getStorage(null, state => {
     if (!state.activeTabId) return;
     chrome.tabs.executeScript(state.activeTabId, {
       code: `document.documentElement.classList.contains('${className}')`
     }, (results) => {
-      console.log('results[0]', results[0]);
       let index = state.hosts.indexOf(state.activeTabHostname);
 
       if (index > -1) {
         onChangeColors(true);
       } else {
+        console.log('results[0]', results[0]);
         onChangeColors(results[0]);
       }
     });
   });
 }
 
-// -----------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------
-// On storage changed
-// -----------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------
 // ch = changes
 function onStorageChanged(ch, areaName) {
   getStorage(null, state => {
@@ -196,23 +159,17 @@ function onStorageChanged(ch, areaName) {
     if (Object.keys(state).length === 0 && state.constructor === Object) {
       return;
     }
+
     // on every change of state, update the context menu
     updateContextMenu(state.changeColors, state.always);
 
     if (ch.activeTabId) {
       onTabSwitch();
     }
-
-    // if (ch.fg || ch.bg || ch.li) {
-    //   if (state.activeTabId) {
-    //     sendTabMessage(state.activeTabId, 'update');
-    //   }
-    // }
   });
 }
 
 function onUpdateChosenColor(payload) {
-  console.log('onUpdateChoseColor cc true');
   getStorage(null, state => {
     switch (state.activeBtn) {
       case "fore": {
@@ -220,24 +177,22 @@ function onUpdateChosenColor(payload) {
         saveStorage({
           fg: state.fg,
           lightness: state.fg.lightness,
-        });
-        onChangeColors(true);
+        }, () => onChangeColors(true));
+        
       } break;
       case "back": {
         updateChosenColor(state.bg, payload);
         saveStorage({
           bg: state.bg,
           lightness: state.bg.lightness,
-        });
-        onChangeColors(true);
+        }, () => onChangeColors(true));
       } break;
       case "link": {
         updateChosenColor(state.li, payload);
         saveStorage({
           li: state.li,
           lightness: state.li.lightness,
-        });
-        onChangeColors(true);
+        }, () => onChangeColors(true));
       } break;
       default: break;
     }
@@ -252,22 +207,19 @@ function onUpdateStrings() {
         createStrings(state.fg);
         saveStorage({
           fg: state.fg,
-        });
-        onChangeColors(true);
+        }, () => onChangeColors(true));
       } break;
       case "back": {
         createStrings(state.bg);
         saveStorage({
           bg: state.bg,
-        });
-        onChangeColors(true);
+        }, () => onChangeColors(true));
       } break;
       case "link": {
         createStrings(state.li);
         saveStorage({
           li: state.li,
-        });
-        onChangeColors(true);
+        }, () => onChangeColors(true));
       } break;
       default: break;
     }
@@ -363,16 +315,6 @@ function sendTabMessage(activeTabId, message, payload, response) {
     browser.tabs.sendMessage(activeTabId, { message, payload }, response);
   }
 }
-
-// function watchTab() {
-//   if (bIsChrome) {
-//     chrome.tabs.onUpdated.removeListener(tabUpdated);
-//     chrome.tabs.onUpdated.addListener(tabUpdated);
-//   } else {
-//     chrome.tabs.onUpdated.removeListener(tabUpdated);
-//     browser.tabs.onUpdated.addListener(tabUpdated);
-//   }
-// }
 
 function notify(req, sender, res) {
   switch (req.message) {
