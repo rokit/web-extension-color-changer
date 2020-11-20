@@ -153,7 +153,7 @@ function drawCanvas() {
   ctx.fillStyle = `hsl(0, 0%, ${state.lightness}%)`;
   ctx.fill();
   ctx.strokeStyle = strokeColor;
-  hoverId === "zero" ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
+  // hoverId === "zero" ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
   if (
     (state.activeBtn === "fore" && state.fg.chosenId === "zero") ||
@@ -165,6 +165,7 @@ function drawCanvas() {
   }
   ctx.stroke();
   ctx.setLineDash([0]);
+  ctx.lineWidth = 1;
 
   if (swatches["zero"]) {
     updateSwatch(swatches["zero"], 0, 0, state.lightness);
@@ -196,7 +197,7 @@ function drawCanvas() {
       }
 
       ctx.strokeStyle = strokeColor;
-      hoverId === id ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
+      // hoverId === id ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
       if ((state.activeBtn === "fore" && state.fg.chosenId === id) ||
         (state.activeBtn === "back" && state.bg.chosenId === id) ||
@@ -207,19 +208,20 @@ function drawCanvas() {
       }
       ctx.stroke();
       ctx.setLineDash([0]);
+      ctx.lineWidth = 1;
     }
   }
 
-  if (hoverId) {
-    ctx.beginPath();
-    ctx.arc(originX, originY, bigRadius, 0, 2 * Math.PI, false);
-    ctx.fillStyle = swatches[hoverId].hsl;
-    ctx.fill();
-    ctx.closePath();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = strokeColor;
-    ctx.stroke();
-  }
+  // if (hoverId) {
+  //   ctx.beginPath();
+  //   ctx.arc(originX, originY, bigRadius, 0, 2 * Math.PI, false);
+  //   ctx.fillStyle = swatches[hoverId].hsl;
+  //   ctx.fill();
+  //   ctx.closePath();
+  //   ctx.lineWidth = 1;
+  //   ctx.strokeStyle = strokeColor;
+  //   ctx.stroke();
+  // }
 }
 
 function checkCollision(swatches, x, y) {
