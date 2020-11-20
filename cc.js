@@ -127,22 +127,24 @@ function getState() {
     } catch {
       activeTabHostname = null;
     }
+    saveStorage({ activeTabHostname });
     let index = state.hosts.indexOf(activeTabHostname);
 
     if (index > -1) {
-      sendRuntimeMessage('changeColors', true);
+      state.changeColors = true;
+      state.always = true;
+      saveStorage({ changeColors: true, always: true });
       updateContent();
-      saveStorage({always: true, activeTabHostname });
     } else {
-      sendRuntimeMessage('changeColors', false);
-      saveStorage({ always: false, activeTabHostname });
+      state.changeColors = false;
+      state.always = false;
+      saveStorage({ changeColors: false, always: false });
     }
   })
 }
 
 function saveStorage(obj, response) {
   response = response || (() => { });
-  console.log('response', response);
   if (bIsChrome) {
     chrome.storage.local.set({ ...obj }, response);
   } else {

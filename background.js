@@ -43,15 +43,31 @@ const lightness = 80;
 const hosts = [];
 
 function onChangeColors(changeColors) {
-  if (!changeColors) {
-    saveStorage({always: false});
-  }
-  saveStorage({changeColors}, () => {
+  saveStorage({ changeColors }, () => {
     getStorage(null, state => {
+      if (!changeColors && state.always) {
+        onAlways(false);
+      }
       sendTabMessage(state.activeTabId, 'update');
     });
   })
-} 
+}
+
+function onAlways(always) {
+  saveStorage({ always }, () => {
+    getStorage(null, state => {
+      let index = state.hosts.indexOf(state.activeTabHostname);
+      if (state.always && index === -1) {
+        state.hosts.push(state.activeTabHostname);
+        saveStorage({ hosts: [...state.hosts] });
+        onChangeColors(true);
+      } else if (!state.always && index > -1) {
+        state.hosts.splice(index, 1);
+        saveStorage({ hosts: [...state.hosts] });
+      }
+    })
+  });
+}
 
 function createContextMenu() {
   getStorage(null, state => {
@@ -61,7 +77,7 @@ function createContextMenu() {
       contexts: ["all"],
       type: "checkbox",
       checked: state.changeColors,
-      onclick: evt => onChangeColors(evt.changeColors),
+      onclick: evt => onChangeColors(evt.checked),
     };
 
     let ctxAlways = {
@@ -70,7 +86,7 @@ function createContextMenu() {
       contexts: ["all"],
       type: "checkbox",
       checked: state.always,
-      onclick: evt => saveStorage({ always: evt.checked }),
+      onclick: evt => onAlways(evt.checked),
     };
 
     if (bIsChrome) {
@@ -110,7 +126,6 @@ function tabActivated(tabInfo) {
     }
 
     if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
-      console.log('url', url);
       saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId });
     } else {
       saveStorage({ activeTabHostname: null, activeTabId: null });
@@ -175,11 +190,7 @@ function onTabSwitch() {
 // -----------------------------------------------------------------------------------------------
 // ch = changes
 function onStorageChanged(ch, areaName) {
-  console.log('---- storage changed', ch);
   getStorage(null, state => {
-    // console.log('state', state);
-    // console.log('ch', ch);
-
     // if state is empty, return
     // state can be empty when clearing storage
     if (Object.keys(state).length === 0 && state.constructor === Object) {
@@ -189,30 +200,14 @@ function onStorageChanged(ch, areaName) {
     updateContextMenu(state.changeColors, state.always);
 
     if (ch.activeTabId) {
-      // check if hostname is in hosts
       onTabSwitch();
-      // watchTab();
     }
 
-    if (ch.always) {
-      updateContextMenu(state.changeColors, state.always);
-      let index = state.hosts.indexOf(state.activeTabHostname);
-      if (state.always && index === -1) {
-        state.hosts.push(state.activeTabHostname);
-        console.log('ch.always cc true');
-        saveStorage({ hosts: [...state.hosts] });
-        onChangeColors(true);
-      } else if (!state.always && index > -1) {
-        state.hosts.splice(index, 1);
-        saveStorage({ hosts: [...state.hosts] });
-      }
-    }
-
-    if (ch.fg || ch.bg || ch.li) {
-      if (state.activeTabId) {
-        sendTabMessage(state.activeTabId, 'update');
-      }
-    }
+    // if (ch.fg || ch.bg || ch.li) {
+    //   if (state.activeTabId) {
+    //     sendTabMessage(state.activeTabId, 'update');
+    //   }
+    // }
   });
 }
 
@@ -324,7 +319,6 @@ function onUpdateLightness(lightness) {
 
 // gets or initializes a property, then saves
 function initState() {
-  console.log('init state cc false');
   let stateToGetOrInitialize = {
     changeColors,
     always,
@@ -354,7 +348,6 @@ function getStorage(obj, response) {
 
 function saveStorage(obj, response) {
   response = response || (() => { });
-  console.log('response', response);
   if (bIsChrome) {
     chrome.storage.local.set({ ...obj }, response);
   } else {
@@ -388,6 +381,7 @@ function notify(req, sender, res) {
     case 'resetState': onResetState(); break;
     case 'updateLightness': onUpdateLightness(req.payload); break;
     case 'changeColors': onChangeColors(req.payload); break;
+    case 'always': onAlways(req.payload); break;
     default: break;
   }
 }

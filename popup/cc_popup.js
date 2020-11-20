@@ -49,7 +49,7 @@ changeColorsCheckbox.onclick = () => {
 };
 
 alwaysCheckbox.onclick = () => {
-  saveStorage({ always: alwaysCheckbox.checked });
+  sendRuntimeMessage('always', alwaysCheckbox.checked);
 };
 
 alwaysCheckbox.onmouseover = function () {
