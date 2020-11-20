@@ -59,7 +59,7 @@ alwaysCheckbox.onmouseout = function () {
 }
 
 clearBtn.onclick = function () {
-  sendRuntimeMessage('resetState');
+  sendRuntimeMessage('reset');
 }
 
 lightnessSlider.oninput = function () {

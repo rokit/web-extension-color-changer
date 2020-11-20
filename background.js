@@ -126,7 +126,7 @@ function tabActivated(tabInfo) {
     }
 
     if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
-      saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId });
+      saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId }, onTabSwitch);
     } else {
       saveStorage({ activeTabHostname: null, activeTabId: null });
     }
@@ -162,10 +162,6 @@ function onStorageChanged(ch, areaName) {
 
     // on every change of state, update the context menu
     updateContextMenu(state.changeColors, state.always);
-
-    if (ch.activeTabId) {
-      onTabSwitch();
-    }
   });
 }
 
@@ -227,7 +223,7 @@ function onUpdateStrings() {
 }
 
 // saves defaults
-function onResetState() {
+function onReset() {
   // don't reset:
   // colorChanger
   // activeTabId
@@ -243,7 +239,13 @@ function onResetState() {
     lightness,
   };
 
-  saveStorage(stateToReset);
+  saveStorage(stateToReset, () => {
+    getStorage(null, state => {
+      if (state.changeColors) {
+        sendTabMessage(state.activeTabId, 'update');
+      }
+    })
+  });
 }
 
 function onUpdateLightness(lightness) {
@@ -320,7 +322,7 @@ function notify(req, sender, res) {
   switch (req.message) {
     case 'updateChosenColor': onUpdateChosenColor(req.payload); break;
     case 'updateStrings': onUpdateStrings(); break;
-    case 'resetState': onResetState(); break;
+    case 'reset': onReset(); break;
     case 'updateLightness': onUpdateLightness(req.payload); break;
     case 'changeColors': onChangeColors(req.payload); break;
     case 'always': onAlways(req.payload); break;
