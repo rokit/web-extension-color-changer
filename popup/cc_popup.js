@@ -28,6 +28,7 @@ var infoText = document.querySelector("#info p");
 
 var changeColorsCheckbox = document.getElementById("change-colors");
 var alwaysCheckbox = document.getElementById("always");
+var alwaysLabel = document.getElementById("always-label");
 
 var foreBtn = document.getElementById("fore");
 var backBtn = document.getElementById("back");
@@ -46,7 +47,7 @@ alwaysCheckbox.onclick = () => {
   sendRuntimeMessage('always', alwaysCheckbox.checked);
 };
 
-alwaysCheckbox.onmouseover = function () {
+function alwaysMouseover() {
   if (!state.activeTabId) {
     return;
   }
@@ -54,9 +55,14 @@ alwaysCheckbox.onmouseover = function () {
   info.style.opacity = 1;
 }
 
-alwaysCheckbox.onmouseout = function () {
+function alwaysMouseout() {
   info.style.opacity = 0;
 }
+
+alwaysCheckbox.onmouseover = alwaysMouseover;
+alwaysCheckbox.onmouseout = alwaysMouseout;
+alwaysLabel.onmouseover = alwaysMouseover;
+alwaysLabel.onmouseout = alwaysMouseout;
 
 clearBtn.onclick = function () {
   sendRuntimeMessage('reset');
