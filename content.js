@@ -98,9 +98,9 @@ function updateContent() {
 function getStorage(obj, response) {
   response = response || (() => { });
   if (bIsChrome) {
-    chrome.storage.local.get(obj, response);
+    chrome.storage.sync.get(obj, response);
   } else {
-    browser.storage.local.get(obj, response);
+    browser.storage.sync.get(obj, response);
   }
 }
 
@@ -146,9 +146,9 @@ function getState() {
 function saveStorage(obj, response) {
   response = response || (() => { });
   if (bIsChrome) {
-    chrome.storage.local.set({ ...obj }, response);
+    chrome.storage.sync.set({ ...obj }, response);
   } else {
-    browser.storage.local.set({ ...obj }, response);
+    browser.storage.sync.set({ ...obj }, response);
   }
 }
 

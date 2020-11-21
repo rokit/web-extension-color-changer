@@ -122,7 +122,7 @@ function tabsQueryCallback(tabInfo, tabs) {
   } catch {
     activeTabHostname = null;
   }
-  
+
   if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
     saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId }, onTabSwitch);
   } else {
@@ -143,10 +143,9 @@ function tabExecuteScriptCallback(results, state) {
   let index = state.hosts.indexOf(state.activeTabHostname);
 
   if (index > -1) {
-    onChangeColors(true);
+    saveStorage({ changeColors: true, always: true });
   } else {
-    console.log('results[0]', results[0]);
-    onChangeColors(results[0]);
+    saveStorage({ changeColors: results[0], always: false });
   }
 }
 
@@ -309,27 +308,27 @@ function initState() {
 function getStorage(obj, response) {
   response = response || (() => { });
   if (bIsChrome) {
-    chrome.storage.local.get(obj, response);
+    chrome.storage.sync.get(obj, response);
   } else {
-    browser.storage.local.get(obj, response);
+    browser.storage.sync.get(obj, response);
   }
 }
 
 function saveStorage(obj, response) {
   response = response || (() => { });
   if (bIsChrome) {
-    chrome.storage.local.set({ ...obj }, response);
+    chrome.storage.sync.set({ ...obj }, response);
   } else {
-    browser.storage.local.set({ ...obj }, response);
+    browser.storage.sync.set({ ...obj }, response);
   }
 }
 
 function clearStorage(obj, response) {
   response = response || (() => { });
   if (bIsChrome) {
-    chrome.storage.local.clear();
+    chrome.storage.sync.clear();
   } else {
-    browser.storage.local.clear();
+    browser.storage.sync.clear();
   }
 }
 
