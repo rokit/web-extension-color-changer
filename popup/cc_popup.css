@@ -214,7 +214,7 @@ footer:hover {
 
 footer section {
   display: grid;
-  grid-template-areas: "donate always-on clear-storage";
+  grid-template-areas: "donate always-on reset";
   grid-template-rows: 1fr 1fr 1fr;
   grid-template-columns: 1fr;
   grid-gap: 10px;
@@ -231,8 +231,8 @@ footer section {
   grid-area: always-on;
 }
 
-#clear-storage {
-  grid-area: clear-storage;
+#reset {
+  grid-area: reset;
 }
 
 #info {

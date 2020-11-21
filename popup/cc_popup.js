@@ -33,7 +33,7 @@ var alwaysLabel = document.getElementById("always-label");
 var foreBtn = document.getElementById("fore");
 var backBtn = document.getElementById("back");
 var linkBtn = document.getElementById("link");
-var clearBtn = document.getElementById("clear-storage");
+var resetBtn = document.getElementById("reset");
 
 var foreSwatch = document.getElementById("fore-swatch");
 var backSwatch = document.getElementById("back-swatch");
@@ -64,7 +64,7 @@ alwaysCheckbox.onmouseout = alwaysMouseout;
 alwaysLabel.onmouseover = alwaysMouseover;
 alwaysLabel.onmouseout = alwaysMouseout;
 
-clearBtn.onclick = function () {
+resetBtn.onclick = function () {
   sendRuntimeMessage('reset');
 }
 
