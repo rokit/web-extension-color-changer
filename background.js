@@ -113,24 +113,30 @@ function updateContextMenu(changeColors, always) {
   }
 }
 
+function tabsQueryCallback(tabInfo, tabs) {
+  let url = null;
+  let activeTabHostname = null;
+  try {
+    url = new URL(tabs[0].url);
+    activeTabHostname = url.hostname;
+  } catch {
+    activeTabHostname = null;
+  }
+  
+  if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
+    saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId }, onTabSwitch);
+  } else {
+    saveStorage({ activeTabHostname: null, activeTabId: null });
+  }
+}
+
 // on tab activation get tabid and hostname
 function tabActivated(tabInfo) {
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    let url = null;
-    let activeTabHostname = null;
-    try {
-      url = new URL(tabs[0].url);
-      activeTabHostname = url.hostname;
-    } catch {
-      activeTabHostname = null;
-    }
-
-    if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
-      saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId }, onTabSwitch);
-    } else {
-      saveStorage({ activeTabHostname: null, activeTabId: null });
-    }
-  });
+  if (bIsChrome) {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => tabsQueryCallback(tabInfo, tabs));
+  } else {
+    browser.tabs.query({ active: true, currentWindow: true }, tabs => tabsQueryCallback(tabInfo, tabs));
+  }
 }
 
 function onTabSwitch() {
