@@ -26,7 +26,7 @@ var lightnessValue = document.getElementById("lightness-value");
 var info = document.getElementById("info");
 var infoText = document.querySelector("#info p");
 
-var changeColorsCheckbox = document.getElementById("cc");
+var changeColorsCheckbox = document.getElementById("change-colors");
 var alwaysCheckbox = document.getElementById("always");
 
 var foreBtn = document.getElementById("fore");

@@ -28,21 +28,21 @@ body, html {
 #scope .checkbox-container {
   display: flex;
   background-color: #eee;
-  border: 2px solid white;
 }
 
 #scope label {
   flex: 1;
   font-size: 1.1rem;
   align-self: center;
-  padding-left: 10px;
+  padding: 14px 0 14px 10px;
+  user-select: none;
 }
 
 #scope input[type="checkbox"] {
   width: 30px;
   height: 30px;
   align-self: center;
-  margin: 10px;
+  margin-right: 10px;
 }
 
 #cc-div {
