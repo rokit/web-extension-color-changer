@@ -16,6 +16,7 @@
       "js": ["cc.js"]
     }
   ],
+  "web_accessible_resources": ["icons/icon.svg"],
   "background": { "scripts": ["background.js"] },
   "permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
   "browser_action": {

@@ -174,7 +174,7 @@ function onUpdateChosenColor(payload) {
           fg: state.fg,
           lightness: state.fg.lightness,
         }, () => onChangeColors(true));
-        
+
       } break;
       case "back": {
         updateChosenColor(state.bg, payload);
@@ -309,6 +309,15 @@ function saveStorage(obj, response) {
   }
 }
 
+function clearStorage(obj, response) {
+  response = response || (() => { });
+  if (bIsChrome) {
+    chrome.storage.local.clear();
+  } else {
+    browser.storage.local.clear();
+  }
+}
+
 function sendTabMessage(activeTabId, message, payload, response) {
   if (!activeTabId) return;
   if (bIsChrome) {
@@ -330,15 +339,31 @@ function notify(req, sender, res) {
   }
 }
 
+function showAboutPage() {
+  if (bIsChrome) {
+    chrome.tabs.create({ url: chrome.extension.getURL("about/about.html") });
+  } else {
+    browser.tabs.create({ url: chrome.extension.getURL("about/about.html") });
+  }
+}
+
+function onInstalled(object) {
+  if (object.reason !== 'install') return;
+
+  clearStorage();
+  showAboutPage();
+}
+
 if (bIsChrome) {
   chrome.tabs.onActivated.addListener(tabActivated);
   chrome.runtime.onMessage.addListener(notify);
   chrome.storage.onChanged.addListener(onStorageChanged);
+  chrome.runtime.onInstalled.addListener(onInstalled);
 } else {
   browser.tabs.onActivated.addListener(tabActivated);
   browser.runtime.onMessage.addListener(notify);
   browser.storage.onChanged.addListener(onStorageChanged);
+  browser.runtime.onInstalled.addListener(onInstalled);
 }
 
-chrome.storage.local.clear(); // will also trigger a storage.onChanged event
 initState();
