@@ -20,7 +20,7 @@
   "background": { "scripts": ["background.js"] },
   "permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
   "browser_action": {
-    "default_popup": "popup/cc_popup.html",
+    "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
       "24": "icons/icon-24.png",
