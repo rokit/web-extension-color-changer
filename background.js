@@ -139,21 +139,30 @@ function tabActivated(tabInfo) {
   }
 }
 
+function tabExecuteScriptCallback(results, state) {
+  let index = state.hosts.indexOf(state.activeTabHostname);
+
+  if (index > -1) {
+    onChangeColors(true);
+  } else {
+    console.log('results[0]', results[0]);
+    onChangeColors(results[0]);
+  }
+}
+
 function onTabSwitch() {
   getStorage(null, state => {
     if (!state.activeTabId) return;
-    chrome.tabs.executeScript(state.activeTabId, {
-      code: `document.documentElement.classList.contains('${className}')`
-    }, (results) => {
-      let index = state.hosts.indexOf(state.activeTabHostname);
 
-      if (index > -1) {
-        onChangeColors(true);
-      } else {
-        console.log('results[0]', results[0]);
-        onChangeColors(results[0]);
-      }
-    });
+    if (bIsChrome) {
+      chrome.tabs.executeScript(state.activeTabId, {
+        code: `document.documentElement.classList.contains('${className}')`
+      }, results => tabExecuteScriptCallback(results, state));
+    } else {
+      browser.tabs.executeScript(state.activeTabId, {
+        code: `document.documentElement.classList.contains('${className}')`
+      }, results => tabExecuteScriptCallback(results, state));
+    }
   });
 }
 
