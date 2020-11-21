@@ -1,5 +1,5 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
-var className = "color-changer-2";
+var className = "color-changer-v3";
 var contextMenuCreated = false;
 
 function ChosenColor(hue, saturation, lightness, chosenId) {

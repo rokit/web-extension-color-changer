@@ -1,5 +1,5 @@
 var bIsChrome = /Chrome/.test(navigator.userAgent);
-var className = "color-changer-2";
+var className = "color-changer-v3";
 
 var ccStyle = document.createElement('style');
 ccStyle.id = "color-changer-style";
