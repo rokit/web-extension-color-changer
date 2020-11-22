@@ -1,10 +1,11 @@
 3.0.0
 Change Colors now only applies to the current tab instead of all tabs.
 Fixed Lightness slider display on Firefox.
-Moving the Lightness slider now updates the page live.
+Moving the Lightness slider now updates the page immediately.
+Removed the Never button since Color Changer is no longer applied to all tabs.
+Renamed the Clear Data button to Reset, and removed it from the context menu. The Reset button can still be found in the flyout menu and has the same functionality.
+Removed the Donate button. Thank you to those who donated.
 Updated description.
-Renamed the Clear Data button to Reset, and removed it from the context menu.
-Removed donate button. Thank you to those who donated.
 
 2.0.3
 Changed the way link colors work. Hues shift up on hover and down on visited rather than changing lightness.
