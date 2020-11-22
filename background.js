@@ -114,6 +114,7 @@ function updateContextMenu(changeColors, always) {
 }
 
 function tabsQueryCallback(tabInfo, tabs) {
+  const activeTabId = tabInfo.tabId;
   let url = null;
   let activeTabHostname = null;
   try {
@@ -124,9 +125,9 @@ function tabsQueryCallback(tabInfo, tabs) {
   }
 
   if (url && url.protocol !== 'chrome:' && url.protocol !== 'about:') {
-    saveStorage({ activeTabHostname, activeTabId: tabInfo.tabId }, onTabSwitch);
+    saveStorage({ activeTabHostname, activeTabId }, onTabSwitch);
   } else {
-    saveStorage({ activeTabHostname: null, activeTabId: null });
+    saveStorage({ activeTabHostname, activeTabId });
   }
 }
 
@@ -143,9 +144,9 @@ function tabExecuteScriptCallback(results, state) {
   let index = state.hosts.indexOf(state.activeTabHostname);
 
   if (index > -1) {
-    saveStorage({ changeColors: true, always: true });
+    saveStorage({ always: true }, () => onChangeColors(true));
   } else {
-    saveStorage({ changeColors: results[0], always: false });
+    saveStorage({ always: false }, () => onChangeColors(results[0]));
   }
 }
 
@@ -290,7 +291,6 @@ function initState() {
     changeColors,
     always,
     hosts,
-    activeTabId,
     activeTabHostname,
     fg,
     bg,
