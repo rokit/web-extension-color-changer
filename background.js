@@ -316,8 +316,10 @@ function getStorage(obj, response) {
 function saveStorage(obj, response) {
   response = response || (() => { });
   if (bIsChrome) {
+    if (chrome.runtime.lastError) return;
     chrome.storage.sync.set({ ...obj }, response);
   } else {
+    if (browser.runtime.lastError) return;
     browser.storage.sync.set({ ...obj }, response);
   }
 }
