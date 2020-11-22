@@ -322,12 +322,12 @@ function saveStorage(obj, response) {
   }
 }
 
-function clearStorage(obj, response) {
+function clearStorage(response) {
   response = response || (() => { });
   if (bIsChrome) {
-    chrome.storage.sync.clear();
+    chrome.storage.sync.clear(response);
   } else {
-    browser.storage.sync.clear();
+    browser.storage.sync.clear(response);
   }
 }
 
@@ -352,19 +352,22 @@ function notify(req, sender, res) {
   }
 }
 
-function showAboutPage() {
+function showAboutPage(reason) {
   if (bIsChrome) {
-    chrome.tabs.create({ url: chrome.extension.getURL("about/about.html") });
+    chrome.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
   } else {
-    browser.tabs.create({ url: chrome.extension.getURL("about/about.html") });
+    browser.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
   }
 }
 
 function onInstalled(object) {
-  if (object.reason !== 'install') return;
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
+  if (object.reason === "update") {
+    // only do this for major versions with breaking changes
+    clearStorage(initState); 
+  }
 
-  clearStorage();
-  showAboutPage();
+  showAboutPage(object.reason);
 }
 
 if (bIsChrome) {

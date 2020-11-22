@@ -1,5 +1,6 @@
 3.0.0
 Change Colors now only applies to the current tab instead of all tabs.
+Fixed Lightness slider display on Firefox.
 Moving the Lightness slider now updates the page live.
 Updated description.
 Renamed the Clear Data button to Reset, and removed it from the context menu.
