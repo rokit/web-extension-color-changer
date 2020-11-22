@@ -4,29 +4,26 @@ Fixed Lightness slider display on Firefox.
 Moving the Lightness slider now updates the page live.
 Updated description.
 Renamed the Clear Data button to Reset, and removed it from the context menu.
-Removed donate button.
-  Thank you to those who donated.
+Removed donate button. Thank you to those who donated.
 
 2.0.3
-Changed the way link colors work. Hues shift up on hover and down on visited rather than changing lightness. Border colors will now be darker or lighter depending on the background lightness.
+Changed the way link colors work. Hues shift up on hover and down on visited rather than changing lightness.
+Border colors will now be darker or lighter depending on the background lightness.
 
 2.0.2
-Changed "0% Sat" to "Gray".
+Changed "0% Sat" to "Gray" on the color wheel.
 
 2.0.1
-fixed bug where info bar made part of the color wheel inaccessible
+Fixed bug where info bar made part of the color wheel inaccessible.
 
 2.0.0
-colors now change almost instantaneously
-colors can now be reversed without a page refresh
+Colors now change instantaneously.
+Colors can now be reversed without a page refresh.
 Added two new buttons: Always and Never. Always will always change pages on a subdomain. Never will never change pages on a subdomain.
 Change Colors button is now a global toggle that applies to all tabs. It will stay on until you turn it off.
-added right-click context menu for convenience
-
-If it doesn't work, please try refreshing your current tab or reopening your browser.
-Please report any bugs to webextdev@gmail.com
+Added right-click context menu for convenience.
 
 1.0.2
-will now preserve background images
-will now preserve borders
-Change Colors button is now a toggle
+Will now preserve background images.
+Will now preserve borders.
+Change Colors button is now a toggle.
