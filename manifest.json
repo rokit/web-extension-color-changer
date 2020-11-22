@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Color Changer",
   "version": "3.0.0",
-  "description": "Some sites have good information, but don't always choose the best colors for text, background, and links. With this extension, you can change a page's colors to make it more accessible.",
+  "description": "Change a page's text, background, and link colors to your liking.",
 
   "icons": {
     "16": "icons/icon-16.png",
