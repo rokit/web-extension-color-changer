@@ -210,7 +210,6 @@ function onUpdateChosenColor(payload) {
 }
 
 function onUpdateStrings() {
-  console.log('onupdatestrings cc true');
   getStorage(null, state => {
     switch (state.activeBtn) {
       case "fore": {
