@@ -43,6 +43,11 @@ const lightness = 80;
 const hosts = [];
 
 function onChangeColors(changeColors) {
+  if (chrome.runtime.lastError) {
+    // can exceed max write operations in chrome with lightness slider
+    return;
+  }
+
   saveStorage({ changeColors }, () => {
     getStorage(null, state => {
       if (!changeColors && state.always) {
@@ -262,7 +267,7 @@ function onReset() {
   });
 }
 
-function onUpdateLightness(lightness) {
+function onChangeLightness(lightness) {
   getStorage(null, state => {
     switch (state.activeBtn) {
       case 'fore': {
@@ -347,7 +352,7 @@ function notify(req, sender, res) {
     case 'updateChosenColor': onUpdateChosenColor(req.payload); break;
     case 'updateStrings': onUpdateStrings(); break;
     case 'reset': onReset(); break;
-    case 'updateLightness': onUpdateLightness(req.payload); break;
+    case 'changeLightness': onChangeLightness(req.payload); break;
     case 'changeColors': onChangeColors(req.payload); break;
     case 'always': onAlways(req.payload); break;
     default: break;
@@ -366,7 +371,7 @@ function onInstalled(object) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
   if (object.reason === "update") {
     // only do this for major versions with breaking changes
-    clearStorage(initState); 
+    clearStorage(initState);
   }
 
   showAboutPage(object.reason);

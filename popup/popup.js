@@ -70,8 +70,12 @@ resetBtn.onclick = function () {
 
 lightnessSlider.oninput = function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
+}
+
+lightnessSlider.onchange = function () {
+  lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
   let lightness = parseInt(this.value);
-  sendRuntimeMessage('updateLightness', lightness);
+  sendRuntimeMessage('changeLightness', lightness);
 }
 
 function handleFore() {
