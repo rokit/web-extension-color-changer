@@ -1,3 +1,7 @@
+3.0.1
+Fixed max write operations per minute bug with chrome that would lock up the UI when using the slider.
+More styling tweaks for the range slider.
+
 3.0.0
 Change Colors now only applies to the current tab instead of all tabs.
 Fixed Lightness slider display on Firefox.
@@ -28,3 +32,10 @@ Added right-click context menu for convenience.
 Will now preserve background images.
 Will now preserve borders.
 Change Colors button is now a toggle.
+
+
+"applications": {
+  "gecko": {
+    "id": "@colorchanger"
+  }
+}
