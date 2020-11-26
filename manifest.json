@@ -26,5 +26,10 @@
       "24": "icons/icon-24.png",
       "32": "icons/icon-32.png"
     }
+  },
+  "applications": {
+    "gecko": {
+      "id": "@colorchanger"
+    }
   }
 }
