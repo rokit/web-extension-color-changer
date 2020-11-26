@@ -42,12 +42,17 @@ const activeBtn = 'fore';
 const lightness = 80;
 const hosts = [];
 
-function onChangeColors(changeColors) {
-  if (chrome.runtime.lastError) {
-    // can exceed max write operations in chrome with lightness slider
-    return;
-  }
+// can potentially use this to check for errors
+// function hasError() {
+//   if (bIsChrome && chrome.runtime.lastError) {
+//       return true;
+//   } else if (browser.runtime.lastError) {
+//     return true;
+//   }
+//   return false;
+// }
 
+function onChangeColors(changeColors) {
   saveStorage({ changeColors }, () => {
     getStorage(null, state => {
       if (!changeColors && state.always) {
