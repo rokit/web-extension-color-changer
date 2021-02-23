@@ -374,12 +374,12 @@ function showAboutPage(reason) {
 
 function onInstalled(object) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
-  if (object.reason === "update") {
+  if (object.reason === 'update') {
     // only do this for major versions with breaking changes
-    clearStorage(initState);
+    // clearStorage(initState);
+  } else if (object.reason === 'install') {
+    showAboutPage(object.reason);
   }
-
-  showAboutPage(object.reason);
 }
 
 if (bIsChrome) {
