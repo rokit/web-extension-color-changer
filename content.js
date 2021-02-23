@@ -12,12 +12,13 @@ var css = "";
 var state = null;
 
 function updateCss() {
+  let not = ':not(video):not(video *):not(.rc-VideoMiniPlayer *)';
   css = `
   .${className} {
     background-color: ${state.bg.hsl} !important;
   }
 
-  .${className} * {
+  .${className} *${not} {
     color: ${state.fg.hsl} !important;
     background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
@@ -66,20 +67,6 @@ function updateCss() {
   .${className} a:visited *
   {
     color: ${state.li.hueVisited} !important;
-  }
-
-  video,
-  div[role=video],
-  div[role=progressbar]
-  {
-    background-color: initial !important;
-  }
-
-  /* exclusion for coursera videos */
-  .rc-VideoControlsContainer,
-  .rc-VideoControlsContainer *
-  {
-    background-color: initial !important;
   }
 `;
 }
