@@ -16,42 +16,70 @@ function updateCss() {
   .${className} {
     background-color: ${state.bg.hsl} !important;
   }
+
   .${className} * {
     color: ${state.fg.hsl} !important;
     background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
-  .${className} *:before, .${className} *:after {
-    color: ${state.fg.hsl} !important;
-    background: ${state.bg.hsl} !important;
-    border-color: ${state.bg.lightnessShift} !important;
-  }
+
   .${className} img {
     visibility: visible !important;
   }
+
   .${className} button {
     color: ${state.li.hsl} !important;
   }
 
-  .${className} input, .${className} input *,
-  .${className} textarea, .${className} textarea *,
-  .${className} pre, .${className} pre *,
-  .${className} code, .${className} code * {
+  .${className} input,
+  .${className} input *,
+  .${className} textarea,
+  .${className} textarea *,
+  .${className} pre,
+  .${className} pre *,
+  .${className} code,
+  .${className} code *
+  {
     background-color: ${state.bg.lightnessShift} !important;
   }
 
-  .${className} a, .${className} a * {
+  .${className} a,
+  .${className} a *
+  {
     color: ${state.li.hsl} !important;
     background-color: ${state.bg.hsl} !important;
   }
-  .${className} a:hover, .${className} a:hover * {
+
+  .${className} a:hover,
+  .${className} a:hover *
+  {
     color: ${state.li.hueHovered} !important;
   }
-  .${className} a:active, .${className} a:active * {
+
+  .${className} a:active,
+  .${className} a:active *
+  {
     color: ${state.li.hueVisited} !important;
   }
-  .${className} a:visited, .${className} a:visited * {
+
+  .${className} a:visited,
+  .${className} a:visited *
+  {
     color: ${state.li.hueVisited} !important;
+  }
+
+  video,
+  div[role=video],
+  div[role=progressbar]
+  {
+    background-color: initial !important;
+  }
+
+  /* exclusion for coursera videos */
+  .rc-VideoControlsContainer,
+  .rc-VideoControlsContainer *
+  {
+    background-color: initial !important;
   }
 `;
 }
