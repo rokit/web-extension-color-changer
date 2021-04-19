@@ -12,52 +12,45 @@ var css = "";
 var state = null;
 
 function updateCss() {
-  let not = ':not(img):not(img *):not(video):not(video *):not(svg):not(svg *):not(.rc-VideoMiniPlayer *)';
   css = `
-  .${className} *${not} {
+  .${className} {
+    background-color: ${state.bg.hsl} !important;
+  }
+  .${className} * {
     color: ${state.fg.hsl} !important;
     background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
-
-  .${className} *${not} button {
+  .${className} *:before, .${className} *:after {
+    color: ${state.fg.hsl} !important;
+    background: ${state.bg.hsl} !important;
+    border-color: ${state.bg.lightnessShift} !important;
+  }
+  .${className} img {
+    visibility: visible !important;
+  }
+  .${className} button {
     color: ${state.li.hsl} !important;
   }
 
-  .${className} *${not} input,
-  .${className} *${not} input *,
-  .${className} *${not} textarea,
-  .${className} *${not} textarea *,
-  .${className} *${not} pre,
-  .${className} *${not} pre *,
-  .${className} *${not} code,
-  .${className} *${not} code *
-  {
+  .${className} input, .${className} input *,
+  .${className} textarea, .${className} textarea *,
+  .${className} pre, .${className} pre *,
+  .${className} code, .${className} code * {
     background-color: ${state.bg.lightnessShift} !important;
   }
 
-  .${className} *${not} a,
-  .${className} *${not} a *
-  {
+  .${className} a, .${className} a * {
     color: ${state.li.hsl} !important;
     background-color: ${state.bg.hsl} !important;
   }
-
-  .${className} *${not} a:hover,
-  .${className} *${not} a:hover *
-  {
+  .${className} a:hover, .${className} a:hover * {
     color: ${state.li.hueHovered} !important;
   }
-
-  .${className} *${not} a:active,
-  .${className} *${not} a:active *
-  {
+  .${className} a:active, .${className} a:active * {
     color: ${state.li.hueVisited} !important;
   }
-
-  .${className} *${not} a:visited,
-  .${className} *${not} a:visited *
-  {
+  .${className} a:visited, .${className} a:visited * {
     color: ${state.li.hueVisited} !important;
   }
 `;
