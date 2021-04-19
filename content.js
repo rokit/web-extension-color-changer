@@ -12,45 +12,59 @@ var css = "";
 var state = null;
 
 function updateCss() {
+  let not = ':not(img):not(img *):not(video):not(video *):not(svg):not(svg *):not(.rc-VideoMiniPlayer *)';
   css = `
-  .${className} {
+  .${className}${not} {
     background-color: ${state.bg.hsl} !important;
   }
-  .${className} * {
+  .${className} *${not} {
     color: ${state.fg.hsl} !important;
     background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
-  .${className} *:before, .${className} *:after {
+  .${className}${not} *:before,
+  .${className}${not} *:after {
     color: ${state.fg.hsl} !important;
     background: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
-  .${className} img {
+  .${className}${not} img {
     visibility: visible !important;
   }
-  .${className} button {
+  .${className}${not} button {
     color: ${state.li.hsl} !important;
   }
 
-  .${className} input, .${className} input *,
-  .${className} textarea, .${className} textarea *,
-  .${className} pre, .${className} pre *,
-  .${className} code, .${className} code * {
+  .${className}${not} input,
+  .${className}${not} input *,
+  .${className}${not} textarea,
+  .${className}${not} textarea *,
+  .${className}${not} pre,
+  .${className}${not} pre *,
+  .${className}${not} code,
+  .${className}${not} code *
+  {
     background-color: ${state.bg.lightnessShift} !important;
   }
 
-  .${className} a, .${className} a * {
+  .${className}${not} a,
+  .${className}${not} a *
+  {
     color: ${state.li.hsl} !important;
     background-color: ${state.bg.hsl} !important;
   }
-  .${className} a:hover, .${className} a:hover * {
+  .${className}${not} a:hover,
+  .${className}${not} a:hover *
+  {
     color: ${state.li.hueHovered} !important;
   }
-  .${className} a:active, .${className} a:active * {
+  .${className}${not} a:active,
+  .${className}${not} a:active *
+  {
     color: ${state.li.hueVisited} !important;
   }
-  .${className} a:visited, .${className} a:visited * {
+  .${className}${not} a:visited,
+  .${className}${not} a:visited * {
     color: ${state.li.hueVisited} !important;
   }
 `;
