@@ -14,9 +14,6 @@ var state = null;
 function updateCss() {
   let not = ':not(img):not(img *):not(video):not(video *):not(svg):not(svg *):not(.rc-VideoMiniPlayer *)';
   css = `
-  .${className}${not} {
-    background-color: ${state.bg.hsl} !important;
-  }
   .${className} *${not} {
     color: ${state.fg.hsl} !important;
     background-color: ${state.bg.hsl} !important;
