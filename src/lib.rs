@@ -13,6 +13,15 @@ pub async fn main() {
         .expect("Could not get local storage")
         .expect("Could not unwrap local storage");
 
+    let document = window.document().expect("Could not get document.");
+
+    // hostname does not include the port, e.g., developer.mozilla.org.
+    let hostname = document
+        .location()
+        .expect("Could not get location.")
+        .hostname()
+        .expect("Could not get hostname.");
+
     let hosts: Vec<String> = match storage
         .get("hosts")
         .expect("Error occured with getting storage key.")
@@ -22,6 +31,12 @@ pub async fn main() {
         }
         None => vec![],
     };
+
+    if hosts.contains(&hostname) {
+        log!("hosts contained hostname");
+    }
+
+    log!("hostname: {:?}", hostname);
     log!("hosts: {:?}", hosts);
     log!("hello");
 }
