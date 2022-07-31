@@ -48,10 +48,10 @@ alwaysCheckbox.onclick = () => {
 };
 
 function alwaysMouseover() {
-  if (!state.activeTabId) {
-    return;
-  }
-  infoText.textContent = `Always change colors on host: ${state.activeTabHostname}`;
+  // if (!state.activeTabId) {
+  //   return;
+  // }
+  // infoText.textContent = `Always change colors on host: ${state.activeTabHostname}`;
   info.style.opacity = 1;
 }
 
@@ -259,7 +259,7 @@ canvas.onclick = function (e) {
 
 canvas.onmouseout = function () {
   hoverId = null;
-  drawCanvas();
+  // drawCanvas();
 }
 
 canvas.onmousemove = function (e) {
@@ -268,7 +268,7 @@ canvas.onmousemove = function (e) {
   if (swatch) {
     hoverId = swatch.id;
 
-    drawCanvas();
+    // drawCanvas();
 
     canvas.style.cursor = 'pointer';
   } else {
@@ -283,7 +283,7 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function saveStorage(obj, response) {
-  response = response || (() => {});
+  response = response || (() => { });
   if (bIsChrome) {
     chrome.storage.sync.set({ ...obj }, response);
   } else {
@@ -301,28 +301,48 @@ function getStorage(obj, response) {
 }
 
 function updateUi() {
-  getStorage(null, theState => {
-    state = theState;
-    foreSwatch.style.background = state.fg.hsl;
-    backSwatch.style.background = state.bg.hsl;
-    linkSwatch.style.background = state.li.hsl;
+  // getStorage(null, theState => {
+  //   state = theState;
+  //   foreSwatch.style.background = state.fg.hsl;
+  //   backSwatch.style.background = state.bg.hsl;
+  //   linkSwatch.style.background = state.li.hsl;
 
-    changeColorsCheckbox.checked = state.changeColors;
-    alwaysCheckbox.checked = state.always;
-    lightnessSlider.value = state.lightness;
-    lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
+  //   changeColorsCheckbox.checked = state.changeColors;
+  //   alwaysCheckbox.checked = state.always;
+  //   lightnessSlider.value = state.lightness;
+  //   lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
 
-    setActiveColorButton();
-    drawCanvas();
-  });
+  //   setActiveColorButton();
+  //   drawCanvas();
+  // });
+}
+
+function sendTabMessage(activeTabId, message, payload, response) {
+  if (!activeTabId) return;
+  if (bIsChrome) {
+    chrome.tabs.sendMessage(activeTabId, { message, payload }, response);
+  } else {
+    browser.tabs.sendMessage(activeTabId, { message, payload }, response);
+  }
+}
+
+function tabsQueryCallback(tabs) {
+  console.log('tabs', tabs);
+  sendTabMessage(tabs[0].id, 'reset', null, null);
 }
 
 function sendRuntimeMessage(message, payload, response) {
   if (bIsChrome) {
-    chrome.runtime.sendMessage({ message, payload }, response);
+    chrome.tabs.query({ active: true, currentWindow: true }, tabsQueryCallback);
   } else {
-    browser.runtime.sendMessage({ message, payload }, response);
+    browser.tabs.query({ active: true, currentWindow: true }, tabsQueryCallback);
   }
+
+  // if (bIsChrome) {
+  //   chrome.runtime.sendMessage({ message, payload }, response);
+  // } else {
+  //   browser.runtime.sendMessage({ message, payload }, response);
+  // }
 }
 
 if (bIsChrome) {

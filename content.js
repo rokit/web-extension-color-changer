@@ -1,4 +1,24 @@
 let colorChanger = null;
+var bIsChrome = /Chrome/.test(navigator.userAgent);
+
+function notify(req, sender, res) {
+  switch (req.message) {
+    case 'reset': console.log("got reset"); break;
+    case 'update': {
+      // getStorage(null, theState => {
+      //   state = theState;
+      //   updateContent();
+      // })
+    }; break;
+    default: break;
+  }
+}
+
+if (bIsChrome) {
+  chrome.runtime.onMessage.addListener(notify);
+} else {
+  browser.runtime.onMessage.addListener(notify);
+}
 
 async function run() {
   let w = await wasm_bindgen(chrome.runtime.getURL('pkg/color_changer_bg.wasm'));
@@ -6,7 +26,6 @@ async function run() {
 }
 run();
 
-// var bIsChrome = /Chrome/.test(navigator.userAgent);
 // var className = "color-changer-v3";
 
 // var ccStyle = document.createElement('style');
@@ -123,17 +142,7 @@ run();
 //   }
 // }
 
-// function notify(req, sender, res) {
-//   switch (req.message) {
-//     case 'update': {
-//       getStorage(null, theState => {
-//         state = theState;
-//         updateContent();
-//       })
-//     }; break;
-//     default: break;
-//   }
-// }
+
 
 // function getState() {
 //   getStorage(null, theState => {
@@ -173,10 +182,6 @@ run();
 //   }
 // }
 
-// if (bIsChrome) {
-//   chrome.runtime.onMessage.addListener(notify);
-// } else {
-//   browser.runtime.onMessage.addListener(notify);
-// }
+
 
 // getState();
