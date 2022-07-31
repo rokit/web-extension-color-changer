@@ -59,7 +59,8 @@ pub struct ColorChanger {
     pub li: Hsl,
 }
 
-pub const COLOR_CHANGER_STORAGE: &str = "color_changer_storage";
+pub const COLOR_CHANGER_STORAGE: &str = "color_changer_i9XOynEn";
+pub const COLOR_CHANGER_CLASS_NAME: &str = "color-changer-i9XOynEn";
 
 impl ColorChanger {
     pub fn new() -> ColorChanger {
@@ -142,6 +143,18 @@ pub async fn main() {
     // let mutation_closure: Function = mutation_callback;
     let mutation_observer = MutationObserver::new(f.as_ref().unchecked_ref())
         .expect("Could not create mutation observer.");
+    f.forget();
+
+    let mut observer_config = MutationObserverInit::new();
+    observer_config.attribute_filter(&JsValue::from_serde(&["class"]).unwrap());
+
+    let html = document
+        .document_element()
+        .expect("Could not get html element.");
+
+    mutation_observer
+        .observe_with_options(&html, &observer_config)
+        .expect("Could not start observer.");
 
     log!("hostname: {:?}", hostname);
     log!("hosts: {:?}", color_changer.hosts);
