@@ -10,13 +10,19 @@ use web_sys::*;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ColorChanger {
     pub hosts: Vec<String>,
+    pub change_colors: bool,
+    pub always: bool,
 }
 
 pub const COLOR_CHANGER_STORAGE: &str = "color_changer_storage";
 
 impl ColorChanger {
     pub fn new() -> ColorChanger {
-        ColorChanger { hosts: Vec::new() }
+        ColorChanger {
+            hosts: Vec::new(),
+            change_colors: false,
+            always: false,
+        }
     }
 
     pub fn should_change_colors(&self, hostname: &str) -> bool {
