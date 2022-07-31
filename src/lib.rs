@@ -180,21 +180,15 @@ pub fn add_color_changer_class() {
         .document_element()
         .expect("Could not get html element.");
 
-    let mut class_name = html.class_name();
-    let classes: Vec<&str> = class_name.split_whitespace().collect();
-    if classes
-        .iter()
-        .find(|&c| c == &COLOR_CHANGER_CLASS_NAME)
-        .is_none()
-    {
-        class_name += " ";
-        class_name += COLOR_CHANGER_CLASS_NAME;
+    let class_list = html.class_list();
 
-        // If our class is the only one, we can trim the space we added.
-        html.set_class_name(&class_name.trim());
+    if !class_list.contains(COLOR_CHANGER_CLASS_NAME) {
+        let jsv = JsValue::from_serde(&[COLOR_CHANGER_CLASS_NAME])
+            .expect("Could not create array JsValue for class.");
+        class_list
+            .add(&js_sys::Array::from(&jsv))
+            .expect("Could not add class to html.");
     }
-
-    log!("html class name: {}", class_name);
 }
 
 #[cfg(test)]
