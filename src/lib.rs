@@ -10,6 +10,8 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::*;
 
+static mut STATE: ColorChanger = ColorChanger::new();
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Hsl {
     // degrees 0-360
@@ -21,7 +23,7 @@ pub struct Hsl {
 }
 
 impl Hsl {
-    pub fn black() -> Hsl {
+    pub const fn black() -> Hsl {
         Hsl {
             hue: 0,
             saturation: 0,
@@ -29,7 +31,7 @@ impl Hsl {
         }
     }
 
-    pub fn white() -> Hsl {
+    pub const fn white() -> Hsl {
         Hsl {
             hue: 0,
             saturation: 0,
@@ -37,7 +39,7 @@ impl Hsl {
         }
     }
 
-    pub fn blue() -> Hsl {
+    pub const fn blue() -> Hsl {
         Hsl {
             hue: 223,
             saturation: 54,
@@ -63,7 +65,7 @@ pub const COLOR_CHANGER_STORAGE: &str = "color_changer_i9XOynEn";
 pub const COLOR_CHANGER_CLASS_NAME: &str = "color-changer-i9XOynEn";
 
 impl ColorChanger {
-    pub fn new() -> ColorChanger {
+    pub const fn new() -> ColorChanger {
         ColorChanger {
             hosts: Vec::new(),
             change_colors: false,
@@ -138,14 +140,14 @@ pub async fn main() {
 
     color_changer.should_change_colors(&hostname);
 
-    let mutation_callback = Closure::wrap(
+    let mutation_closure = Closure::wrap(
         Box::new(mutation_callback) as Box<dyn FnMut(Vec<MutationRecord>, MutationObserver)>
     );
 
     // let mutation_closure: Function = mutation_callback;
-    let mutation_observer = MutationObserver::new(mutation_callback.as_ref().unchecked_ref())
+    let mutation_observer = MutationObserver::new(mutation_closure.as_ref().unchecked_ref())
         .expect("Could not create mutation observer.");
-    mutation_callback.forget();
+    mutation_closure.forget();
 
     let mut observer_config = MutationObserverInit::new();
     observer_config.attribute_filter(&JsValue::from_serde(&["class"]).unwrap());
