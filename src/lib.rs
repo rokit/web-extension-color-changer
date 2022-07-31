@@ -135,7 +135,9 @@ pub async fn main() {
 
     color_changer.should_change_colors(&hostname);
 
-    let f = Closure::wrap(Box::new(mutation_callback) as Box<dyn FnMut()>);
+    let f = Closure::wrap(
+        Box::new(mutation_callback) as Box<dyn FnMut(Vec<MutationRecord>, MutationObserver)>
+    );
 
     // let mutation_closure: Function = mutation_callback;
     let mutation_observer = MutationObserver::new(f.as_ref().unchecked_ref())
@@ -146,7 +148,12 @@ pub async fn main() {
     log!("hello");
 }
 
-pub fn mutation_callback() {}
+pub fn mutation_callback(mutation_records: Vec<MutationRecord>, observer: MutationObserver) {
+    for record in mutation_records {
+        log!("observer: {:?}", observer);
+        log!("mutation record: {:?}", record);
+    }
+}
 
 #[cfg(test)]
 mod tests {
