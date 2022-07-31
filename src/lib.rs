@@ -1,12 +1,18 @@
 #[macro_use]
 mod util;
 
+use serde::Deserialize;
+use serde::Serialize;
+
 use wasm_bindgen::prelude::*;
 use web_sys::*;
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ColorChanger {
     pub hosts: Vec<String>,
 }
+
+pub const COLOR_CHANGER_STORAGE: &str = "color_changer_storage";
 
 impl ColorChanger {
     pub fn new() -> ColorChanger {
@@ -28,8 +34,6 @@ impl ColorChanger {
 pub async fn main() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-    let mut color_changer = ColorChanger::new();
-
     let window = web_sys::window().expect("Could not get the window.");
     let storage = window
         .local_storage()
@@ -45,17 +49,31 @@ pub async fn main() {
         .hostname()
         .expect("Could not get hostname.");
 
-    let hosts: Vec<String> = match storage
-        .get("hosts")
-        .expect("Error occured with getting storage key.")
-    {
-        Some(hosts) => {
-            serde_json::from_str(&hosts).expect("Could not deserialize hosts to Vec<String>.")
+    // Get the storage.
+    let color_changer = match storage.get(COLOR_CHANGER_STORAGE) {
+        Ok(Some(cc)) => {
+            serde_json::from_str(&cc).expect("Could not deserialize Color Changer from storage.")
         }
-        None => vec![],
+        Ok(None) => {
+            log!("Color changer was in storage, but could not be deserialized. Creating color changer with default values.");
+            ColorChanger::new()
+        }
+        Err(e) => {
+            log!("Error when initializing color changer from storage. Creating color changer with default values.");
+            ColorChanger::new()
+        }
     };
 
-    color_changer.hosts = hosts;
+    // Set the storage for cases where Color Changer is just now being created.
+    match storage.set(
+        COLOR_CHANGER_STORAGE,
+        &serde_json::to_string(&color_changer).unwrap(),
+    ) {
+        Ok(()) => {
+            log!("success")
+        }
+        Err(e) => log!("Error when setting color changer storage: {:?}", e),
+    };
 
     color_changer.should_change_colors(&hostname);
     log!("hostname: {:?}", hostname);
