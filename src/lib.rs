@@ -186,13 +186,12 @@ impl ColorChanger {
 
 // }
 
-pub fn mutation_callback(mutation_records: Vec<MutationRecord>, observer: MutationObserver) {
-    for record in mutation_records {
-        log!("observer: {:?}", observer);
-        log!("mutation record: {:?}", record);
-    }
-
+pub fn mutation_callback(_mutation_records: Vec<MutationRecord>, _observer: MutationObserver) {
     add_color_changer_class();
+    // for record in mutation_records {
+    //     log!("observer: {:?}", observer);
+    //     log!("mutation record: {:?}", record);
+    // }
 }
 
 /// Only adds class if it doesn't exist.
