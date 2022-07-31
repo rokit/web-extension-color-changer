@@ -48,6 +48,25 @@ impl Hsl {
             lightness: 34,
         }
     }
+
+    pub fn set_hue(&mut self, hue: u32) {
+        self.hue = hue;
+    }
+
+    pub fn set_saturation(&mut self, saturation: u32) {
+        self.saturation = saturation;
+    }
+
+    pub fn set_lightness(&mut self, lightness: u32) {
+        self.lightness = lightness;
+    }
+
+    pub fn hsl(&self) -> String {
+        format!(
+            "hsl({}, {}%, {}%)",
+            self.hue, self.saturation, self.lightness
+        )
+    }
 }
 
 #[wasm_bindgen]
@@ -62,6 +81,8 @@ pub struct ColorChangerState {
     pub bg: Hsl,
     /// links
     pub li: Hsl,
+    /// lightness slider
+    pub lightness: u32,
 }
 
 #[wasm_bindgen]
@@ -74,6 +95,7 @@ impl ColorChangerState {
             fg: Hsl::black(),
             bg: Hsl::white(),
             li: Hsl::blue(),
+            lightness: 75,
         }
     }
 
