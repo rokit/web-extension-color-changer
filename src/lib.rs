@@ -89,6 +89,8 @@ impl ColorChanger {
 pub async fn main() {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
+    add_color_changer_class();
+
     let window = web_sys::window().expect("Could not get the window.");
     let storage = window
         .local_storage()
@@ -136,14 +138,14 @@ pub async fn main() {
 
     color_changer.should_change_colors(&hostname);
 
-    let f = Closure::wrap(
+    let mutation_callback = Closure::wrap(
         Box::new(mutation_callback) as Box<dyn FnMut(Vec<MutationRecord>, MutationObserver)>
     );
 
     // let mutation_closure: Function = mutation_callback;
-    let mutation_observer = MutationObserver::new(f.as_ref().unchecked_ref())
+    let mutation_observer = MutationObserver::new(mutation_callback.as_ref().unchecked_ref())
         .expect("Could not create mutation observer.");
-    f.forget();
+    mutation_callback.forget();
 
     let mut observer_config = MutationObserverInit::new();
     observer_config.attribute_filter(&JsValue::from_serde(&["class"]).unwrap());
@@ -166,6 +168,33 @@ pub fn mutation_callback(mutation_records: Vec<MutationRecord>, observer: Mutati
         log!("observer: {:?}", observer);
         log!("mutation record: {:?}", record);
     }
+
+    add_color_changer_class();
+}
+
+/// Only adds class if it doesn't exist.
+pub fn add_color_changer_class() {
+    let window = web_sys::window().expect("Could not get the window.");
+    let document = window.document().expect("Could not get document.");
+    let html = document
+        .document_element()
+        .expect("Could not get html element.");
+
+    let mut class_name = html.class_name();
+    let classes: Vec<&str> = class_name.split_whitespace().collect();
+    if classes
+        .iter()
+        .find(|&c| c == &COLOR_CHANGER_CLASS_NAME)
+        .is_none()
+    {
+        class_name += " ";
+        class_name += COLOR_CHANGER_CLASS_NAME;
+
+        // If our class is the only one, we can trim the space we added.
+        html.set_class_name(&class_name.trim());
+    }
+
+    log!("html class name: {}", class_name);
 }
 
 #[cfg(test)]
