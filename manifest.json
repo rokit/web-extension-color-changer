@@ -12,8 +12,8 @@
   "content_scripts": [
     {
       "run_at": "document_start",
-      "matches": ["<all_urls>"],
-      "js": ["content.js", "pkg/color_changer.js"]
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["pkg/color_changer.js", "content.js"]
     }
   ],
   "web_accessible_resources": [
@@ -22,15 +22,6 @@
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
-  "background": { "service_worker": "background.js" },
   "host_permissions": ["http://*/*", "https://*/*"],
-  "permissions": ["storage", "tabs", "activeTab", "contextMenus"],
-  "action": {
-    "default_popup": "popup/popup.html",
-    "default_icon": {
-      "16": "icons/icon-16.png",
-      "24": "icons/icon-24.png",
-      "32": "icons/icon-32.png"
-    }
-  }
+  "permissions": ["storage", "tabs", "activeTab", "contextMenus"]
 }
