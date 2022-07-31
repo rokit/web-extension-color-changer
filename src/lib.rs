@@ -1,10 +1,13 @@
 #[macro_use]
 mod util;
 
+use js_sys::Function;
 use serde::Deserialize;
 use serde::Serialize;
 
+use wasm_bindgen::closure::WasmClosure;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
 use web_sys::*;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -131,10 +134,19 @@ pub async fn main() {
     };
 
     color_changer.should_change_colors(&hostname);
+
+    let f = Closure::wrap(Box::new(mutation_callback) as Box<dyn FnMut()>);
+
+    // let mutation_closure: Function = mutation_callback;
+    let mutation_observer = MutationObserver::new(f.as_ref().unchecked_ref())
+        .expect("Could not create mutation observer.");
+
     log!("hostname: {:?}", hostname);
     log!("hosts: {:?}", color_changer.hosts);
     log!("hello");
 }
+
+pub fn mutation_callback() {}
 
 #[cfg(test)]
 mod tests {
