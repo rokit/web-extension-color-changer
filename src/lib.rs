@@ -8,10 +8,52 @@ use wasm_bindgen::prelude::*;
 use web_sys::*;
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct Hsl {
+    // degrees 0-360
+    pub hue: u32,
+    // 0-100%
+    pub saturation: u32,
+    // 0-100%
+    pub lightness: u32,
+}
+
+impl Hsl {
+    pub fn black() -> Hsl {
+        Hsl {
+            hue: 0,
+            saturation: 0,
+            lightness: 0,
+        }
+    }
+
+    pub fn white() -> Hsl {
+        Hsl {
+            hue: 0,
+            saturation: 0,
+            lightness: 100,
+        }
+    }
+
+    pub fn blue() -> Hsl {
+        Hsl {
+            hue: 223,
+            saturation: 54,
+            lightness: 34,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ColorChanger {
     pub hosts: Vec<String>,
     pub change_colors: bool,
     pub always: bool,
+    /// foreground
+    pub fg: Hsl,
+    /// background
+    pub bg: Hsl,
+    /// links
+    pub li: Hsl,
 }
 
 pub const COLOR_CHANGER_STORAGE: &str = "color_changer_storage";
@@ -22,6 +64,9 @@ impl ColorChanger {
             hosts: Vec::new(),
             change_colors: false,
             always: false,
+            fg: Hsl::black(),
+            bg: Hsl::white(),
+            li: Hsl::blue(),
         }
     }
 
@@ -80,9 +125,9 @@ pub async fn main() {
         &serde_json::to_string(&color_changer).unwrap(),
     ) {
         Ok(()) => {
-            log!("success")
+            log!("Successfully saved color changer to storage.")
         }
-        Err(e) => log!("Error when setting color changer storage: {:?}", e),
+        Err(e) => log!("Error when saving color changer to storage: {:?}", e),
     };
 
     color_changer.should_change_colors(&hostname);
