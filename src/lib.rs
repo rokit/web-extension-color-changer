@@ -114,7 +114,7 @@ pub async fn main() {
             ColorChanger::new()
         }
         Err(e) => {
-            log!("Error when initializing color changer from storage. Creating default color changer.");
+            log!("Error when initializing color changer from storage. Creating default color changer. Error: {:?}", e);
             ColorChanger::new()
         }
     };
