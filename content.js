@@ -1,5 +1,8 @@
+let colorChanger = null;
+
 async function run() {
-  await wasm_bindgen(chrome.runtime.getURL('pkg/color_changer_bg.wasm'));
+  let w = await wasm_bindgen(chrome.runtime.getURL('pkg/color_changer_bg.wasm'));
+  let colorChanger = w.colorchanger_new();
 }
 run();
 
