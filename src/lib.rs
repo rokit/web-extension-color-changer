@@ -57,15 +57,19 @@ pub async fn main() {
 
     // Get the storage.
     let color_changer = match storage.get(COLOR_CHANGER_STORAGE) {
-        Ok(Some(cc)) => {
-            serde_json::from_str(&cc).expect("Could not deserialize Color Changer from storage.")
-        }
+        Ok(Some(color_changer_storage)) => match serde_json::from_str(&color_changer_storage) {
+            Ok(cc) => cc,
+            Err(e) => {
+                log!("Could not deserialize Color Changer from storage. Creating default color changer.");
+                ColorChanger::new()
+            }
+        },
         Ok(None) => {
-            log!("Color changer was in storage, but could not be deserialized. Creating color changer with default values.");
+            log!("Color changer was None in storage. Creating default color changer.");
             ColorChanger::new()
         }
         Err(e) => {
-            log!("Error when initializing color changer from storage. Creating color changer with default values.");
+            log!("Error when initializing color changer from storage. Creating default color changer.");
             ColorChanger::new()
         }
     };
