@@ -1,2 +1,8 @@
 *.zip
 *.txt
+manifest.json
+
+# Added by cargo
+
+/target
+/Cargo.lock

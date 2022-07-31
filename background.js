@@ -366,9 +366,9 @@ function notify(req, sender, res) {
 
 function showAboutPage(reason) {
   if (bIsChrome) {
-    chrome.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
+    chrome.tabs.create({ url: chrome.runtime.getURL(`about/about.html?reason=${reason}`) });
   } else {
-    browser.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
+    browser.tabs.create({ url: chrome.runtime.getURL(`about/about.html?reason=${reason}`) });
   }
 }
 

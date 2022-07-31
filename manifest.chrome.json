@@ -19,7 +19,7 @@
   "web_accessible_resources": [
     {
       "resources": ["icons/icon.svg", "pkg/color_changer_bg.wasm"],
-      "matches": ["http://*/*", "https://*/*"]
+      "matches": ["<all_urls>"]
     }
   ],
   "background": { "service_worker": "background.js" },

@@ -8,9 +8,9 @@ const greeting = document.getElementById('greeting');
 // set image src from web_accessible_resources
 let imgUrl = "";
 if (bIsChrome) {
-  imgUrl = chrome.extension.getURL("icons/icon.svg");
+  imgUrl = chrome.runtime.getURL("icons/icon.svg");
 } else {
-  imgUrl = browser.extension.getURL("icons/icon.svg");
+  imgUrl = browser.runtime.getURL("icons/icon.svg");
 }
 icon.src = imgUrl;
 
