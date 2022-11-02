@@ -293,19 +293,6 @@ function onStorageChanged(changes: object, areaName: string) {
 //   });
 // }
 
-/** If state hasn't been previously set in storage, initialize it, otherwise overwrite the default state. */
-async function initServiceWorker() {
-  let storageState = await getStorageAsync();
-  if (storageState) {
-    state = storageState;
-  } else {
-    await saveStorageAsync(state);
-  }
-
-  console.log('state', state);
-  // createContextMenu();
-}
-
 // function sendTabMessage(activeTabId, message, payload, response) {
 //   if (!activeTabId) return;
 //   chrome.tabs.sendMessage(activeTabId, { message, payload }, response);
@@ -329,6 +316,7 @@ function onMessage(req, sender, res) {
 //   chrome.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
 // }
 
+// --------------------------------------------------------------------------------------------- installed
 function onInstalled(details: any) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
   if (details.reason === 'update') {
@@ -339,7 +327,7 @@ function onInstalled(details: any) {
   }
 }
 
-// --------------------------------------------------------------------------------------------- Storage
+// --------------------------------------------------------------------------------------------- storage
 function getStorageAsync(): Promise<State | undefined> {
   // Immediately return a promise and start asynchronous work
   return new Promise((resolve, reject) => {
@@ -375,11 +363,24 @@ function clearStorage() {
   chrome.storage.sync.clear();
 }
 
-// --------------------------------------------------------------------------------------------- Listeners
+// --------------------------------------------------------------------------------------------- listeners
 chrome.tabs.onActivated.addListener(onTabActivated);
 chrome.runtime.onMessage.addListener(onMessage);
 chrome.storage.onChanged.addListener(onStorageChanged);
 chrome.runtime.onInstalled.addListener(onInstalled);
 
-// --------------------------------------------------------------------------------------------- Init service worker.
+// --------------------------------------------------------------------------------------------- init
+/** If state hasn't been previously set in storage, initialize it, otherwise overwrite the default state. */
+async function initServiceWorker() {
+  let storageState = await getStorageAsync();
+  if (storageState) {
+    state = storageState;
+  } else {
+    await saveStorageAsync(state);
+  }
+
+  console.log('state', state);
+  // createContextMenu();
+}
+
 initServiceWorker();
