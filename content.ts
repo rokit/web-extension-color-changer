@@ -1,4 +1,4 @@
-import { State } from "./interfaces";
+import { Message, State } from "./interfaces";
 
 // var bIsChrome = /Chrome/.test(navigator.userAgent);
 var className = "color-changer-v4";
@@ -119,7 +119,7 @@ function updateContent() {
 //   }
 // }
 
-function onMessage(req, sender, res) {
+function onMessage(req: Message, sender, res) {
   console.log('req', req);
   switch (req.message) {
     case 'update': {

@@ -2,7 +2,7 @@
 // var className = "color-changer-v4";
 // var contextMenuCreated = false;
 
-import { Color, State, Swatch } from "./interfaces";
+import { Color, Message, State, Swatch } from "./interfaces";
 
 function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
   let color: Color = {
@@ -308,7 +308,7 @@ async function sendTabMessage(message: string) {
   }
 }
 
-function onMessage(req, sender, res) {
+function onMessage(req: Message, sender, res) {
   console.log('req', req);
   console.log('sender', sender);
   switch (req.message) {

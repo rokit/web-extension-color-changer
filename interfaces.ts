@@ -26,3 +26,8 @@ export interface Color {
   hueVisited: string;
   alpha: string;
 }
+
+export interface Message {
+  message: string;
+  payload: State | null;
+}
