@@ -2,45 +2,56 @@
 // var className = "color-changer-v4";
 // var contextMenuCreated = false;
 
-// function ChosenColor(hue, saturation, lightness, chosenId) {
-//   this.hue = hue;
-//   this.saturation = saturation;
-//   this.lightness = lightness;
-//   this.chosenId = chosenId;
-//   createStrings(this);
-// }
+import { Color, State, Swatch } from "./interfaces";
 
-// function updateChosenColor(color, swatch) {
-//   color.hue = swatch.hue;
-//   color.saturation = swatch.saturation;
-//   color.lightness = swatch.lightness;
-//   color.chosenId = swatch.id;
-//   createStrings(color);
-// }
+function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
+  let color: Color = {
+    swatch: {
+      hue,
+      saturation,
+      lightness,
+      chosenId,
+    },
+    hsl: "",
+    lightnessShift: "",
+    hueHovered: "",
+    hueVisited: "",
+    alpha: "",
+  }
+  initHslStrings(color);
+  return color;
+}
 
-// function createStrings(color) {
-//   color.hsl = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness}%)`;
-//   if (color.lightness >= 50) {
-//     color.lightnessShift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness - 10}%)`;
-//   } else {
-//     color.lightnessShift = `hsl(${color.hue}, ${color.saturation}%, ${color.lightness + 10}%)`;
-//   }
-//   color.hueHovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
-//   color.hueVisited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.lightness}%)`;
-//   color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.lightness}%, 0.5)`;
-// }
+function initHslStrings(color: Color) {
+  color.hsl = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%)`;
+  if (color.swatch.lightness >= 50) {
+    color.lightnessShift = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness - 10}%)`;
+  } else {
+    color.lightnessShift = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness + 10}%)`;
+  }
+  color.hueHovered = `hsl(${color.swatch.hue + 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
+  color.hueVisited = `hsl(${color.swatch.hue - 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
+  color.alpha = `hsla(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%, 0.5)`;
+}
 
-// // defaults
-// const changeColors = false;
-// const always = false;
-// const activeTabId = null;
-// const activeTabHostname = null;
-// const fg = new ChosenColor(0, 0, 80, 'zero');
-// const bg = new ChosenColor(0, 0, 25, 'zero');
-// const li = new ChosenColor(68, 80, 80, '2-6');
-// const activeBtn = 'fore';
-// const lightness = 80;
-// const hosts = [];
+function updateColor(color: Color, swatch: Swatch) {
+  color.swatch = swatch;
+  initHslStrings(color);
+}
+
+// defaults
+let state: State = {
+  changeColors: false,
+  always: false,
+  activeTabId: null,
+  activeTabHostname: "",
+  fg: createColor(0, 0, 80, 'zero'),
+  bg: createColor(0, 0, 25, 'zero'),
+  li: createColor(68, 80, 80, '2-6'),
+  activeBtn: 'fore',
+  lightness: 80,
+  hosts: [],
+}
 
 // // can potentially use this to check for errors
 // // function hasError() {
@@ -181,7 +192,7 @@ function onStorageChanged(changes: object, areaName: string) {
 //   getStorage(null, state => {
 //     switch (state.activeBtn) {
 //       case "fore": {
-//         updateChosenColor(state.fg, payload);
+//         updateColor(state.fg, payload);
 //         saveStorage({
 //           fg: state.fg,
 //           lightness: state.fg.lightness,
@@ -189,14 +200,14 @@ function onStorageChanged(changes: object, areaName: string) {
 
 //       } break;
 //       case "back": {
-//         updateChosenColor(state.bg, payload);
+//         updateColor(state.bg, payload);
 //         saveStorage({
 //           bg: state.bg,
 //           lightness: state.bg.lightness,
 //         }, () => onChangeColors(true));
 //       } break;
 //       case "link": {
-//         updateChosenColor(state.li, payload);
+//         updateColor(state.li, payload);
 //         saveStorage({
 //           li: state.li,
 //           lightness: state.li.lightness,
@@ -326,7 +337,7 @@ function onMessage(req, sender, res) {
   console.log('req', req);
   console.log('sender', sender);
   switch (req.message) {
-    // case 'updateChosenColor': onUpdateChosenColor(req.payload); break;
+    // case 'updateColor': onUpdateChosenColor(req.payload); break;
     // case 'updateStrings': onUpdateStrings(); break;
     // case 'reset': onReset(); break;
     // case 'changeLightness': onChangeLightness(req.payload); break;
@@ -350,12 +361,52 @@ function onInstalled(details: any) {
   }
 }
 
+function getStorageAsync() {
+  // Immediately return a promise and start asynchronous work
+  return new Promise((resolve, reject) => {
+    // Asynchronously fetch all data from storage.sync.
+    chrome.storage.sync.get(['colorChangerState'], (result) => {
+      // Pass any observed errors down the promise chain.
+      if (chrome.runtime.lastError) {
+        return reject(chrome.runtime.lastError);
+      }
+
+      if (!result.colorChangerState) {
+        saveStorageAsync(state);
+        return resolve(state);
+      }
+
+      // Pass the data retrieved from storage down the promise chain.
+      resolve(result);
+    });
+  });
+}
+
+function saveStorageAsync(state: State): Promise<boolean> {
+  // Immediately return a promise and start asynchronous work
+  return new Promise((resolve, reject) => {
+    // Asynchronously fetch all data from storage.sync.
+    chrome.storage.sync.set({ 'colorChangerState': state }, () => {
+      // Pass any observed errors down the promise chain.
+      if (chrome.runtime.lastError) {
+        return reject(chrome.runtime.lastError);
+      }
+      // Pass the data retrieved from storage down the promise chain.
+      resolve(true);
+    });
+  });
+}
+
 chrome.tabs.onActivated.addListener(onTabActivated);
 chrome.runtime.onMessage.addListener(onMessage);
 chrome.storage.onChanged.addListener(onStorageChanged);
 chrome.runtime.onInstalled.addListener(onInstalled);
 
+
 // initState();
 // // console.log('asdf bg');
+
+// saveStorageAsync(state);
+getStorageAsync();
 
 console.log('bg');

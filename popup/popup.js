@@ -2,7 +2,7 @@ var background = chrome.extension.getBackgroundPage();
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 var state = null;
 
-function Swatch(x, y, id, radius, hue, saturation, lightness) {
+function CanvasSwatch(x, y, id, radius, hue, saturation, lightness) {
   this.x = x;
   this.y = y;
   this.id = id;
@@ -181,7 +181,7 @@ function drawCanvas() {
   if (swatches["zero"]) {
     updateSwatch(swatches["zero"], 0, 0, state.lightness);
   } else {
-    swatches["zero"] = new Swatch(zeroSatOffsetX, zeroSatOffsetY, "zero", satRadius, 0, 0, state.lightness);
+    swatches["zero"] = new CanvasSwatch(zeroSatOffsetX, zeroSatOffsetY, "zero", satRadius, 0, 0, state.lightness);
   }
 
   for (var j = 0; j < rings; j++) {
@@ -204,7 +204,7 @@ function drawCanvas() {
       if (swatches[id]) {
         updateSwatch(swatches[id], hue, saturation, state.lightness);
       } else {
-        swatches[id] = new Swatch(x, y, id, littleRadius, hue, saturation, state.lightness);
+        swatches[id] = new CanvasSwatch(x, y, id, littleRadius, hue, saturation, state.lightness);
       }
 
       ctx.strokeStyle = strokeColor;
