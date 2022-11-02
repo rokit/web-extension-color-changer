@@ -134,9 +134,7 @@ function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
 }
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
-async function validateTab(tab: chrome.tabs.Tab) {
-  // console.log('active tab', tab);
-
+function validateTab(tab: chrome.tabs.Tab) {
   if (!tab || !tab.id || !tab.url) {
     return;
   }
@@ -298,11 +296,15 @@ function onStorageChanged(changes: object, areaName: string) {
 //   });
 // }
 
-function sendTabMessage(message: string) {
+async function sendTabMessage(message: string) {
   if (!state.activeTabId) return;
-  chrome.tabs.sendMessage(state.activeTabId, { message, payload: state }, (response: any) => {
-    console.log('message response', response);
-  });
+  try {
+    await chrome.tabs.sendMessage(state.activeTabId, { message, payload: state });
+  } catch (e) {
+    // add please refresh tab to UI.
+    console.log('estate', state);
+    console.log('e', e);
+  }
 }
 
 function onMessage(req, sender, res) {
