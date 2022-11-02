@@ -294,7 +294,7 @@ function onStorageChanged(changes: object, areaName: string) {
 // }
 
 /** If state hasn't been previously set in storage, initialize it, otherwise overwrite the default state. */
-async function initSserviceWorker() {
+async function initServiceWorker() {
   let storageState = await getStorageAsync();
   if (storageState) {
     state = storageState;
@@ -333,7 +333,7 @@ function onInstalled(details: any) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
   if (details.reason === 'update') {
     // only do this for major versions with breaking changes
-    // clearStorage(initSserviceWorker);
+    // clearStorage(initServiceWorker);
   } else if (details.reason === 'install') {
     // showAboutPage(details.reason);
   }
@@ -382,4 +382,4 @@ chrome.storage.onChanged.addListener(onStorageChanged);
 chrome.runtime.onInstalled.addListener(onInstalled);
 
 // --------------------------------------------------------------------------------------------- Init service worker.
-initSserviceWorker();
+initServiceWorker();
