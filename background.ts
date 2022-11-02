@@ -293,40 +293,18 @@ function onStorageChanged(changes: object, areaName: string) {
 //   });
 // }
 
-// // gets or initializes a property, then saves
-// function initState() {
-//   let stateToGetOrInitialize = {
-//     changeColors,
-//     always,
-//     hosts,
-//     activeTabHostname,
-//     fg,
-//     bg,
-//     li,
-//     activeBtn,
-//     lightness,
-//   };
+/** If state hasn't been previously set in storage, initialize it, otherwise overwrite the default state. */
+async function initSserviceWorker() {
+  let storageState = await getStorageAsync();
+  if (storageState) {
+    state = storageState;
+  } else {
+    await saveStorageAsync(state);
+  }
 
-//   getStorage(stateToGetOrInitialize, state => {
-//     saveStorage(state, createContextMenu);
-//   });
-// }
-
-// function getStorage(obj, response) {
-//   response = response || (() => { });
-//   chrome.storage.sync.get(obj, response);
-// }
-
-// function saveStorage(obj, response) {
-//   response = response || (() => { });
-//   if (chrome.runtime.lastError) return;
-//   chrome.storage.sync.set({ ...obj }, response);
-// }
-
-// function clearStorage(response) {
-//   response = response || (() => { });
-//   chrome.storage.sync.clear(response);
-// }
+  console.log('state', state);
+  // createContextMenu();
+}
 
 // function sendTabMessage(activeTabId, message, payload, response) {
 //   if (!activeTabId) return;
@@ -355,13 +333,14 @@ function onInstalled(details: any) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
   if (details.reason === 'update') {
     // only do this for major versions with breaking changes
-    // clearStorage(initState);
+    // clearStorage(initSserviceWorker);
   } else if (details.reason === 'install') {
     // showAboutPage(details.reason);
   }
 }
 
-function getStorageAsync() {
+// --------------------------------------------------------------------------------------------- Storage
+function getStorageAsync(): Promise<State | undefined> {
   // Immediately return a promise and start asynchronous work
   return new Promise((resolve, reject) => {
     // Asynchronously fetch all data from storage.sync.
@@ -371,13 +350,8 @@ function getStorageAsync() {
         return reject(chrome.runtime.lastError);
       }
 
-      if (!result.colorChangerState) {
-        saveStorageAsync(state);
-        return resolve(state);
-      }
-
       // Pass the data retrieved from storage down the promise chain.
-      resolve(result);
+      resolve(result.colorChangerState);
     });
   });
 }
@@ -397,16 +371,15 @@ function saveStorageAsync(state: State): Promise<boolean> {
   });
 }
 
+function clearStorage() {
+  chrome.storage.sync.clear();
+}
+
+// --------------------------------------------------------------------------------------------- Listeners
 chrome.tabs.onActivated.addListener(onTabActivated);
 chrome.runtime.onMessage.addListener(onMessage);
 chrome.storage.onChanged.addListener(onStorageChanged);
 chrome.runtime.onInstalled.addListener(onInstalled);
 
-
-// initState();
-// // console.log('asdf bg');
-
-// saveStorageAsync(state);
-getStorageAsync();
-
-console.log('bg');
+// --------------------------------------------------------------------------------------------- Init service worker.
+initSserviceWorker();
