@@ -1,3 +1,4 @@
+var background = chrome.extension.getBackgroundPage();
 var bIsChrome = /Chrome/.test(navigator.userAgent);
 var state = null;
 
@@ -79,13 +80,13 @@ lightnessSlider.onchange = function () {
 }
 
 function handleFore() {
-  saveStorage({ activeBtn: 'fore', lightness: state.fg.lightness });
+  background.saveStorage({ activeBtn: 'fore', lightness: state.fg.lightness });
 }
 function handleBack() {
-  saveStorage({ activeBtn: 'back', lightness: state.bg.lightness });
+  background.saveStorage({ activeBtn: 'back', lightness: state.bg.lightness });
 }
 function handleLink() {
-  saveStorage({ activeBtn: 'link', lightness: state.li.lightness });
+  background.saveStorage({ activeBtn: 'link', lightness: state.li.lightness });
 }
 
 foreSwatch.onclick = handleFore;
@@ -282,26 +283,26 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function saveStorage(obj, response) {
-  response = response || (() => {});
-  if (bIsChrome) {
-    chrome.storage.sync.set({ ...obj }, response);
-  } else {
-    browser.storage.sync.set({ ...obj }, response);
-  }
-}
+// function background.saveStorage(obj, response) {
+//   response = response || (() => { });
+//   if (bIsChrome) {
+//     chrome.storage.sync.set({ ...obj }, response);
+//   } else {
+//     browser.storage.sync.set({ ...obj }, response);
+//   }
+// }
 
-function getStorage(obj, response) {
-  response = response || (() => { });
-  if (bIsChrome) {
-    chrome.storage.sync.get(obj, response);
-  } else {
-    browser.storage.sync.get(obj, response);
-  }
-}
+// function getStorage(obj, response) {
+//   response = response || (() => { });
+//   if (bIsChrome) {
+//     chrome.storage.sync.get(obj, response);
+//   } else {
+//     browser.storage.sync.get(obj, response);
+//   }
+// }
 
 function updateUi() {
-  getStorage(null, theState => {
+  background.getStorage(null, theState => {
     state = theState;
     foreSwatch.style.background = state.fg.hsl;
     backSwatch.style.background = state.bg.hsl;

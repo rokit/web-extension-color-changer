@@ -21,11 +21,7 @@
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [
     {
-      "resources": [
-        "icons/icon.svg",
-        "pkg/color_changer.js",
-        "pkg/color_changer_bg.wasm"
-      ],
+      "resources": ["icons/icon.svg"],
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
