@@ -301,6 +301,7 @@ async function sendTabMessage(message: string) {
   try {
     await chrome.tabs.sendMessage(state.activeTabId, { message, payload: state });
   } catch (e) {
+    await chrome.tabs.reload(state.activeTabId);
     // add please refresh tab to UI.
     console.log('estate', state);
     console.log('e', e);
