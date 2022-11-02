@@ -306,6 +306,7 @@ function onMessage(req: Message, sender, res) {
   console.log('sender', sender);
   switch (req.message) {
     case 'init-content-state': res({ state }); break;
+    case 'popup-state': res({ state }); break;
     // case 'updateColor': onUpdateChosenColor(req.payload); break;
     // case 'updateStrings': onUpdateStrings(); break;
     // case 'reset': onReset(); break;

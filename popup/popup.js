@@ -1,5 +1,4 @@
-var background = chrome.extension.getBackgroundPage();
-var bIsChrome = /Chrome/.test(navigator.userAgent);
+// var bIsChrome = /Chrome/.test(navigator.userAgent);
 var state = null;
 
 function CanvasSwatch(x, y, id, radius, hue, saturation, lightness) {
@@ -301,9 +300,9 @@ canvas.onmousemove = function (e) {
 //   }
 // }
 
-function updateUi() {
-  background.getStorage(null, theState => {
-    state = theState;
+async function updateUi() {
+  sendRuntimeMessage('popup-state', null, (res) => {
+    state = res.state;
     foreSwatch.style.background = state.fg.hsl;
     backSwatch.style.background = state.bg.hsl;
     linkSwatch.style.background = state.li.hsl;
@@ -315,21 +314,13 @@ function updateUi() {
 
     setActiveColorButton();
     drawCanvas();
-  });
+  })
 }
 
 function sendRuntimeMessage(message, payload, response) {
-  if (bIsChrome) {
-    chrome.runtime.sendMessage({ message, payload }, response);
-  } else {
-    browser.runtime.sendMessage({ message, payload }, response);
-  }
+  chrome.runtime.sendMessage({ message, payload }, response);
 }
 
-if (bIsChrome) {
-  chrome.storage.onChanged.addListener(updateUi);
-} else {
-  browser.storage.onChanged.addListener(updateUi);
-}
+chrome.storage.onChanged.addListener(updateUi);
 
 window.onload = updateUi;
