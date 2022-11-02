@@ -4,6 +4,19 @@
 
 import { Color, Message, State, Swatch } from "./interfaces";
 
+let state: State = {
+  changeColors: false,
+  always: false,
+  activeTabId: null,
+  activeTabHostname: "",
+  fg: createColor(0, 0, 80, 'zero'),
+  bg: createColor(0, 0, 25, 'zero'),
+  li: createColor(68, 80, 80, '2-6'),
+  activeBtn: 'fore',
+  lightness: 80,
+  hosts: [],
+}
+
 function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
   let color: Color = {
     swatch: {
@@ -39,20 +52,6 @@ function updateColor(color: Color, swatch: Swatch) {
   initHslStrings(color);
 }
 
-// defaults
-let state: State = {
-  changeColors: false,
-  always: false,
-  activeTabId: null,
-  activeTabHostname: "",
-  fg: createColor(0, 0, 80, 'zero'),
-  bg: createColor(0, 0, 25, 'zero'),
-  li: createColor(68, 80, 80, '2-6'),
-  activeBtn: 'fore',
-  lightness: 80,
-  hosts: [],
-}
-
 // // can potentially use this to check for errors
 // // function hasError() {
 // //   if (bIsChrome && chrome.runtime.lastError) {
@@ -63,8 +62,8 @@ let state: State = {
 // //   return false;
 // // }
 
-async function onChangeColors(shouldChangeColors: boolean) {
-  state.changeColors = shouldChangeColors;
+async function onChangeColors(changeColors: boolean) {
+  state.changeColors = changeColors;
   saveStorageAsync(state);
   // if (!shouldChangeColors && state.always) {
   //   onAlways(false);
@@ -127,26 +126,21 @@ async function onChangeColors(shouldChangeColors: boolean) {
 
 
 
-/** On tab activation, query for the active tab and current window. */
+/** On tab activation, get the full tab data. */
 function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
-  // Should only result in a max of one tab.
+  state.activeTabId = tabInfo.tabId;
+  state.activeTabHostname = "";
   chrome.tabs.get(tabInfo.tabId, (tab: chrome.tabs.Tab) => validateTab(tab));
 }
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
-  if (!tab || !tab.id || !tab.url) {
+  if (!tab.id || !tab.url) {
     return;
   }
 
-  let url: URL;
-  try {
-    url = new URL(tab.url);
-  } catch {
-    return;
-  }
+  let url = new URL(tab.url);
 
-  console.log('url', url);
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
     return;
   }
@@ -175,7 +169,6 @@ function validateTab(tab: chrome.tabs.Tab) {
 //   });
 // }
 
-// ch = changes
 function onStorageChanged(changes: object, areaName: string) {
   console.log('changes', changes);
   console.log('areaName', areaName);
