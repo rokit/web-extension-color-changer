@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Color Changer",
-  "version": "3.0.4",
+  "version": "4.0.0",
   "description": "Change a page's text, background, and link colors to your liking.",
 
   "icons": {
@@ -9,17 +9,30 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
+  "background": { "service_worker": "background.js", "type": "module" },
   "content_scripts": [
     {
       "run_at": "document_start",
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["pkg/color_changer.js", "content.js"]
     }
   ],
-  "web_accessible_resources": ["icons/icon.svg"],
-  "background": { "scripts": ["background.js"] },
-  "permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
-  "browser_action": {
+  "permissions": ["storage", "tabs", "activeTab", "contextMenus"],
+  "host_permissions": ["*://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/icon.svg",
+        "pkg/color_changer.js",
+        "pkg/color_changer_bg.wasm"
+      ],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
