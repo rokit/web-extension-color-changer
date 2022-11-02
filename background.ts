@@ -79,6 +79,14 @@ function onAlways(always) {
   });
 }
 
+function onContextMenuClicked(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) {
+  if (info.menuItemId === "changeColors") {
+    onChangeColors(info.checked)
+  } else if (info.menuItemId === "always") {
+    onAlways(info.checked)
+  }
+}
+
 function createContextMenu() {
   getStorage(null, state => {
     let ctxColorChanger: object = {
@@ -87,7 +95,6 @@ function createContextMenu() {
       contexts: ["all"],
       type: "checkbox",
       checked: state.changeColors,
-      onclick: evt => onChangeColors(evt.checked),
     };
 
     let ctxAlways: object = {
@@ -96,12 +103,13 @@ function createContextMenu() {
       contexts: ["all"],
       type: "checkbox",
       checked: state.always,
-      onclick: evt => onAlways(evt.checked),
     };
 
     chrome.contextMenus.removeAll();
     chrome.contextMenus.create(ctxColorChanger);
     chrome.contextMenus.create(ctxAlways);
+    chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
+    chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
     contextMenuCreated = true;
   });
 }
