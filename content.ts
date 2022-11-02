@@ -166,8 +166,16 @@ function onMessage(req, sender, res) {
 //   }
 // }
 
+function sendRuntimeMessageFromContent(message: string) {
+  chrome.runtime.sendMessage({ message }, (response) => {
+    if (response.state) {
+      state = response.state;
+    }
+  });
+}
+
 chrome.runtime.onMessage.addListener(onMessage);
 
-// getState();
+sendRuntimeMessageFromContent("init-content-state");
 
 console.log('content sc');
