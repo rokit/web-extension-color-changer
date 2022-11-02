@@ -1,2 +1,4 @@
 *.zip
 *.txt
+
+/node_modules

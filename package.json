@@ -1,0 +1,22 @@
+{
+  "name": "color-changer",
+  "version": "4.0.0",
+  "description": "Change a page's text, background, and link colors to your liking.",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/rokit/web-extension-color-changer.git"
+  },
+  "author": "Luke Simpson",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/rokit/web-extension-color-changer/issues"
+  },
+  "homepage": "https://github.com/rokit/web-extension-color-changer#readme",
+  "dependencies": {
+    "@parcel/config-webextension": "^2.7.0"
+  }
+}
