@@ -9,12 +9,12 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
-  "background": { "service_worker": "background.js", "type": "module" },
+  "background": { "service_worker": "background.ts", "type": "module" },
   "content_scripts": [
     {
       "run_at": "document_start",
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["pkg/color_changer.js", "content.js"]
+      "js": ["content.ts"]
     }
   ],
   "permissions": ["storage", "tabs", "activeTab", "contextMenus"],

@@ -2,8 +2,8 @@
   "name": "color-changer",
   "version": "4.0.0",
   "description": "Change a page's text, background, and link colors to your liking.",
-  "main": "background.js",
   "scripts": {
+    "build": "parcel build manifest.json --config @parcel/config-webextension",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,7 +16,8 @@
     "url": "https://github.com/rokit/web-extension-color-changer/issues"
   },
   "homepage": "https://github.com/rokit/web-extension-color-changer#readme",
-  "dependencies": {
-    "@parcel/config-webextension": "^2.7.0"
+  "devDependencies": {
+    "@parcel/config-webextension": "^2.7.0",
+    "parcel": "^2.7.0"
   }
 }
