@@ -1,15 +1,12 @@
 import { Message, State } from "./interfaces";
 
-// var bIsChrome = /Chrome/.test(navigator.userAgent);
 var className = "color-changer-v4";
-
 var ccStyle = document.createElement('style');
 ccStyle.id = "color-changer-style";
 
 var observer = new MutationObserver(classListChanged);
 var observerConfig = { attributes: true, attributeFilter: ["class"] };
 
-// var changeColors = false;
 var css = "";
 var state: State | null = null;
 
@@ -110,15 +107,6 @@ function updateContent() {
   }
 }
 
-// function getTheStorage(obj, response) {
-//   response = response || (() => { });
-//   if (bIsChrome) {
-//     chrome.storage.sync.get(obj, response);
-//   } else {
-//     browser.storage.sync.get(obj, response);
-//   }
-// }
-
 function onMessage(req: Message, sender, res) {
   console.log('req', req);
   switch (req.message) {
@@ -129,42 +117,6 @@ function onMessage(req: Message, sender, res) {
     default: break;
   }
 }
-
-// function getState() {
-//   getTheStorage(null, theState => {
-//     state = theState;
-//     let url = null;
-//     let activeTabHostname = null;
-//     try {
-//       url = new URL(document.location.href);
-//       activeTabHostname = url.hostname;
-//     } catch {
-//       activeTabHostname = null;
-//     }
-//     saveStorage({ activeTabHostname });
-//     let index = state.hosts.indexOf(activeTabHostname);
-
-//     if (index > -1) {
-//       state.changeColors = true;
-//       state.always = true;
-//       saveStorage({ changeColors: true, always: true });
-//       updateContent();
-//     } else {
-//       state.changeColors = false;
-//       state.always = false;
-//       saveStorage({ changeColors: false, always: false });
-//     }
-//   })
-// }
-
-// function saveStorage(obj, response) {
-//   response = response || (() => { });
-//   if (bIsChrome) {
-//     chrome.storage.sync.set({ ...obj }, response);
-//   } else {
-//     browser.storage.sync.set({ ...obj }, response);
-//   }
-// }
 
 function sendRuntimeMessageFromContent(message: string) {
   chrome.runtime.sendMessage({ message }, (response) => {
