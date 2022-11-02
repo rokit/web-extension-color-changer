@@ -176,6 +176,7 @@ function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
 // ch = changes
 function onStorageChanged(changes: object, areaName: string) {
   console.log('changes', changes);
+  console.log('areaName', areaName);
   // getStorage(null, state => {
   // if state is empty, return
   // state can be empty when clearing storage
@@ -312,10 +313,6 @@ function onMessage(req, sender, res) {
   }
 }
 
-// function showAboutPage(reason) {
-//   chrome.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
-// }
-
 // --------------------------------------------------------------------------------------------- installed
 function onInstalled(details: any) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
@@ -326,6 +323,10 @@ function onInstalled(details: any) {
     // showAboutPage(details.reason);
   }
 }
+
+// function showAboutPage(reason) {
+//   chrome.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
+// }
 
 // --------------------------------------------------------------------------------------------- storage
 function getStorageAsync(): Promise<State | undefined> {
