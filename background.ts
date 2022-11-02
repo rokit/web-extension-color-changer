@@ -63,31 +63,24 @@ let state: State = {
 // //   return false;
 // // }
 
-// function onChangeColors(changeColors) {
-//   saveStorage({ changeColors }, () => {
-//     getStorage(null, state => {
-//       if (!changeColors && state.always) {
-//         onAlways(false);
-//       }
-//       sendTabMessage(state.activeTabId, 'update', null, null);
-//     });
-//   })
-// }
+function onChangeColors(shouldChangeColors: boolean) {
+  state.changeColors = shouldChangeColors;
+  // if (!shouldChangeColors && state.always) {
+  //   onAlways(false);
+  // }
+  sendTabMessage('update');
+}
 
 // function onAlways(always) {
-//   saveStorage({ always }, () => {
-//     getStorage(null, state => {
-//       let index = state.hosts.indexOf(state.activeTabHostname);
-//       if (state.always && index === -1) {
-//         state.hosts.push(state.activeTabHostname);
-//         saveStorage({ hosts: [...state.hosts] }, null);
-//         onChangeColors(true);
-//       } else if (!state.always && index > -1) {
-//         state.hosts.splice(index, 1);
-//         saveStorage({ hosts: [...state.hosts] }, null);
-//       }
-//     })
-//   });
+//   let index = state.hosts.indexOf(state.activeTabHostname);
+//   if (state.always && index === -1) {
+//     state.hosts.push(state.activeTabHostname);
+//     saveStorage({ hosts: [...state.hosts] }, null);
+//     onChangeColors(true);
+//   } else if (!state.always && index > -1) {
+//     state.hosts.splice(index, 1);
+//     saveStorage({ hosts: [...state.hosts] }, null);
+//   }
 // }
 
 // function onContextMenuClicked(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) {
@@ -131,37 +124,47 @@ let state: State = {
 //   chrome.contextMenus.update('always', { checked: always });
 // }
 
-function tabsQueryCallback(tabInfo: chrome.tabs.TabActiveInfo, tabs: chrome.tabs.Tab[]) {
-  console.log('tabInfo', tabInfo);
-  const activeTabId = tabInfo.tabId;
-  let firstTab = tabs[0];
 
-  if (!firstTab || !firstTab.url) {
+
+/** On tab activation, query for the active tab and current window. */
+function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
+  // Should only result in a max of one tab.
+  chrome.tabs.get(tabInfo.tabId, (tab: chrome.tabs.Tab) => validateTab(tab));
+}
+
+/** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
+async function validateTab(tab: chrome.tabs.Tab) {
+  // console.log('active tab', tab);
+
+  if (!tab || !tab.id || !tab.url) {
     return;
   }
 
-  let url = new URL(firstTab.url);
-  let activeTabHostname = url.hostname;
+  let url: URL;
+  try {
+    url = new URL(tab.url);
+  } catch {
+    return;
+  }
 
+  console.log('url', url);
   if (url.protocol !== 'chrome:' && url.protocol !== 'about:') {
-    // saveStorage({ activeTabHostname, activeTabId }, onTabSwitch);
+    state.activeTabHostname = url.hostname;
+    state.activeTabId = tab.id;
+
+    // If the hostname is found in the hosts list, the user always wants to change colors for the host.
+    if (state.hosts.includes(state.activeTabHostname)) {
+      state.always = true;
+      await saveStorageAsync(state);
+      onChangeColors(true);
+    } else {
+      state.always = false;
+      await saveStorageAsync(state);
+      onChangeColors(false);
+    }
+    // onTabSwitch();
   }
 }
-
-// on tab activation get tabid and hostname
-function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => tabsQueryCallback(tabInfo, tabs));
-}
-
-// function tabExecuteScriptCallback(results, state) {
-//   let index = state.hosts.indexOf(state.activeTabHostname);
-
-//   if (index > -1) {
-//     saveStorage({ always: true }, () => onChangeColors(true));
-//   } else {
-//     saveStorage({ always: false }, () => onChangeColors(results[0]));
-//   }
-// }
 
 // function onTabSwitch() {
 //   getStorage(null, state => {
@@ -294,10 +297,12 @@ function onStorageChanged(changes: object, areaName: string) {
 //   });
 // }
 
-// function sendTabMessage(activeTabId, message, payload, response) {
-//   if (!activeTabId) return;
-//   chrome.tabs.sendMessage(activeTabId, { message, payload }, response);
-// }
+function sendTabMessage(message: string) {
+  if (!state.activeTabId) return;
+  chrome.tabs.sendMessage(state.activeTabId, { message, payload: state }, (response: any) => {
+    console.log('message response', response);
+  });
+}
 
 function onMessage(req, sender, res) {
   console.log('req', req);
