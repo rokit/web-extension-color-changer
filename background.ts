@@ -63,8 +63,9 @@ let state: State = {
 // //   return false;
 // // }
 
-function onChangeColors(shouldChangeColors: boolean) {
+async function onChangeColors(shouldChangeColors: boolean) {
   state.changeColors = shouldChangeColors;
+  saveStorageAsync(state);
   // if (!shouldChangeColors && state.always) {
   //   onAlways(false);
   // }
@@ -148,22 +149,22 @@ async function validateTab(tab: chrome.tabs.Tab) {
   }
 
   console.log('url', url);
-  if (url.protocol !== 'chrome:' && url.protocol !== 'about:') {
-    state.activeTabHostname = url.hostname;
-    state.activeTabId = tab.id;
-
-    // If the hostname is found in the hosts list, the user always wants to change colors for the host.
-    if (state.hosts.includes(state.activeTabHostname)) {
-      state.always = true;
-      await saveStorageAsync(state);
-      onChangeColors(true);
-    } else {
-      state.always = false;
-      await saveStorageAsync(state);
-      onChangeColors(false);
-    }
-    // onTabSwitch();
+  if (url.protocol === 'chrome:' || url.protocol === 'about:') {
+    return;
   }
+
+  state.activeTabId = tab.id;
+  state.activeTabHostname = url.hostname;
+
+  // If the hostname is found in the hosts list, the user always wants to change colors for the host.
+  if (state.hosts.includes(state.activeTabHostname)) {
+    state.always = true;
+    onChangeColors(true);
+  } else {
+    state.always = false;
+    onChangeColors(false);
+  }
+  // onTabSwitch();
 }
 
 // function onTabSwitch() {

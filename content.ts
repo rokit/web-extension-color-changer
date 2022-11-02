@@ -1,110 +1,114 @@
+import { State } from "./interfaces";
+
 // var bIsChrome = /Chrome/.test(navigator.userAgent);
-// var className = "color-changer-v3";
+var className = "color-changer-v4";
 
-// var ccStyle = document.createElement('style');
-// ccStyle.id = "color-changer-style";
+var ccStyle = document.createElement('style');
+ccStyle.id = "color-changer-style";
 
-// var observer = new MutationObserver(classListChanged);
-// var observerConfig = { attributes: true, attributeFilter: ["class"] };
+var observer = new MutationObserver(classListChanged);
+var observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 // var changeColors = false;
-// var css = "";
-// var state: any = null;
+var css = "";
+var state: State | null = null;
 
-// function updateCss() {
-//   let not = ':not(img):not(img *):not(video):not(video *):not(svg):not(svg *):not(.rc-VideoMiniPlayer *)';
-//   css = `
-//   .${className} *${not} {
-//     color: ${state.fg.hsl} !important;
-//     background-color: ${state.bg.hsl} !important;
-//     border-color: ${state.bg.lightnessShift} !important;
-//   }
-//   .${className}${not} *:before,
-//   .${className}${not} *:after {
-//     color: ${state.fg.hsl} !important;
-//     background: ${state.bg.hsl} !important;
-//     border-color: ${state.bg.lightnessShift} !important;
-//   }
-//   .${className}${not} img {
-//     visibility: visible !important;
-//   }
-//   .${className}${not} button {
-//     color: ${state.li.hsl} !important;
-//   }
+function updateCss() {
+  let not = ':not(img):not(img *):not(video):not(video *):not(svg):not(svg *):not(.rc-VideoMiniPlayer *)';
+  if (!state) return;
 
-//   .${className}${not} input,
-//   .${className}${not} input *,
-//   .${className}${not} textarea,
-//   .${className}${not} textarea *,
-//   .${className}${not} pre,
-//   .${className}${not} pre *,
-//   .${className}${not} code,
-//   .${className}${not} code *
-//   {
-//     background-color: ${state.bg.lightnessShift} !important;
-//   }
+  css = `
+  .${className} *${not} {
+    color: ${state.fg.hsl} !important;
+    background-color: ${state.bg.hsl} !important;
+    border-color: ${state.bg.lightnessShift} !important;
+  }
+  .${className}${not} *:before,
+  .${className}${not} *:after {
+    color: ${state.fg.hsl} !important;
+    background: ${state.bg.hsl} !important;
+    border-color: ${state.bg.lightnessShift} !important;
+  }
+  .${className}${not} img {
+    visibility: visible !important;
+  }
+  .${className}${not} button {
+    color: ${state.li.hsl} !important;
+  }
 
-//   .${className}${not} a,
-//   .${className}${not} a *
-//   {
-//     color: ${state.li.hsl} !important;
-//     background-color: ${state.bg.hsl} !important;
-//   }
-//   .${className}${not} a:hover,
-//   .${className}${not} a:hover *
-//   {
-//     color: ${state.li.hueHovered} !important;
-//   }
-//   .${className}${not} a:active,
-//   .${className}${not} a:active *
-//   {
-//     color: ${state.li.hueVisited} !important;
-//   }
-//   .${className}${not} a:visited,
-//   .${className}${not} a:visited * {
-//     color: ${state.li.hueVisited} !important;
-//   }
-// `;
-// }
+  .${className}${not} input,
+  .${className}${not} input *,
+  .${className}${not} textarea,
+  .${className}${not} textarea *,
+  .${className}${not} pre,
+  .${className}${not} pre *,
+  .${className}${not} code,
+  .${className}${not} code *
+  {
+    background-color: ${state.bg.lightnessShift} !important;
+  }
 
-// function classListChanged(mutationList, obs) {
-//   addClass();
-// }
+  .${className}${not} a,
+  .${className}${not} a *
+  {
+    color: ${state.li.hsl} !important;
+    background-color: ${state.bg.hsl} !important;
+  }
+  .${className}${not} a:hover,
+  .${className}${not} a:hover *
+  {
+    color: ${state.li.hueHovered} !important;
+  }
+  .${className}${not} a:active,
+  .${className}${not} a:active *
+  {
+    color: ${state.li.hueVisited} !important;
+  }
+  .${className}${not} a:visited,
+  .${className}${not} a:visited * {
+    color: ${state.li.hueVisited} !important;
+  }
+`;
+}
 
-// function addClass() {
-//   let html = document.documentElement;
-//   if (!html) return;
+function classListChanged(mutationList, obs) {
+  addClass();
+}
 
-//   if (!html.classList.contains(className)) {
-//     html.classList.add(className);
-//   }
+function addClass() {
+  let html = document.documentElement;
+  if (!html) return;
 
-//   observer.observe(html, observerConfig);
-// }
+  if (!html.classList.contains(className)) {
+    html.classList.add(className);
+  }
 
-// function removeClass() {
-//   let html = document.documentElement;
-//   if (!html) return;
+  observer.observe(html, observerConfig);
+}
 
-//   html.classList.remove(className);
-//   observer.disconnect();
-// }
+function removeClass() {
+  let html = document.documentElement;
+  if (!html) return;
 
-// function updateContent() {
-//   if (state.changeColors) {
-//     updateCss();
+  html.classList.remove(className);
+  observer.disconnect();
+}
 
-//     ccStyle.textContent = css;
+function updateContent() {
+  if (state?.changeColors) {
+    updateCss();
 
-//     if (!document.getElementById("color-changer-style")) {
-//       document.head.appendChild(ccStyle);
-//     }
+    ccStyle.textContent = css;
 
-//     addClass();
-//   } else {
-//     removeClass();
-//   }
-// }
+    if (!document.getElementById("color-changer-style")) {
+      document.head.appendChild(ccStyle);
+    }
+
+    addClass();
+  } else {
+    removeClass();
+  }
+}
 
 // function getTheStorage(obj, response) {
 //   response = response || (() => { });
@@ -115,17 +119,16 @@
 //   }
 // }
 
-// function notify(req, sender, res) {
-//   switch (req.message) {
-//     case 'update': {
-//       getTheStorage(null, theState => {
-//         state = theState;
-//         updateContent();
-//       })
-//     }; break;
-//     default: break;
-//   }
-// }
+function onMessage(req, sender, res) {
+  console.log('req', req);
+  switch (req.message) {
+    case 'update': {
+      state = req.payload;
+      updateContent();
+    }; break;
+    default: break;
+  }
+}
 
 // function getState() {
 //   getTheStorage(null, theState => {
@@ -163,11 +166,7 @@
 //   }
 // }
 
-// if (bIsChrome) {
-//   chrome.runtime.onMessage.addListener(notify);
-// } else {
-//   browser.runtime.onMessage.addListener(notify);
-// }
+chrome.runtime.onMessage.addListener(onMessage);
 
 // getState();
 
