@@ -18,6 +18,7 @@
   "homepage": "https://github.com/rokit/web-extension-color-changer#readme",
   "devDependencies": {
     "@parcel/config-webextension": "^2.7.0",
+    "@types/chrome": "^0.0.200",
     "parcel": "^2.7.0"
   }
 }
