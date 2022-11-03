@@ -63,22 +63,27 @@ function updateColor(color: Color, swatch: Swatch) {
 // //   return false;
 // // }
 
-// async function onChangeColors(changeColors: boolean) {
-//   state.changeColors = changeColors;
+function onChangeColors(changeColors: boolean) {
+  state.changeColors = changeColors;
+  saveStorageAsync(state);
+  sendTabMessage(UPDATE_CONTENT);
+}
 
-// }
+function onAlways(always: boolean) {
+  state.always = always;
+  state.changeColors = always;
 
-// function onAlways(always) {
-//   let index = state.hosts.indexOf(state.activeTabHostname);
-//   if (state.always && index === -1) {
-//     state.hosts.push(state.activeTabHostname);
-//     saveStorage({ hosts: [...state.hosts] }, null);
-//     onChangeColors(true);
-//   } else if (!state.always && index > -1) {
-//     state.hosts.splice(index, 1);
-//     saveStorage({ hosts: [...state.hosts] }, null);
-//   }
-// }
+  let hostInList = state.hosts.includes(state.activeTabHostname);
+
+  if (state.always && !hostInList) {
+    state.hosts.push(state.activeTabHostname);
+  } else if (!state.always && hostInList) {
+    state.hosts = state.hosts.filter(x => x !== state.activeTabHostname);
+  }
+
+  saveStorageAsync(state);
+  sendTabMessage(UPDATE_CONTENT);
+}
 
 // function onContextMenuClicked(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) {
 //   if (info.menuItemId === "changeColors") {
@@ -305,12 +310,10 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
       res(state);
     }; break;
     case CHANGE_COLORS: {
-      state.changeColors = req.payload;
-      saveStorageAsync(state);
-      sendTabMessage(UPDATE_CONTENT);
+      onChangeColors(req.payload);
     }; break;
     case ALWAYS: {
-
+      onAlways(req.payload);
     }; break;
     case SET_ACTIVE_BUTTON: {
 

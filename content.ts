@@ -127,13 +127,13 @@ function sendRuntimeMessageFromContent(message: string) {
   });
 }
 
-async function initState() {
+async function init() {
   state = await chrome.runtime.sendMessage({ message: GET_STATE });
-  console.log('init state', state);
+  updateContent();
 }
 
 chrome.runtime.onMessage.addListener(onMessage);
 
-initState();
+init();
 
 console.log('content sc');
