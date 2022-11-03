@@ -1,5 +1,5 @@
-import { GET_STATE, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
-import { Message, State } from "../interfaces";
+import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
+import { State } from "../interfaces";
 
 function CanvasSwatch(x, y, id, radius, hue, saturation, lightness) {
   this.x = x;
@@ -40,11 +40,11 @@ let backSwatch = document.getElementById("back-swatch")!;
 let linkSwatch = document.getElementById("link-swatch")!;
 
 changeColorsCheckbox.onclick = () => {
-  sendRuntimeMessage({ message: 'changeColors', payload: changeColorsCheckbox.checked });
+  chrome.runtime.sendMessage({ message: CHANGE_COLORS, payload: changeColorsCheckbox.checked });
 };
 
 alwaysCheckbox.onclick = () => {
-  sendRuntimeMessage({ message: 'always', payload: alwaysCheckbox.checked });
+  chrome.runtime.sendMessage({ message: ALWAYS, payload: alwaysCheckbox.checked });
 };
 
 async function alwaysMouseover() {
@@ -63,7 +63,7 @@ alwaysLabel.onmouseover = alwaysMouseover;
 alwaysLabel.onmouseout = alwaysMouseout;
 
 resetBtn.onclick = function () {
-  sendRuntimeMessage({ message: 'reset' });
+  chrome.runtime.sendMessage({ message: RESET });
 }
 
 lightnessSlider.addEventListener('input', function () {
@@ -73,18 +73,18 @@ lightnessSlider.addEventListener('input', function () {
 lightnessSlider.addEventListener('change', function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
   let lightness = parseInt(this.value);
-  sendRuntimeMessage({ message: 'changeLightness', payload: lightness });
+  chrome.runtime.sendMessage({ message: CHANGE_LIGHTNESS, payload: lightness });
 })
 
 function onClickForeground() {
-  sendRuntimeMessage({ message: SET_ACTIVE_BUTTON, payload: "fore" });
+  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "fore" });
 }
 function onClickBackground() {
-  sendRuntimeMessage({ message: SET_ACTIVE_BUTTON, payload: "back" });
+  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "back" });
   // saveStorage({ activeBtn: "back", lightness: state.bg.swatch.lightness });
 }
 function onClickLink() {
-  sendRuntimeMessage({ message: SET_ACTIVE_BUTTON, payload: "link" });
+  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "link" });
   // saveStorage({ activeBtn: "link", lightness: state.li.swatch.lightness });
 }
 
@@ -255,7 +255,7 @@ function checkCollision(swatches, x, y) {
 canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
   if (!swatch) return;
-  sendRuntimeMessage({ message: UPDATE_CHOSEN_COLOR, payload: swatch });
+  chrome.runtime.sendMessage({ message: UPDATE_CHOSEN_COLOR, payload: swatch });
 }
 
 canvas.onmouseout = async function () {
@@ -299,11 +299,6 @@ async function updateUi() {
 
   setActiveColorButton(state);
   drawCanvas(state);
-}
-
-function sendRuntimeMessage(message: Message, response?: (response: any) => void) {
-  let res = response ?? (() => { });
-  chrome.runtime.sendMessage(message, res);
 }
 
 chrome.storage.onChanged.addListener(updateUi);
