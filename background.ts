@@ -32,11 +32,11 @@ function createColor(hue: number, saturation: number, lightness: number, chosenI
     hueVisited: "",
     alpha: "",
   }
-  initHslStrings(color);
+  setHslStrings(color);
   return color;
 }
 
-function initHslStrings(color: Color) {
+function setHslStrings(color: Color) {
   color.hsl = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%)`;
   if (color.swatch.lightness >= 50) {
     color.lightnessShift = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness - 10}%)`;
@@ -50,7 +50,7 @@ function initHslStrings(color: Color) {
 
 function updateColor(color: Color, swatch: Swatch) {
   color.swatch = swatch;
-  initHslStrings(color);
+  setHslStrings(color);
 }
 
 // // can potentially use this to check for errors
