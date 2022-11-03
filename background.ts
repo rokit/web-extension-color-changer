@@ -302,6 +302,13 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
     }; break;
     case SET_ACTIVE_BUTTON: {
       state.activeBtn = req.payload;
+      if (state.activeBtn == "fore") {
+        state.lightness = state.fg.swatch.lightness;
+      } else if (state.activeBtn == "back") {
+        state.lightness = state.bg.swatch.lightness;
+      } else if (state.activeBtn == "link") {
+        state.lightness = state.li.swatch.lightness;
+      }
       saveStorageAsync(state);
     }; break;
     case UPDATE_CHOSEN_COLOR: {
