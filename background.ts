@@ -311,7 +311,7 @@ function onMessage(req: Message, sender, res) {
     // case 'updateStrings': onUpdateStrings(); break;
     // case 'reset': onReset(); break;
     // case 'changeLightness': onChangeLightness(req.payload); break;
-    // case 'changeColors': onChangeColors(req.payload); break;
+    case 'changeColors': onChangeColors(req.payload); break;
     // case 'always': onAlways(req.payload); break;
     default: break;
   }

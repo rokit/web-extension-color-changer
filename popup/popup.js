@@ -79,13 +79,13 @@ lightnessSlider.onchange = function () {
 }
 
 function handleFore() {
-  background.saveStorage({ activeBtn: 'fore', lightness: state.fg.lightness });
+  saveStorage({ activeBtn: 'fore', lightness: state.fg.lightness });
 }
 function handleBack() {
-  background.saveStorage({ activeBtn: 'back', lightness: state.bg.lightness });
+  saveStorage({ activeBtn: 'back', lightness: state.bg.lightness });
 }
 function handleLink() {
-  background.saveStorage({ activeBtn: 'link', lightness: state.li.lightness });
+  saveStorage({ activeBtn: 'link', lightness: state.li.lightness });
 }
 
 foreSwatch.onclick = handleFore;
@@ -281,24 +281,6 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// function background.saveStorage(obj, response) {
-//   response = response || (() => { });
-//   if (bIsChrome) {
-//     chrome.storage.sync.set({ ...obj }, response);
-//   } else {
-//     browser.storage.sync.set({ ...obj }, response);
-//   }
-// }
-
-// function getStorage(obj, response) {
-//   response = response || (() => { });
-//   if (bIsChrome) {
-//     chrome.storage.sync.get(obj, response);
-//   } else {
-//     browser.storage.sync.get(obj, response);
-//   }
-// }
 
 async function updateUi() {
   sendRuntimeMessage('popup-state', null, (res) => {

@@ -29,5 +29,5 @@ export interface Color {
 
 export interface Message {
   message: string;
-  payload: State | null;
+  payload: any;
 }
