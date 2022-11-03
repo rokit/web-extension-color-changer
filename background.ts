@@ -316,7 +316,8 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
       onAlways(req.payload);
     }; break;
     case SET_ACTIVE_BUTTON: {
-
+      state.activeBtn = req.payload;
+      saveStorageAsync(state);
     }; break;
     case UPDATE_CHOSEN_COLOR: {
 
