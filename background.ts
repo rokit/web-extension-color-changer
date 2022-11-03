@@ -2,7 +2,7 @@
 // var className = "color-changer-v4";
 // var contextMenuCreated = false;
 
-import { GET_STATE } from "./constants";
+import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { Color, Message, State, Swatch } from "./interfaces";
 
 let state: State = {
@@ -63,14 +63,10 @@ function updateColor(color: Color, swatch: Swatch) {
 // //   return false;
 // // }
 
-async function onChangeColors(changeColors: boolean) {
-  state.changeColors = changeColors;
-  saveStorageAsync(state);
-  // if (!shouldChangeColors && state.always) {
-  //   onAlways(false);
-  // }
-  sendTabMessage('update');
-}
+// async function onChangeColors(changeColors: boolean) {
+//   state.changeColors = changeColors;
+
+// }
 
 // function onAlways(always) {
 //   let index = state.hosts.indexOf(state.activeTabHostname);
@@ -152,12 +148,12 @@ function validateTab(tab: chrome.tabs.Tab) {
   // If the hostname is found in the hosts list, the user always wants to change colors for the host.
   if (state.hosts.includes(state.activeTabHostname)) {
     state.always = true;
-    onChangeColors(true);
+    state.changeColors = true;
   } else {
     state.always = false;
-    onChangeColors(false);
+    state.changeColors = false;
   }
-  // onTabSwitch();
+  sendTabMessage(UPDATE_CONTENT);
 }
 
 // function onTabSwitch() {
@@ -290,6 +286,7 @@ function onStorageChanged(changes: object, areaName: string) {
 //   });
 // }
 
+//** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 async function sendTabMessage(message: string) {
   if (!state.activeTabId) return;
   try {
@@ -302,11 +299,31 @@ async function sendTabMessage(message: string) {
   }
 }
 
-function onMessage(req: Message, sender, res): boolean {
-  console.log('req', req);
-  console.log('sender', sender);
+function onMessage(req: Message, _sender: any, res: any): boolean {
   switch (req.message) {
-    case GET_STATE: res(state); break;
+    case GET_STATE: {
+      res(state);
+    }; break;
+    case CHANGE_COLORS: {
+      state.changeColors = req.payload;
+      saveStorageAsync(state);
+      sendTabMessage(UPDATE_CONTENT);
+    }; break;
+    case ALWAYS: {
+
+    }; break;
+    case SET_ACTIVE_BUTTON: {
+
+    }; break;
+    case UPDATE_CHOSEN_COLOR: {
+
+    }; break;
+    case CHANGE_LIGHTNESS: {
+
+    }; break;
+    case RESET: {
+
+    }; break;
     // case "save-state": {
     //   if (!req.payload) {
     //     console.log("Attempted to save state without a state object.");
@@ -319,9 +336,9 @@ function onMessage(req: Message, sender, res): boolean {
     // case 'updateStrings': onUpdateStrings(); break;
     // case 'reset': onReset(); break;
     // case 'changeLightness': onChangeLightness(req.payload); break;
-    case 'changeColors': onChangeColors(req.payload); break;
     // case 'always': onAlways(req.payload); break;
   }
+
   return true;
 }
 
