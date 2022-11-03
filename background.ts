@@ -307,6 +307,14 @@ function onMessage(req: Message, sender, res) {
   switch (req.message) {
     case 'init-content-state': res({ state }); break;
     case 'popup-state': res({ state }); break;
+    // case "save-state": {
+    //   if (!req.payload) {
+    //     console.log("Attempted to save state without a state object.");
+    //     return;
+    //   };
+    //   state = req.payload;
+    //   saveStorageAsync(state)
+    // }; break;
     // case 'updateColor': onUpdateChosenColor(req.payload); break;
     // case 'updateStrings': onUpdateStrings(); break;
     // case 'reset': onReset(); break;

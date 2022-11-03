@@ -1,5 +1,7 @@
-// var bIsChrome = /Chrome/.test(navigator.userAgent);
-var state = null;
+import { SET_ACTIVE_BUTTON } from "../constants";
+import { Message, State } from "../interfaces";
+
+// let state: State;
 
 function CanvasSwatch(x, y, id, radius, hue, saturation, lightness) {
   this.x = x;
@@ -20,43 +22,43 @@ function updateSwatch(swatch, hue, saturation, lightness) {
   swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-var lightnessSlider = document.getElementById("lightness");
-var lightnessValue = document.getElementById("lightness-value");
+let lightnessSlider = <HTMLInputElement>document.getElementById("lightness")!;
+let lightnessValue = document.getElementById("lightness-value")!;
 
-var info = document.getElementById("info");
-var infoText = document.querySelector("#info p");
+let info = document.getElementById("info")!;
+let infoText = document.getElementById("info-text")!;
 
-var changeColorsCheckbox = document.getElementById("change-colors");
-var alwaysCheckbox = document.getElementById("always");
-var alwaysLabel = document.getElementById("always-label");
+let changeColorsCheckbox = <HTMLInputElement>document.getElementById("change-colors")!;
+let alwaysCheckbox = <HTMLInputElement>document.getElementById("always")!;
+let alwaysLabel = document.getElementById("always-label")!;
 
-var foreBtn = document.getElementById("fore");
-var backBtn = document.getElementById("back");
-var linkBtn = document.getElementById("link");
-var resetBtn = document.getElementById("reset");
+let foreBtn = document.getElementById("fore")!;
+let backBtn = document.getElementById("back")!;
+let linkBtn = document.getElementById("link")!;
+let resetBtn = document.getElementById("reset")!;
 
-var foreSwatch = document.getElementById("fore-swatch");
-var backSwatch = document.getElementById("back-swatch");
-var linkSwatch = document.getElementById("link-swatch");
+let foreSwatch = document.getElementById("fore-swatch")!;
+let backSwatch = document.getElementById("back-swatch")!;
+let linkSwatch = document.getElementById("link-swatch")!;
 
 changeColorsCheckbox.onclick = () => {
-  sendRuntimeMessage('changeColors', changeColorsCheckbox.checked);
+  sendRuntimeMessage({ message: 'changeColors', payload: changeColorsCheckbox.checked });
 };
 
 alwaysCheckbox.onclick = () => {
-  sendRuntimeMessage('always', alwaysCheckbox.checked);
+  sendRuntimeMessage({ message: 'always', payload: alwaysCheckbox.checked });
 };
 
 function alwaysMouseover() {
-  if (!state.activeTabId) {
+  if (!state?.activeTabId) {
     return;
   }
   infoText.textContent = `Always change colors on host: ${state.activeTabHostname}`;
-  info.style.opacity = 1;
+  info.style.opacity = "1";
 }
 
 function alwaysMouseout() {
-  info.style.opacity = 0;
+  info.style.opacity = "0";
 }
 
 alwaysCheckbox.onmouseover = alwaysMouseover;
@@ -65,35 +67,37 @@ alwaysLabel.onmouseover = alwaysMouseover;
 alwaysLabel.onmouseout = alwaysMouseout;
 
 resetBtn.onclick = function () {
-  sendRuntimeMessage('reset');
+  sendRuntimeMessage({ message: 'reset' });
 }
 
-lightnessSlider.oninput = function () {
+lightnessSlider.addEventListener('input', function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
-}
+})
 
-lightnessSlider.onchange = function () {
+lightnessSlider.addEventListener('change', function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
   let lightness = parseInt(this.value);
-  sendRuntimeMessage('changeLightness', lightness);
+  sendRuntimeMessage({ message: 'changeLightness', payload: lightness });
+})
+
+function onClickForeground() {
+  sendRuntimeMessage({ message: SET_ACTIVE_BUTTON, payload: "fore" });
+}
+function onClickBackground() {
+  sendRuntimeMessage({ message: SET_ACTIVE_BUTTON, payload: "back" });
+  // saveStorage({ activeBtn: "back", lightness: state.bg.swatch.lightness });
+}
+function onClickLink() {
+  sendRuntimeMessage({ message: SET_ACTIVE_BUTTON, payload: "link" });
+  // saveStorage({ activeBtn: "link", lightness: state.li.swatch.lightness });
 }
 
-function handleFore() {
-  saveStorage({ activeBtn: 'fore', lightness: state.fg.lightness });
-}
-function handleBack() {
-  saveStorage({ activeBtn: 'back', lightness: state.bg.lightness });
-}
-function handleLink() {
-  saveStorage({ activeBtn: 'link', lightness: state.li.lightness });
-}
-
-foreSwatch.onclick = handleFore;
-foreBtn.onclick = handleFore;
-backSwatch.onclick = handleBack;
-backBtn.onclick = handleBack;
-linkSwatch.onclick = handleLink;
-linkBtn.onclick = handleLink;
+foreSwatch.onclick = onClickForeground;
+foreBtn.onclick = onClickForeground;
+backSwatch.onclick = onClickBackground;
+backBtn.onclick = onClickBackground;
+linkSwatch.onclick = onClickLink;
+linkBtn.onclick = onClickLink;
 
 function setActiveColorButton() {
   foreBtn.classList.remove("active-btn");
@@ -283,15 +287,16 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function updateUi() {
-  sendRuntimeMessage('popup-state', null, (res) => {
+  sendRuntimeMessage({ message: 'popup-state' }, (res) => {
     state = res.state;
+    if (!state) return;
     foreSwatch.style.background = state.fg.hsl;
     backSwatch.style.background = state.bg.hsl;
     linkSwatch.style.background = state.li.hsl;
 
     changeColorsCheckbox.checked = state.changeColors;
     alwaysCheckbox.checked = state.always;
-    lightnessSlider.value = state.lightness;
+    lightnessSlider.value = state.lightness.toString();
     lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
 
     setActiveColorButton();
@@ -299,8 +304,9 @@ async function updateUi() {
   })
 }
 
-function sendRuntimeMessage(message, payload, response) {
-  chrome.runtime.sendMessage({ message, payload }, response);
+function sendRuntimeMessage(message: Message, response?: (response: any) => void) {
+  let res = response ?? (() => { });
+  chrome.runtime.sendMessage(message, res);
 }
 
 chrome.storage.onChanged.addListener(updateUi);
