@@ -1,4 +1,4 @@
-import { GET_STATE, UPDATE } from "./constants";
+import { GET_STATE, UPDATE_CONTENT } from "./constants";
 import { Message, State } from "./interfaces";
 
 var className = "color-changer-v4";
@@ -111,7 +111,7 @@ function updateContent() {
 function onMessage(req: Message, sender, res) {
   console.log('req', req);
   switch (req.message) {
-    case UPDATE: {
+    case UPDATE_CONTENT: {
       state = req.payload;
       updateContent();
     }; break;
