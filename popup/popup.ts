@@ -1,7 +1,5 @@
-import { SET_ACTIVE_BUTTON } from "../constants";
+import { GET_STATE, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
 import { Message, State } from "../interfaces";
-
-// let state: State;
 
 function CanvasSwatch(x, y, id, radius, hue, saturation, lightness) {
   this.x = x;
@@ -49,10 +47,8 @@ alwaysCheckbox.onclick = () => {
   sendRuntimeMessage({ message: 'always', payload: alwaysCheckbox.checked });
 };
 
-function alwaysMouseover() {
-  if (!state?.activeTabId) {
-    return;
-  }
+async function alwaysMouseover() {
+  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
   infoText.textContent = `Always change colors on host: ${state.activeTabHostname}`;
   info.style.opacity = "1";
 }
@@ -99,16 +95,16 @@ backBtn.onclick = onClickBackground;
 linkSwatch.onclick = onClickLink;
 linkBtn.onclick = onClickLink;
 
-function setActiveColorButton() {
+async function setActiveColorButton(state: State) {
   foreBtn.classList.remove("active-btn");
   backBtn.classList.remove("active-btn");
   linkBtn.classList.remove("active-btn");
-  document.getElementById(state.activeBtn).classList.add("active-btn");
+  document.getElementById(state.activeBtn)!.classList.add("active-btn");
 
   foreSwatch.classList.remove("active-swatch");
   backSwatch.classList.remove("active-swatch");
   linkSwatch.classList.remove("active-swatch");
-  document.getElementById(`${state.activeBtn}-swatch`).classList.add("active-swatch");
+  document.getElementById(`${state.activeBtn}-swatch`)!.classList.add("active-swatch");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,11 +112,11 @@ function setActiveColorButton() {
 // Canvas
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-var canvas = document.querySelector("canvas");
-var ctx = canvas.getContext("2d");
-canvas.width = document.querySelector("canvas").offsetWidth;
-canvas.height = document.querySelector("canvas").offsetHeight;
-var canvasHeight = document.querySelector("canvas").offsetHeight;
+var canvas = <HTMLCanvasElement>document.getElementById("cc-canvas")!;
+var ctx = canvas.getContext("2d")!;
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+var canvasHeight = canvas.offsetHeight;
 
 var originX = canvas.width / 2;
 var originY = canvas.height / 2;
@@ -153,7 +149,8 @@ function toRads(degrees) {
   return degrees * (Math.PI / 180);
 }
 
-function drawCanvas() {
+async function drawCanvas(state: State) {
+
   ctx.fillStyle = "white";
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -170,9 +167,9 @@ function drawCanvas() {
   // hoverId === "zero" ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
   if (
-    (state.activeBtn === "fore" && state.fg.chosenId === "zero") ||
-    (state.activeBtn === "back" && state.bg.chosenId === "zero") ||
-    (state.activeBtn === "link" && state.li.chosenId === "zero")) {
+    (state.activeBtn === "fore" && state.fg.swatch.chosenId === "zero") ||
+    (state.activeBtn === "back" && state.bg.swatch.chosenId === "zero") ||
+    (state.activeBtn === "link" && state.li.swatch.chosenId === "zero")) {
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = strokeHoverWidth;
     ctx.setLineDash([5, 2]);
@@ -213,9 +210,9 @@ function drawCanvas() {
       ctx.strokeStyle = strokeColor;
       // hoverId === id ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
-      if ((state.activeBtn === "fore" && state.fg.chosenId === id) ||
-        (state.activeBtn === "back" && state.bg.chosenId === id) ||
-        (state.activeBtn === "link" && state.li.chosenId === id)) {
+      if ((state.activeBtn === "fore" && state.fg.swatch.chosenId === id) ||
+        (state.activeBtn === "back" && state.bg.swatch.chosenId === id) ||
+        (state.activeBtn === "link" && state.li.swatch.chosenId === id)) {
         ctx.strokeStyle = "#000000";
         ctx.lineWidth = strokeHoverWidth;
         ctx.setLineDash([5, 2]);
@@ -258,21 +255,23 @@ function checkCollision(swatches, x, y) {
 canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
   if (!swatch) return;
-  sendRuntimeMessage('updateChosenColor', swatch);
+  sendRuntimeMessage({ message: UPDATE_CHOSEN_COLOR, payload: swatch });
 }
 
-canvas.onmouseout = function () {
+canvas.onmouseout = async function () {
+  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
   hoverId = null;
-  drawCanvas();
+  drawCanvas(state);
 }
 
-canvas.onmousemove = function (e) {
+canvas.onmousemove = async function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
 
   if (swatch) {
+    let state = await chrome.runtime.sendMessage({ message: GET_STATE });
     hoverId = swatch.id;
 
-    drawCanvas();
+    drawCanvas(state);
 
     canvas.style.cursor = 'pointer';
   } else {
@@ -287,21 +286,19 @@ canvas.onmousemove = function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function updateUi() {
-  sendRuntimeMessage({ message: 'popup-state' }, (res) => {
-    state = res.state;
-    if (!state) return;
-    foreSwatch.style.background = state.fg.hsl;
-    backSwatch.style.background = state.bg.hsl;
-    linkSwatch.style.background = state.li.hsl;
+  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
 
-    changeColorsCheckbox.checked = state.changeColors;
-    alwaysCheckbox.checked = state.always;
-    lightnessSlider.value = state.lightness.toString();
-    lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
+  foreSwatch.style.background = state.fg.hsl;
+  backSwatch.style.background = state.bg.hsl;
+  linkSwatch.style.background = state.li.hsl;
 
-    setActiveColorButton();
-    drawCanvas();
-  })
+  changeColorsCheckbox.checked = state.changeColors;
+  alwaysCheckbox.checked = state.always;
+  lightnessSlider.value = state.lightness.toString();
+  lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
+
+  setActiveColorButton(state);
+  drawCanvas(state);
 }
 
 function sendRuntimeMessage(message: Message, response?: (response: any) => void) {
