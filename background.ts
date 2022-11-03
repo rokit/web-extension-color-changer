@@ -3,7 +3,7 @@
 // var contextMenuCreated = false;
 
 import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
-import { Color, Message, State, Swatch } from "./interfaces";
+import { CanvasSwatch, Color, Message, State, Swatch } from "./interfaces";
 
 let state: State = {
   changeColors: false,
@@ -48,9 +48,11 @@ function setHslStrings(color: Color) {
   color.alpha = `hsla(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%, 0.5)`;
 }
 
-function updateColor(color: Color, swatch: Swatch) {
-  console.log('updateColor swatch', swatch);
-  color.swatch = swatch;
+function updateColor(color: Color, swatch: CanvasSwatch) {
+  color.swatch.hue = swatch.hue;
+  color.swatch.saturation = swatch.saturation;
+  color.swatch.lightness = swatch.lightness;
+  color.swatch.chosenId = swatch.id;
   setHslStrings(color);
 }
 
@@ -187,7 +189,7 @@ function onStorageChanged(changes: object, areaName: string) {
   // });
 }
 
-function onUpdateChosenColor(swatch: Swatch) {
+function onUpdateChosenColor(swatch: CanvasSwatch) {
   switch (state.activeBtn) {
     case "fore": {
       updateColor(state.fg, swatch);
