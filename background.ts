@@ -256,28 +256,25 @@ function onUpdateChosenColor(swatch: CanvasSwatch) {
 //   });
 // }
 
-// function onChangeLightness(lightness) {
-//   getStorage(null, state => {
-//     switch (state.activeBtn) {
-//       case 'fore': {
-//         state.fg.lightness = lightness;
-//         createStrings(state.fg);
-//         saveStorage({ lightness, fg: state.fg }, () => onChangeColors(true));
-//       } break;
-//       case 'back': {
-//         state.bg.lightness = lightness;
-//         createStrings(state.bg);
-//         saveStorage({ lightness, bg: state.bg }, () => onChangeColors(true));
-//       } break;
-//       case 'link': {
-//         state.li.lightness = lightness;
-//         createStrings(state.li);
-//         saveStorage({ lightness, li: state.li }, () => onChangeColors(true));
-//       } break;
-//       default: break;
-//     }
-//   });
-// }
+function onChangeLightness(lightness: number) {
+  state.lightness = lightness;
+
+  switch (state.activeBtn) {
+    case "fore": {
+      state.fg.swatch.lightness = lightness;
+      setHslStrings(state.fg);
+    } break;
+    case "back": {
+      state.bg.swatch.lightness = lightness;
+      setHslStrings(state.bg);
+    } break;
+    case "link": {
+      state.li.swatch.lightness = lightness;
+      setHslStrings(state.li);
+    } break;
+    default: break;
+  }
+}
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 async function sendTabMessage(message: string) {
@@ -313,24 +310,14 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
       sendTabMessage(UPDATE_CONTENT);
     }; break;
     case CHANGE_LIGHTNESS: {
-
+      onChangeLightness(req.payload);
+      saveStorageAsync(state);
+      sendTabMessage(UPDATE_CONTENT);
     }; break;
     case RESET: {
-
+      // onReset();
     }; break;
-    // case "save-state": {
-    //   if (!req.payload) {
-    //     console.log("Attempted to save state without a state object.");
-    //     return;
-    //   };
-    //   state = req.payload;
-    //   saveStorageAsync(state)
-    // }; break;
-    // case 'updateColor': onUpdateChosenColor(req.payload); break;
     // case 'updateStrings': onUpdateStrings(); break;
-    // case 'reset': onReset(); break;
-    // case 'changeLightness': onChangeLightness(req.payload); break;
-    // case 'always': onAlways(req.payload); break;
   }
 
   return true;
