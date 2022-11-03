@@ -1,24 +1,5 @@
 import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
-import { State } from "../interfaces";
-
-function CanvasSwatch(x, y, id, radius, hue, saturation, lightness) {
-  this.x = x;
-  this.y = y;
-  this.id = id;
-  this.hovered = false;
-  this.radius = radius;
-  this.hue = hue;
-  this.saturation = saturation;
-  this.lightness = lightness;
-  this.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-}
-
-function updateSwatch(swatch, hue, saturation, lightness) {
-  swatch.hue = hue;
-  swatch.saturation = saturation;
-  swatch.lightness = lightness;
-  swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-};
+import { CanvasSwatch, State } from "../interfaces";
 
 let lightnessSlider = <HTMLInputElement>document.getElementById("lightness")!;
 let lightnessValue = document.getElementById("lightness-value")!;
@@ -81,11 +62,9 @@ function onClickForeground() {
 }
 function onClickBackground() {
   chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "back" });
-  // saveStorage({ activeBtn: "back", lightness: state.bg.swatch.lightness });
 }
 function onClickLink() {
   chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "link" });
-  // saveStorage({ activeBtn: "link", lightness: state.li.swatch.lightness });
 }
 
 foreSwatch.onclick = onClickForeground;
@@ -112,6 +91,27 @@ async function setActiveColorButton(state: State) {
 // Canvas
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+function createCanvasSwatch(x: number, y: number, id: string, radius: number, hue: number, saturation: number, lightness: number): CanvasSwatch {
+  return {
+    x,
+    y,
+    id,
+    hovered: false,
+    radius,
+    hue,
+    saturation,
+    lightness,
+    hsl: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+  }
+}
+
+function updateCanvasSwatch(swatch: CanvasSwatch, hue: number, saturation: number, lightness: number) {
+  swatch.hue = hue;
+  swatch.saturation = saturation;
+  swatch.lightness = lightness;
+  swatch.hsl = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+};
+
 var canvas = <HTMLCanvasElement>document.getElementById("cc-canvas")!;
 var ctx = canvas.getContext("2d")!;
 canvas.width = canvas.offsetWidth;
@@ -145,12 +145,11 @@ var hoverId = null;
 
 var swatches = {};
 
-function toRads(degrees) {
+function toRads(degrees: number) {
   return degrees * (Math.PI / 180);
 }
 
 async function drawCanvas(state: State) {
-
   ctx.fillStyle = "white";
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -179,9 +178,9 @@ async function drawCanvas(state: State) {
   ctx.lineWidth = 1;
 
   if (swatches["zero"]) {
-    updateSwatch(swatches["zero"], 0, 0, state.lightness);
+    updateCanvasSwatch(swatches["zero"], 0, 0, state.lightness);
   } else {
-    swatches["zero"] = new CanvasSwatch(zeroSatOffsetX, zeroSatOffsetY, "zero", satRadius, 0, 0, state.lightness);
+    swatches["zero"] = createCanvasSwatch(zeroSatOffsetX, zeroSatOffsetY, "zero", satRadius, 0, 0, state.lightness);
   }
 
   for (var j = 0; j < rings; j++) {
@@ -202,9 +201,9 @@ async function drawCanvas(state: State) {
       ctx.fill();
 
       if (swatches[id]) {
-        updateSwatch(swatches[id], hue, saturation, state.lightness);
+        updateCanvasSwatch(swatches[id], hue, saturation, state.lightness);
       } else {
-        swatches[id] = new CanvasSwatch(x, y, id, littleRadius, hue, saturation, state.lightness);
+        swatches[id] = createCanvasSwatch(x, y, id, littleRadius, hue, saturation, state.lightness);
       }
 
       ctx.strokeStyle = strokeColor;

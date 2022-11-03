@@ -49,6 +49,7 @@ function setHslStrings(color: Color) {
 }
 
 function updateColor(color: Color, swatch: Swatch) {
+  console.log('updateColor swatch', swatch);
   color.swatch = swatch;
   setHslStrings(color);
 }
@@ -186,35 +187,20 @@ function onStorageChanged(changes: object, areaName: string) {
   // });
 }
 
-// function onUpdateChosenColor(payload) {
-//   getStorage(null, state => {
-//     switch (state.activeBtn) {
-//       case "fore": {
-//         updateColor(state.fg, payload);
-//         saveStorage({
-//           fg: state.fg,
-//           lightness: state.fg.lightness,
-//         }, () => onChangeColors(true));
-
-//       } break;
-//       case "back": {
-//         updateColor(state.bg, payload);
-//         saveStorage({
-//           bg: state.bg,
-//           lightness: state.bg.lightness,
-//         }, () => onChangeColors(true));
-//       } break;
-//       case "link": {
-//         updateColor(state.li, payload);
-//         saveStorage({
-//           li: state.li,
-//           lightness: state.li.lightness,
-//         }, () => onChangeColors(true));
-//       } break;
-//       default: break;
-//     }
-//   });
-// }
+function onUpdateChosenColor(swatch: Swatch) {
+  switch (state.activeBtn) {
+    case "fore": {
+      updateColor(state.fg, swatch);
+    } break;
+    case "back": {
+      updateColor(state.bg, swatch);
+    } break;
+    case "link": {
+      updateColor(state.li, swatch);
+    } break;
+    default: break;
+  }
+}
 
 // function onUpdateStrings() {
 //   getStorage(null, state => {
@@ -320,7 +306,9 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
       saveStorageAsync(state);
     }; break;
     case UPDATE_CHOSEN_COLOR: {
-
+      onUpdateChosenColor(req.payload);
+      saveStorageAsync(state);
+      sendTabMessage(UPDATE_CONTENT);
     }; break;
     case CHANGE_LIGHTNESS: {
 

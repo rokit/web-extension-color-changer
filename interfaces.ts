@@ -31,3 +31,15 @@ export interface Message {
   message: string;
   payload?: any;
 }
+
+export interface CanvasSwatch {
+  hovered: boolean;
+  hsl: string;
+  hue: number;
+  id: string;
+  lightness: number;
+  radius: number;
+  saturation: number;
+  x: number;
+  y: number;
+}
