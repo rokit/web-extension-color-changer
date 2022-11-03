@@ -1,3 +1,4 @@
+import { GET_STATE, UPDATE } from "./constants";
 import { Message, State } from "./interfaces";
 
 var className = "color-changer-v4";
@@ -110,7 +111,7 @@ function updateContent() {
 function onMessage(req: Message, sender, res) {
   console.log('req', req);
   switch (req.message) {
-    case 'update': {
+    case UPDATE: {
       state = req.payload;
       updateContent();
     }; break;
@@ -126,8 +127,13 @@ function sendRuntimeMessageFromContent(message: string) {
   });
 }
 
+async function initState() {
+  state = await chrome.runtime.sendMessage({ message: GET_STATE });
+  console.log('init state', state);
+}
+
 chrome.runtime.onMessage.addListener(onMessage);
 
-sendRuntimeMessageFromContent("init-content-state");
+initState();
 
 console.log('content sc');

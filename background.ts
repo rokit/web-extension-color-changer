@@ -2,6 +2,7 @@
 // var className = "color-changer-v4";
 // var contextMenuCreated = false;
 
+import { GET_STATE } from "./constants";
 import { Color, Message, State, Swatch } from "./interfaces";
 
 let state: State = {
@@ -301,12 +302,11 @@ async function sendTabMessage(message: string) {
   }
 }
 
-function onMessage(req: Message, sender, res) {
+function onMessage(req: Message, sender, res): boolean {
   console.log('req', req);
   console.log('sender', sender);
   switch (req.message) {
-    case 'init-content-state': res({ state }); break;
-    case 'popup-state': res({ state }); break;
+    case GET_STATE: res(state); break;
     // case "save-state": {
     //   if (!req.payload) {
     //     console.log("Attempted to save state without a state object.");
@@ -321,8 +321,8 @@ function onMessage(req: Message, sender, res) {
     // case 'changeLightness': onChangeLightness(req.payload); break;
     case 'changeColors': onChangeColors(req.payload); break;
     // case 'always': onAlways(req.payload); break;
-    default: break;
   }
+  return true;
 }
 
 // --------------------------------------------------------------------------------------------- installed
