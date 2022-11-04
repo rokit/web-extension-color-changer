@@ -141,9 +141,10 @@ function onReset() {
 
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
-function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
+async function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
   state.activeTabId = tabInfo.tabId;
   state.activeTabHostname = "";
+  await saveStorageAsync(state);
   chrome.tabs.get(tabInfo.tabId, (tab: chrome.tabs.Tab) => validateTab(tab));
 }
 
@@ -170,6 +171,8 @@ function validateTab(tab: chrome.tabs.Tab) {
     state.always = false;
     state.changeColors = false;
   }
+  saveStorageAsync(state);
+  updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
 }
 
@@ -217,6 +220,10 @@ function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chro
   } else if (info.menuItemId === ALWAYS) {
     onAlways(isChecked)
   }
+  updateContextMenu();
+}
+
+function updateContextMenu() {
   chrome.contextMenus.update(CHANGE_COLORS, { checked: state.changeColors });
   chrome.contextMenus.update(ALWAYS, { checked: state.always });
 }
