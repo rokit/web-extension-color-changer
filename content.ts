@@ -119,14 +119,6 @@ function onMessage(req: Message, sender, res) {
   }
 }
 
-function sendRuntimeMessageFromContent(message: string) {
-  chrome.runtime.sendMessage({ message }, (response) => {
-    if (response.state) {
-      state = response.state;
-    }
-  });
-}
-
 async function init() {
   state = await chrome.runtime.sendMessage({ message: GET_STATE });
   updateContent();
@@ -135,5 +127,3 @@ async function init() {
 chrome.runtime.onMessage.addListener(onMessage);
 
 init();
-
-console.log('content sc');
