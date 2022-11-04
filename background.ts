@@ -34,8 +34,11 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
 }
 
 function onChangeColors(changeColors: boolean) {
-  if (!state.activeTabHostname) return;
-  if (!state.activeTabId) return;
+  if (!state.activeTabHostname || !state.activeTabId) {
+    console.log('Invalid host or id');
+    console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
+    return
+  };
 
   if (changeColors && !state.hosts.includes(state.activeTabHostname)) {
     state.hosts.push(state.activeTabHostname);
@@ -43,7 +46,7 @@ function onChangeColors(changeColors: boolean) {
     state.hosts = [...state.hosts.filter((host) => host !== state.activeTabHostname)];
   }
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
-  saveStorageAsync(state);
+  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 function onSetActiveButton(button: string) {
@@ -57,7 +60,7 @@ function onSetActiveButton(button: string) {
     state.lightness = state.li.swatch.lightness;
   }
 
-  saveStorageAsync(state);
+  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 function onUpdateChosenColor(swatch: CanvasSwatch) {
@@ -73,8 +76,8 @@ function onUpdateChosenColor(swatch: CanvasSwatch) {
     } break;
     default: break;
   }
-  saveStorageAsync(state);
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 function updateColor(color: Color, swatch: CanvasSwatch) {
@@ -104,7 +107,7 @@ function onChangeLightness(lightness: number) {
     default: break;
   }
 
-  saveStorageAsync(state);
+  chrome.storage.sync.set({ 'colorChangerState': state });
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
 }
 
@@ -122,37 +125,40 @@ function onReset() {
   state.activeBtn = defaultState.activeBtn;
   state.lightness = defaultState.lightness;
 
-  saveStorageAsync(state);
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
-async function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
-  state.activeTabId = tabInfo.tabId;
-  state.activeTabHostname = "";
-  await saveStorageAsync(state);
+function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
   chrome.tabs.get(tabInfo.tabId, (tab: chrome.tabs.Tab) => validateTab(tab));
 }
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
   if (!tab.id || !tab.url) {
+    state.activeTabId = null;
+    state.activeTabHostname = "";
+    chrome.storage.sync.set({ 'colorChangerState': state });
     return;
   }
 
   let url = new URL(tab.url);
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
+    state.activeTabId = null;
+    state.activeTabHostname = "";
+    chrome.storage.sync.set({ 'colorChangerState': state });
     return;
   }
 
   state.activeTabId = tab.id;
   state.activeTabHostname = url.hostname;
 
-  saveStorageAsync(state);
   updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
@@ -184,9 +190,8 @@ function createContextMenu() {
 }
 
 function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chrome.tabs.Tab) {
-  let isChecked = !!info.checked;
   if (info.menuItemId === CHANGE_COLORS) {
-    onChangeColors(isChecked)
+    onChangeColors(!!info.checked)
     updateContextMenu();
   }
 }
@@ -227,21 +232,6 @@ function getStorageAsync(): Promise<State | undefined> {
   });
 }
 
-function saveStorageAsync(state: State): Promise<boolean> {
-  // Immediately return a promise and start asynchronous work
-  return new Promise((resolve, reject) => {
-    // Asynchronously fetch all data from storage.sync.
-    chrome.storage.sync.set({ 'colorChangerState': state }, () => {
-      // Pass any observed errors down the promise chain.
-      if (chrome.runtime.lastError) {
-        return reject(chrome.runtime.lastError);
-      }
-      // Pass the data retrieved from storage down the promise chain.
-      resolve(true);
-    });
-  });
-}
-
 function clearStorage() {
   chrome.storage.sync.remove("colorChangerState");
 }
@@ -259,7 +249,7 @@ async function initServiceWorker() {
     state = storageState;
   }
 
-  await saveStorageAsync(state);
+  chrome.storage.sync.set({ 'colorChangerState': state });
 
   console.log('state', state);
   createContextMenu();
