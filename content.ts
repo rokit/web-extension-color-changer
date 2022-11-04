@@ -8,9 +8,8 @@ var observer = new MutationObserver(classListChanged);
 var observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 var css = "";
-var state: State | null = null;
 
-function updateCss() {
+function updateCss(state: State) {
   let not = ':not(img):not(img *):not(video):not(video *):not(svg):not(svg *):not(.rc-VideoMiniPlayer *)';
   if (!state) return;
 
@@ -87,9 +86,9 @@ function removeClass() {
   observer.disconnect();
 }
 
-function updateContent() {
-  if (state?.changeColors) {
-    updateCss();
+function updateContent(state: State) {
+  if (state.changeColors) {
+    updateCss(state);
 
     ccStyle.textContent = css;
 
@@ -107,16 +106,15 @@ function onMessage(req: Message, sender, res) {
   console.log('req', req);
   switch (req.message) {
     case UPDATE_CONTENT: {
-      state = req.payload;
-      updateContent();
+      updateContent(req.payload);
     }; break;
     default: break;
   }
 }
 
 async function init() {
-  state = await chrome.runtime.sendMessage({ message: GET_STATE });
-  updateContent();
+  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
+  updateContent(state);
 }
 
 chrome.runtime.onMessage.addListener(onMessage);

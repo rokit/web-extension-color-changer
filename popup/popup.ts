@@ -1,15 +1,10 @@
-import { ALWAYS, BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
+import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
 import { CanvasSwatch, State } from "../interfaces";
 
 let lightnessSlider = <HTMLInputElement>document.getElementById("lightness")!;
 let lightnessValue = document.getElementById("lightness-value")!;
 
-let info = document.getElementById("info")!;
-let infoText = document.getElementById("info-text")!;
-
 let changeColorsCheckbox = <HTMLInputElement>document.getElementById("change-colors")!;
-let alwaysCheckbox = <HTMLInputElement>document.getElementById("always")!;
-let alwaysLabel = document.getElementById("always-label")!;
 
 let foreBtn = document.getElementById(FORE_BTN)!;
 let backBtn = document.getElementById(BACK_BTN)!;
@@ -24,25 +19,6 @@ changeColorsCheckbox.onclick = () => {
   chrome.runtime.sendMessage({ message: CHANGE_COLORS, payload: changeColorsCheckbox.checked });
 };
 
-alwaysCheckbox.onclick = () => {
-  chrome.runtime.sendMessage({ message: ALWAYS, payload: alwaysCheckbox.checked });
-};
-
-async function alwaysMouseover() {
-  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
-  infoText.textContent = `Always change colors on host: ${state.activeTabHostname}`;
-  info.style.opacity = "1";
-}
-
-function alwaysMouseout() {
-  info.style.opacity = "0";
-}
-
-alwaysCheckbox.onmouseover = alwaysMouseover;
-alwaysCheckbox.onmouseout = alwaysMouseout;
-alwaysLabel.onmouseover = alwaysMouseover;
-alwaysLabel.onmouseout = alwaysMouseout;
-
 resetBtn.onclick = function () {
   chrome.runtime.sendMessage({ message: RESET });
 }
@@ -53,8 +29,7 @@ lightnessSlider.addEventListener('input', function () {
 
 lightnessSlider.addEventListener('change', function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
-  let lightness = parseInt(this.value);
-  chrome.runtime.sendMessage({ message: CHANGE_LIGHTNESS, payload: lightness });
+  chrome.runtime.sendMessage({ message: CHANGE_LIGHTNESS, payload: parseInt(this.value) });
 })
 
 function onClickForeground() {
@@ -143,7 +118,7 @@ let satRadius = bigRadius * 0.5;
 
 var hoverId = null;
 
-var swatches = {};
+var swatches: { [index: string]: CanvasSwatch } = {};
 
 function toRads(degrees: number) {
   return degrees * (Math.PI / 180);
@@ -292,7 +267,6 @@ async function updateUi() {
   linkSwatch.style.background = state.li.hsl;
 
   changeColorsCheckbox.checked = state.changeColors;
-  alwaysCheckbox.checked = state.always;
   lightnessSlider.value = state.lightness.toString();
   lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
 

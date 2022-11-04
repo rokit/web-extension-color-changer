@@ -1,5 +1,5 @@
 
-import { ALWAYS, BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
+import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State } from "./interfaces";
 import { setHslStrings } from "./utils";
 
@@ -9,13 +9,10 @@ let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
 function onMessage(req: Message, _sender: any, res: any): boolean {
   switch (req.message) {
     case GET_STATE: {
-      res(getStorageAsync());
+      res(state);
     }; break;
     case CHANGE_COLORS: {
       onChangeColors(req.payload);
-    }; break;
-    case ALWAYS: {
-      onAlways(req.payload);
     }; break;
     case SET_ACTIVE_BUTTON: {
       onSetActiveButton(req.payload);
@@ -38,22 +35,6 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
 
 function onChangeColors(changeColors: boolean) {
   state.changeColors = changeColors;
-  saveStorageAsync(state);
-  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
-}
-
-function onAlways(always: boolean) {
-  state.always = always;
-  state.changeColors = always;
-
-  let hostInList = state.hosts.includes(state.activeTabHostname);
-
-  if (state.always && !hostInList) {
-    state.hosts.push(state.activeTabHostname);
-  } else if (!state.always && hostInList) {
-    state.hosts = state.hosts.filter((x: string) => x !== state.activeTabHostname);
-  }
-
   saveStorageAsync(state);
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
 }
@@ -127,7 +108,6 @@ function onChangeLightness(lightness: number) {
 */
 function onReset() {
   let defaultState = JSON.parse(JSON.stringify(DEFAULT_STATE));
-  state.always = defaultState.always;
   state.hosts = defaultState.hosts;
   state.fg = defaultState.fg;
   state.bg = defaultState.bg;
@@ -165,10 +145,8 @@ function validateTab(tab: chrome.tabs.Tab) {
 
   // If the hostname is found in the hosts list, the user always wants to change colors for the host.
   if (state.hosts.includes(state.activeTabHostname)) {
-    state.always = true;
     state.changeColors = true;
   } else {
-    state.always = false;
     state.changeColors = false;
   }
   saveStorageAsync(state);
@@ -182,8 +160,8 @@ async function sendTabMessage(message: Message) {
   try {
     await chrome.tabs.sendMessage(state.activeTabId, message);
   } catch (e) {
-    console.log('e', e);
-    // Refresh tab to reconnect.
+    console.log("sendTabMessage error", e);
+    console.log("refreshing tab", state.activeTabHostname);
     await chrome.tabs.reload(state.activeTabId);
   }
 }
@@ -198,34 +176,22 @@ function createContextMenu() {
     checked: state.changeColors,
   };
 
-  let ctxAlways: object = {
-    id: ALWAYS,
-    title: "Always",
-    contexts: ["all"],
-    type: "checkbox",
-    checked: state.always,
-  };
-
   chrome.contextMenus.removeAll();
   chrome.contextMenus.create(ctxColorChanger);
-  chrome.contextMenus.create(ctxAlways);
   chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
   chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
 }
 
 function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chrome.tabs.Tab) {
-  let isChecked = info.checked ? true : false;
+  let isChecked = !!info.checked;
   if (info.menuItemId === CHANGE_COLORS) {
     onChangeColors(isChecked)
-  } else if (info.menuItemId === ALWAYS) {
-    onAlways(isChecked)
   }
   updateContextMenu();
 }
 
 function updateContextMenu() {
   chrome.contextMenus.update(CHANGE_COLORS, { checked: state.changeColors });
-  chrome.contextMenus.update(ALWAYS, { checked: state.always });
 }
 
 // --------------------------------------------------------------------------------------------- installed
@@ -260,7 +226,7 @@ function getStorageAsync(): Promise<State | undefined> {
   });
 }
 
-function saveStorageAsync(state: State): Promise<boolean> {
+function saveStorageAsync(state: State | null): Promise<boolean> {
   // Immediately return a promise and start asynchronous work
   return new Promise((resolve, reject) => {
     // Asynchronously fetch all data from storage.sync.
@@ -276,7 +242,7 @@ function saveStorageAsync(state: State): Promise<boolean> {
 }
 
 function clearStorage() {
-  chrome.storage.sync.clear();
+  chrome.storage.sync.remove("colorChangerState");
 }
 
 // --------------------------------------------------------------------------------------------- listeners

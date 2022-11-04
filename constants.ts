@@ -4,7 +4,6 @@ import { createColor } from "./utils";
 export const GET_STATE = "GET_STATE";
 export const UPDATE_CONTENT = "UPDATE_CONTENT";
 export const CHANGE_COLORS = "CHANGE_COLORS";
-export const ALWAYS = "ALWAYS";
 export const SET_ACTIVE_BUTTON = "SET_ACTIVE_BUTTON";
 export const UPDATE_CHOSEN_COLOR = "UPDATE_CHOSEN_COLOR";
 export const CHANGE_LIGHTNESS = "CHANGE_LIGHTNESS";
@@ -19,7 +18,6 @@ export const COLOR_CHANGER_CLASS_NAME = "color-changer-v4";
 
 export const DEFAULT_STATE: State = {
   changeColors: false,
-  always: false,
   activeTabId: null,
   activeTabHostname: "",
   fg: createColor(0, 0, 80, 'zero'),

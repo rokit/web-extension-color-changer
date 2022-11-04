@@ -1,6 +1,5 @@
 export interface State {
   changeColors: boolean;
-  always: boolean;
   activeTabId: number | null;
   activeTabHostname: string;
   fg: Color;
