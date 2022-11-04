@@ -69,7 +69,7 @@ function updateCss() {
 `;
 }
 
-function classListChanged(mutationList, obs) {
+function classListChanged(mutationList: MutationRecord[], obs: MutationObserver) {
   addClass();
 }
 
