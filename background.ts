@@ -9,7 +9,7 @@ let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
 function onMessage(req: Message, _sender: any, res: any): boolean {
   switch (req.message) {
     case GET_STATE: {
-      res(state);
+      res(getStorageAsync());
     }; break;
     case CHANGE_COLORS: {
       onChangeColors(req.payload);
@@ -214,7 +214,7 @@ function createContextMenu() {
 }
 
 function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chrome.tabs.Tab) {
-  let isChecked = info.checked ? info.checked : false;
+  let isChecked = info.checked ? true : false;
   if (info.menuItemId === CHANGE_COLORS) {
     onChangeColors(isChecked)
   } else if (info.menuItemId === ALWAYS) {
@@ -290,9 +290,9 @@ async function initServiceWorker() {
   let storageState = await getStorageAsync();
   if (storageState) {
     state = storageState;
-  } else {
-    await saveStorageAsync(state);
   }
+
+  await saveStorageAsync(state);
 
   console.log('state', state);
   createContextMenu();
