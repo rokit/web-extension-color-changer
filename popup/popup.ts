@@ -1,5 +1,6 @@
 import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
 import { CanvasSwatch, State } from "../interfaces";
+import { shouldChangeColors } from "../utils";
 
 let lightnessSlider = <HTMLInputElement>document.getElementById("lightness")!;
 let lightnessValue = document.getElementById("lightness-value")!;
@@ -260,13 +261,13 @@ canvas.onmousemove = async function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function updateUi() {
-  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
+  let state: State = await chrome.runtime.sendMessage({ message: GET_STATE });
 
   foreSwatch.style.background = state.fg.hsl;
   backSwatch.style.background = state.bg.hsl;
   linkSwatch.style.background = state.li.hsl;
 
-  changeColorsCheckbox.checked = state.changeColors;
+  changeColorsCheckbox.checked = shouldChangeColors(state);
   lightnessSlider.value = state.lightness.toString();
   lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
 

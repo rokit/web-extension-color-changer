@@ -112,7 +112,6 @@ function onChangeLightness(lightness: number) {
 }
 
 /** Sets back to defaults. Does not reset:
- * changeColors
  * activeTabId
  * activeTabHostname
 */
