@@ -55,11 +55,6 @@ async function setActiveColorButton(state: State) {
   backBtn.classList.remove("active-btn");
   linkBtn.classList.remove("active-btn");
   document.getElementById(state.activeBtn)!.classList.add("active-btn");
-
-  foreSwatch.classList.remove("active-swatch");
-  backSwatch.classList.remove("active-swatch");
-  linkSwatch.classList.remove("active-swatch");
-  document.getElementById(`${state.activeBtn}-swatch`)!.classList.add("active-swatch");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
