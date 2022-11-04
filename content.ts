@@ -1,5 +1,6 @@
 import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CONTENT } from "./constants";
 import { Message, State } from "./interfaces";
+import { shouldChangeColors } from "./utils";
 
 var ccStyle = document.createElement('style');
 ccStyle.id = COLOR_CHANGER_STYLE_ID;
@@ -87,7 +88,7 @@ function removeClass() {
 }
 
 function updateContent(state: State) {
-  if (state.changeColors) {
+  if (shouldChangeColors(state)) {
     updateCss(state);
 
     ccStyle.textContent = css;

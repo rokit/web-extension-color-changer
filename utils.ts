@@ -1,4 +1,4 @@
-import { Color } from "./interfaces";
+import { Color, State } from "./interfaces";
 
 export function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
   let color: Color = {
@@ -28,4 +28,15 @@ export function setHslStrings(color: Color) {
   color.hueHovered = `hsl(${color.swatch.hue + 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
   color.hueVisited = `hsl(${color.swatch.hue - 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
   color.alpha = `hsla(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%, 0.5)`;
+}
+
+export function shouldChangeColors(state: State): boolean {
+  if (!state.activeTabHostname) return false;
+  if (!state.activeTabId) return false;
+
+  if (state.hosts.includes(state.activeTabHostname)) {
+    return true;
+  } else {
+    return false;
+  }
 }

@@ -1,7 +1,7 @@
 
 import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State } from "./interfaces";
-import { setHslStrings } from "./utils";
+import { setHslStrings, shouldChangeColors } from "./utils";
 
 let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
 
@@ -34,9 +34,16 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
 }
 
 function onChangeColors(changeColors: boolean) {
-  state.changeColors = changeColors;
-  saveStorageAsync(state);
+  if (!state.activeTabHostname) return;
+  if (!state.activeTabId) return;
+
+  if (changeColors && !state.hosts.includes(state.activeTabHostname)) {
+    state.hosts.push(state.activeTabHostname);
+  } else {
+    state.hosts = [...state.hosts.filter((host) => host !== state.activeTabHostname)];
+  }
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  saveStorageAsync(state);
 }
 
 function onSetActiveButton(button: string) {
@@ -143,12 +150,6 @@ function validateTab(tab: chrome.tabs.Tab) {
   state.activeTabId = tab.id;
   state.activeTabHostname = url.hostname;
 
-  // If the hostname is found in the hosts list, the user always wants to change colors for the host.
-  if (state.hosts.includes(state.activeTabHostname)) {
-    state.changeColors = true;
-  } else {
-    state.changeColors = false;
-  }
   saveStorageAsync(state);
   updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
@@ -173,7 +174,7 @@ function createContextMenu() {
     title: "Change Colors",
     contexts: ["all"],
     type: "checkbox",
-    checked: state.changeColors,
+    checked: shouldChangeColors(state),
   };
 
   chrome.contextMenus.removeAll();
@@ -186,12 +187,12 @@ function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chro
   let isChecked = !!info.checked;
   if (info.menuItemId === CHANGE_COLORS) {
     onChangeColors(isChecked)
+    updateContextMenu();
   }
-  updateContextMenu();
 }
 
 function updateContextMenu() {
-  chrome.contextMenus.update(CHANGE_COLORS, { checked: state.changeColors });
+  chrome.contextMenus.update(CHANGE_COLORS, { checked: shouldChangeColors(state) });
 }
 
 // --------------------------------------------------------------------------------------------- installed
