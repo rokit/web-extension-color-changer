@@ -226,7 +226,7 @@ function getStorageAsync(): Promise<State | undefined> {
   });
 }
 
-function saveStorageAsync(state: State | null): Promise<boolean> {
+function saveStorageAsync(state: State): Promise<boolean> {
   // Immediately return a promise and start asynchronous work
   return new Promise((resolve, reject) => {
     // Asynchronously fetch all data from storage.sync.
