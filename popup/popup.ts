@@ -1,4 +1,4 @@
-import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
+import { ALWAYS, BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
 import { CanvasSwatch, State } from "../interfaces";
 
 let lightnessSlider = <HTMLInputElement>document.getElementById("lightness")!;
@@ -11,14 +11,14 @@ let changeColorsCheckbox = <HTMLInputElement>document.getElementById("change-col
 let alwaysCheckbox = <HTMLInputElement>document.getElementById("always")!;
 let alwaysLabel = document.getElementById("always-label")!;
 
-let foreBtn = document.getElementById("fore")!;
-let backBtn = document.getElementById("back")!;
-let linkBtn = document.getElementById("link")!;
+let foreBtn = document.getElementById(FORE_BTN)!;
+let backBtn = document.getElementById(BACK_BTN)!;
+let linkBtn = document.getElementById(LINK_BTN)!;
 let resetBtn = document.getElementById("reset")!;
 
-let foreSwatch = document.getElementById("fore-swatch")!;
-let backSwatch = document.getElementById("back-swatch")!;
-let linkSwatch = document.getElementById("link-swatch")!;
+let foreSwatch = document.getElementById(`${FORE_BTN}-swatch`)!;
+let backSwatch = document.getElementById(`${BACK_BTN}-swatch`)!;
+let linkSwatch = document.getElementById(`${LINK_BTN}-swatch`)!;
 
 changeColorsCheckbox.onclick = () => {
   chrome.runtime.sendMessage({ message: CHANGE_COLORS, payload: changeColorsCheckbox.checked });
@@ -58,13 +58,13 @@ lightnessSlider.addEventListener('change', function () {
 })
 
 function onClickForeground() {
-  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "fore" });
+  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: FORE_BTN });
 }
 function onClickBackground() {
-  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "back" });
+  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: BACK_BTN });
 }
 function onClickLink() {
-  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: "link" });
+  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: LINK_BTN });
 }
 
 foreSwatch.onclick = onClickForeground;
@@ -166,9 +166,9 @@ async function drawCanvas(state: State) {
   // hoverId === "zero" ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
   if (
-    (state.activeBtn === "fore" && state.fg.swatch.chosenId === "zero") ||
-    (state.activeBtn === "back" && state.bg.swatch.chosenId === "zero") ||
-    (state.activeBtn === "link" && state.li.swatch.chosenId === "zero")) {
+    (state.activeBtn === FORE_BTN && state.fg.swatch.chosenId === "zero") ||
+    (state.activeBtn === BACK_BTN && state.bg.swatch.chosenId === "zero") ||
+    (state.activeBtn === LINK_BTN && state.li.swatch.chosenId === "zero")) {
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = strokeHoverWidth;
     ctx.setLineDash([5, 2]);
@@ -209,9 +209,9 @@ async function drawCanvas(state: State) {
       ctx.strokeStyle = strokeColor;
       // hoverId === id ? ctx.lineWidth = strokeHoverWidth : ctx.lineWidth = 1;
 
-      if ((state.activeBtn === "fore" && state.fg.swatch.chosenId === id) ||
-        (state.activeBtn === "back" && state.bg.swatch.chosenId === id) ||
-        (state.activeBtn === "link" && state.li.swatch.chosenId === id)) {
+      if ((state.activeBtn === FORE_BTN && state.fg.swatch.chosenId === id) ||
+        (state.activeBtn === BACK_BTN && state.bg.swatch.chosenId === id) ||
+        (state.activeBtn === LINK_BTN && state.li.swatch.chosenId === id)) {
         ctx.strokeStyle = "#000000";
         ctx.lineWidth = strokeHoverWidth;
         ctx.setLineDash([5, 2]);

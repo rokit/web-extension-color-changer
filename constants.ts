@@ -10,6 +10,10 @@ export const UPDATE_CHOSEN_COLOR = "UPDATE_CHOSEN_COLOR";
 export const CHANGE_LIGHTNESS = "CHANGE_LIGHTNESS";
 export const RESET = "RESET";
 
+export const FORE_BTN = "fore";
+export const BACK_BTN = "back";
+export const LINK_BTN = "link";
+
 export const DEFAULT_STATE: State = {
   changeColors: false,
   always: false,
@@ -18,7 +22,7 @@ export const DEFAULT_STATE: State = {
   fg: createColor(0, 0, 80, 'zero'),
   bg: createColor(0, 0, 25, 'zero'),
   li: createColor(68, 80, 80, '2-6'),
-  activeBtn: 'fore',
+  activeBtn: FORE_BTN,
   lightness: 80,
   hosts: [],
 }

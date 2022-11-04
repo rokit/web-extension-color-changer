@@ -2,7 +2,7 @@
 // var className = "color-changer-v4";
 // var contextMenuCreated = false;
 
-import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
+import { ALWAYS, BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State, Swatch } from "./interfaces";
 import { setHslStrings } from "./utils";
 
@@ -151,13 +151,13 @@ function onStorageChanged(changes: object, areaName: string) {
 
 function onUpdateChosenColor(swatch: CanvasSwatch) {
   switch (state.activeBtn) {
-    case "fore": {
+    case FORE_BTN: {
       updateColor(state.fg, swatch);
     } break;
-    case "back": {
+    case BACK_BTN: {
       updateColor(state.bg, swatch);
     } break;
-    case "link": {
+    case LINK_BTN: {
       updateColor(state.li, swatch);
     } break;
     default: break;
@@ -213,15 +213,15 @@ function onChangeLightness(lightness: number) {
   state.lightness = lightness;
 
   switch (state.activeBtn) {
-    case "fore": {
+    case FORE_BTN: {
       state.fg.swatch.lightness = lightness;
       setHslStrings(state.fg);
     } break;
-    case "back": {
+    case BACK_BTN: {
       state.bg.swatch.lightness = lightness;
       setHslStrings(state.bg);
     } break;
-    case "link": {
+    case LINK_BTN: {
       state.li.swatch.lightness = lightness;
       setHslStrings(state.li);
     } break;
@@ -255,11 +255,11 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
     }; break;
     case SET_ACTIVE_BUTTON: {
       state.activeBtn = req.payload;
-      if (state.activeBtn == "fore") {
+      if (state.activeBtn == FORE_BTN) {
         state.lightness = state.fg.swatch.lightness;
-      } else if (state.activeBtn == "back") {
+      } else if (state.activeBtn == BACK_BTN) {
         state.lightness = state.bg.swatch.lightness;
-      } else if (state.activeBtn == "link") {
+      } else if (state.activeBtn == LINK_BTN) {
         state.lightness = state.li.swatch.lightness;
       }
       saveStorageAsync(state);
