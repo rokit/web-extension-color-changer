@@ -1,9 +1,8 @@
-import { GET_STATE, UPDATE_CONTENT } from "./constants";
+import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CONTENT } from "./constants";
 import { Message, State } from "./interfaces";
 
-var className = "color-changer-v4";
 var ccStyle = document.createElement('style');
-ccStyle.id = "color-changer-style";
+ccStyle.id = COLOR_CHANGER_STYLE_ID;
 
 var observer = new MutationObserver(classListChanged);
 var observerConfig = { attributes: true, attributeFilter: ["class"] };
@@ -16,54 +15,54 @@ function updateCss() {
   if (!state) return;
 
   css = `
-  .${className} *${not} {
+  .${COLOR_CHANGER_CLASS_NAME} *${not} {
     color: ${state.fg.hsl} !important;
     background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
-  .${className}${not} *:before,
-  .${className}${not} *:after {
+  .${COLOR_CHANGER_CLASS_NAME}${not} *:before,
+  .${COLOR_CHANGER_CLASS_NAME}${not} *:after {
     color: ${state.fg.hsl} !important;
     background: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
-  .${className}${not} img {
+  .${COLOR_CHANGER_CLASS_NAME}${not} img {
     visibility: visible !important;
   }
-  .${className}${not} button {
+  .${COLOR_CHANGER_CLASS_NAME}${not} button {
     color: ${state.li.hsl} !important;
   }
 
-  .${className}${not} input,
-  .${className}${not} input *,
-  .${className}${not} textarea,
-  .${className}${not} textarea *,
-  .${className}${not} pre,
-  .${className}${not} pre *,
-  .${className}${not} code,
-  .${className}${not} code *
+  .${COLOR_CHANGER_CLASS_NAME}${not} input,
+  .${COLOR_CHANGER_CLASS_NAME}${not} input *,
+  .${COLOR_CHANGER_CLASS_NAME}${not} textarea,
+  .${COLOR_CHANGER_CLASS_NAME}${not} textarea *,
+  .${COLOR_CHANGER_CLASS_NAME}${not} pre,
+  .${COLOR_CHANGER_CLASS_NAME}${not} pre *,
+  .${COLOR_CHANGER_CLASS_NAME}${not} code,
+  .${COLOR_CHANGER_CLASS_NAME}${not} code *
   {
     background-color: ${state.bg.lightnessShift} !important;
   }
 
-  .${className}${not} a,
-  .${className}${not} a *
+  .${COLOR_CHANGER_CLASS_NAME}${not} a,
+  .${COLOR_CHANGER_CLASS_NAME}${not} a *
   {
     color: ${state.li.hsl} !important;
     background-color: ${state.bg.hsl} !important;
   }
-  .${className}${not} a:hover,
-  .${className}${not} a:hover *
+  .${COLOR_CHANGER_CLASS_NAME}${not} a:hover,
+  .${COLOR_CHANGER_CLASS_NAME}${not} a:hover *
   {
     color: ${state.li.hueHovered} !important;
   }
-  .${className}${not} a:active,
-  .${className}${not} a:active *
+  .${COLOR_CHANGER_CLASS_NAME}${not} a:active,
+  .${COLOR_CHANGER_CLASS_NAME}${not} a:active *
   {
     color: ${state.li.hueVisited} !important;
   }
-  .${className}${not} a:visited,
-  .${className}${not} a:visited * {
+  .${COLOR_CHANGER_CLASS_NAME}${not} a:visited,
+  .${COLOR_CHANGER_CLASS_NAME}${not} a:visited * {
     color: ${state.li.hueVisited} !important;
   }
 `;
@@ -75,8 +74,8 @@ function classListChanged(mutationList: MutationRecord[], obs: MutationObserver)
 
 function addClass() {
   let html = document.documentElement;
-  if (!html.classList.contains(className)) {
-    html.classList.add(className);
+  if (!html.classList.contains(COLOR_CHANGER_CLASS_NAME)) {
+    html.classList.add(COLOR_CHANGER_CLASS_NAME);
   }
 
   observer.observe(html, observerConfig);
@@ -84,7 +83,7 @@ function addClass() {
 
 function removeClass() {
   let html = document.documentElement;
-  html.classList.remove(className);
+  html.classList.remove(COLOR_CHANGER_CLASS_NAME);
   observer.disconnect();
 }
 
