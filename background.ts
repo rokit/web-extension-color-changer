@@ -1,5 +1,3 @@
-// var bIsChrome = /Chrome/.test(navigator.userAgent);
-// var className = "color-changer-v4";
 // var contextMenuCreated = false;
 
 import { ALWAYS, BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
@@ -16,15 +14,15 @@ function updateColor(color: Color, swatch: CanvasSwatch) {
   setHslStrings(color);
 }
 
-// // can potentially use this to check for errors
-// // function hasError() {
-// //   if (bIsChrome && chrome.runtime.lastError) {
-// //       return true;
-// //   } else if (browser.runtime.lastError) {
-// //     return true;
-// //   }
-// //   return false;
-// // }
+// can potentially use this to check for errors
+// function hasError() {
+//   if (bIsChrome && chrome.runtime.lastError) {
+//       return true;
+//   } else if (browser.runtime.lastError) {
+//     return true;
+//   }
+//   return false;
+// }
 
 function onChangeColors(changeColors: boolean) {
   state.changeColors = changeColors;
@@ -124,31 +122,6 @@ function validateTab(tab: chrome.tabs.Tab) {
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
 }
 
-// function onTabSwitch() {
-//   getStorage(null, state => {
-//     if (!state.activeTabId) return;
-
-//     chrome.tabs.executeScript(state.activeTabId, {
-//       code: `document.documentElement.classList.contains('${className}')`
-//     }, results => tabExecuteScriptCallback(results, state));
-//   });
-// }
-
-// function onStorageChanged(changes: object, areaName: string) {
-//   console.log('changes', changes);
-//   console.log('areaName', areaName);
-//   // getStorage(null, state => {
-//   // if state is empty, return
-//   // state can be empty when clearing storage
-//   // if (Object.keys(state).length === 0 && state.constructor === Object) {
-//   //   return;
-//   // }
-
-//   // on every change of state, update the context menu
-//   // updateContextMenu(state.changeColors, state.always);
-//   // });
-// }
-
 function onUpdateChosenColor(swatch: CanvasSwatch) {
   switch (state.activeBtn) {
     case FORE_BTN: {
@@ -179,32 +152,6 @@ function onSetActiveButton(button: string) {
 
   saveStorageAsync(state);
 }
-
-// function onUpdateStrings() {
-//   getStorage(null, state => {
-//     switch (state.activeBtn) {
-//       case "fore": {
-//         createStrings(state.fg);
-//         saveStorage({
-//           fg: state.fg,
-//         }, () => onChangeColors(true));
-//       } break;
-//       case "back": {
-//         createStrings(state.bg);
-//         saveStorage({
-//           bg: state.bg,
-//         }, () => onChangeColors(true));
-//       } break;
-//       case "link": {
-//         createStrings(state.li);
-//         saveStorage({
-//           li: state.li,
-//         }, () => onChangeColors(true));
-//       } break;
-//       default: break;
-//     }
-//   });
-// }
 
 /** Sets back to defaults. Does not reset:
  * changeColors
