@@ -175,16 +175,15 @@ async function sendTabMessage(message: Message) {
 
 // --------------------------------------------------------------------------------------------- context menu
 function createContextMenu() {
-  let ctxColorChanger: object = {
+  let menu: object = {
     id: CHANGE_COLORS,
     title: "Change Colors",
-    contexts: ["all"],
     type: "checkbox",
     checked: shouldChangeColors(state),
   };
 
   chrome.contextMenus.removeAll();
-  chrome.contextMenus.create(ctxColorChanger);
+  chrome.contextMenus.create(menu);
   chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
   chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
 }
