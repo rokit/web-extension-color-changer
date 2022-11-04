@@ -104,7 +104,6 @@ function updateContent(state: State) {
 }
 
 function onMessage(req: Message, sender, res) {
-  console.log('req', req);
   switch (req.message) {
     case UPDATE_CONTENT: {
       updateContent(req.payload);
