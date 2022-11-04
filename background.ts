@@ -162,6 +162,22 @@ function onUpdateChosenColor(swatch: CanvasSwatch) {
     } break;
     default: break;
   }
+  saveStorageAsync(state);
+  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+}
+
+function onSetActiveButton(button: string) {
+  state.activeBtn = button;
+
+  if (button == FORE_BTN) {
+    state.lightness = state.fg.swatch.lightness;
+  } else if (button == BACK_BTN) {
+    state.lightness = state.bg.swatch.lightness;
+  } else if (button == LINK_BTN) {
+    state.lightness = state.li.swatch.lightness;
+  }
+
+  saveStorageAsync(state);
 }
 
 // function onUpdateStrings() {
@@ -227,6 +243,9 @@ function onChangeLightness(lightness: number) {
     } break;
     default: break;
   }
+
+  saveStorageAsync(state);
+  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
 }
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
@@ -235,10 +254,9 @@ async function sendTabMessage(message: Message) {
   try {
     await chrome.tabs.sendMessage(state.activeTabId, message);
   } catch (e) {
-    await chrome.tabs.reload(state.activeTabId);
-    // add please refresh tab to UI.
-    console.log('estate', state);
     console.log('e', e);
+    // Refresh tab to reconnect.
+    await chrome.tabs.reload(state.activeTabId);
   }
 }
 
@@ -254,30 +272,18 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
       onAlways(req.payload);
     }; break;
     case SET_ACTIVE_BUTTON: {
-      state.activeBtn = req.payload;
-      if (state.activeBtn == FORE_BTN) {
-        state.lightness = state.fg.swatch.lightness;
-      } else if (state.activeBtn == BACK_BTN) {
-        state.lightness = state.bg.swatch.lightness;
-      } else if (state.activeBtn == LINK_BTN) {
-        state.lightness = state.li.swatch.lightness;
-      }
-      saveStorageAsync(state);
+      onSetActiveButton(req.payload);
     }; break;
     case UPDATE_CHOSEN_COLOR: {
       onUpdateChosenColor(req.payload);
-      saveStorageAsync(state);
-      sendTabMessage({ message: UPDATE_CONTENT, payload: state });
     }; break;
     case CHANGE_LIGHTNESS: {
       onChangeLightness(req.payload);
-      saveStorageAsync(state);
-      sendTabMessage({ message: UPDATE_CONTENT, payload: state });
     }; break;
     case RESET: {
       onReset();
     }; break;
-    // case 'updateStrings': onUpdateStrings(); break;
+    default: break;
   }
 
   return true;
