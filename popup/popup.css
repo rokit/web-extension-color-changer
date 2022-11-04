@@ -10,8 +10,6 @@
 body, html {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 16px;
-  overflow: hidden;
-  height: 600px;
   width: 410px;
 }
 
@@ -61,6 +59,7 @@ canvas {
   grid-template: [row1-start] "fore fore_swatch"auto [row1-end] [row2-start] "back back_swatch"auto [row2-end] [row3-start] "link link_swatch"auto [row3-end] / 80% auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
+  margin-bottom: 20px;
 }
 
 #fore {
