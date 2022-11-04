@@ -1,10 +1,9 @@
-// var contextMenuCreated = false;
 
 import { ALWAYS, BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State, Swatch } from "./interfaces";
 import { setHslStrings } from "./utils";
 
-let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
 
 function updateColor(color: Color, swatch: CanvasSwatch) {
   color.swatch.hue = swatch.hue;
@@ -13,16 +12,6 @@ function updateColor(color: Color, swatch: CanvasSwatch) {
   color.swatch.chosenId = swatch.id;
   setHslStrings(color);
 }
-
-// can potentially use this to check for errors
-// function hasError() {
-//   if (bIsChrome && chrome.runtime.lastError) {
-//       return true;
-//   } else if (browser.runtime.lastError) {
-//     return true;
-//   }
-//   return false;
-// }
 
 function onChangeColors(changeColors: boolean) {
   state.changeColors = changeColors;
@@ -39,47 +28,47 @@ function onAlways(always: boolean) {
   if (state.always && !hostInList) {
     state.hosts.push(state.activeTabHostname);
   } else if (!state.always && hostInList) {
-    state.hosts = state.hosts.filter(x => x !== state.activeTabHostname);
+    state.hosts = state.hosts.filter((x: string) => x !== state.activeTabHostname);
   }
 
   saveStorageAsync(state);
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
 }
 
-// function onContextMenuClicked(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) {
-//   if (info.menuItemId === "changeColors") {
-//     onChangeColors(info.checked)
-//   } else if (info.menuItemId === "always") {
-//     onAlways(info.checked)
-//   }
-// }
+function onContextMenuClicked(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) {
+  let isChecked = info.checked ? info.checked : false;
+  if (info.menuItemId === CHANGE_COLORS) {
+    onChangeColors(isChecked)
+  } else if (info.menuItemId === ALWAYS) {
+    onAlways(isChecked)
+  }
+  chrome.contextMenus.update(CHANGE_COLORS, { checked: state.changeColors });
+  chrome.contextMenus.update(ALWAYS, { checked: state.always });
+}
 
-// function createContextMenu() {
-//   getStorage(null, state => {
-//     let ctxColorChanger: object = {
-//       id: "changeColors",
-//       title: "Change Colors",
-//       contexts: ["all"],
-//       type: "checkbox",
-//       checked: state.changeColors,
-//     };
+function createContextMenu() {
+  let ctxColorChanger: object = {
+    id: CHANGE_COLORS,
+    title: "Change Colors",
+    contexts: ["all"],
+    type: "checkbox",
+    checked: state.changeColors,
+  };
 
-//     let ctxAlways: object = {
-//       id: "always",
-//       title: "Always",
-//       contexts: ["all"],
-//       type: "checkbox",
-//       checked: state.always,
-//     };
+  let ctxAlways: object = {
+    id: ALWAYS,
+    title: "Always",
+    contexts: ["all"],
+    type: "checkbox",
+    checked: state.always,
+  };
 
-//     chrome.contextMenus.removeAll();
-//     chrome.contextMenus.create(ctxColorChanger);
-//     chrome.contextMenus.create(ctxAlways);
-//     chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
-//     chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
-//     contextMenuCreated = true;
-//   });
-// }
+  chrome.contextMenus.removeAll();
+  chrome.contextMenus.create(ctxColorChanger);
+  chrome.contextMenus.create(ctxAlways);
+  chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
+  chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
+}
 
 // function updateContextMenu(changeColors, always) {
 //   if (!contextMenuCreated) return;
@@ -233,6 +222,7 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
     default: break;
   }
 
+  // Allows the caller to await a response.
   return true;
 }
 
@@ -304,7 +294,17 @@ async function initServiceWorker() {
   }
 
   console.log('state', state);
-  // createContextMenu();
+  createContextMenu();
 }
 
 initServiceWorker();
+
+// can potentially use this to check for errors
+// function hasError() {
+//   if (bIsChrome && chrome.runtime.lastError) {
+//       return true;
+//   } else if (browser.runtime.lastError) {
+//     return true;
+//   }
+//   return false;
+// }
