@@ -2,51 +2,11 @@
 // var className = "color-changer-v4";
 // var contextMenuCreated = false;
 
-import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
+import { ALWAYS, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, GET_STATE, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State, Swatch } from "./interfaces";
+import { setHslStrings } from "./utils";
 
-let state: State = {
-  changeColors: false,
-  always: false,
-  activeTabId: null,
-  activeTabHostname: "",
-  fg: createColor(0, 0, 80, 'zero'),
-  bg: createColor(0, 0, 25, 'zero'),
-  li: createColor(68, 80, 80, '2-6'),
-  activeBtn: 'fore',
-  lightness: 80,
-  hosts: [],
-}
-
-function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
-  let color: Color = {
-    swatch: {
-      hue,
-      saturation,
-      lightness,
-      chosenId,
-    },
-    hsl: "",
-    lightnessShift: "",
-    hueHovered: "",
-    hueVisited: "",
-    alpha: "",
-  }
-  setHslStrings(color);
-  return color;
-}
-
-function setHslStrings(color: Color) {
-  color.hsl = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%)`;
-  if (color.swatch.lightness >= 50) {
-    color.lightnessShift = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness - 10}%)`;
-  } else {
-    color.lightnessShift = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness + 10}%)`;
-  }
-  color.hueHovered = `hsl(${color.swatch.hue + 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
-  color.hueVisited = `hsl(${color.swatch.hue - 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
-  color.alpha = `hsla(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%, 0.5)`;
-}
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
 
 function updateColor(color: Color, swatch: CanvasSwatch) {
   color.swatch.hue = swatch.hue;
@@ -230,31 +190,24 @@ function onUpdateChosenColor(swatch: CanvasSwatch) {
 //   });
 // }
 
-// // saves defaults
-// function onReset() {
-//   // don't reset:
-//   // colorChanger
-//   // activeTabId
-//   // activeTabHostname
+/** Sets back to defaults. Does not reset:
+ * changeColors
+ * activeTabId
+ * activeTabHostname
+*/
+function onReset() {
+  let defaultState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  state.always = defaultState.always;
+  state.hosts = defaultState.hosts;
+  state.fg = defaultState.fg;
+  state.bg = defaultState.bg;
+  state.li = defaultState.li;
+  state.activeBtn = defaultState.activeBtn;
+  state.lightness = defaultState.lightness;
 
-//   const stateToReset = {
-//     always,
-//     hosts,
-//     fg,
-//     bg,
-//     li,
-//     activeBtn,
-//     lightness,
-//   };
-
-//   saveStorage(stateToReset, () => {
-//     getStorage(null, state => {
-//       if (state.changeColors) {
-//         sendTabMessage(state.activeTabId, 'update', null, null);
-//       }
-//     })
-//   });
-// }
+  saveStorageAsync(state);
+  sendTabMessage(UPDATE_CONTENT);
+}
 
 function onChangeLightness(lightness: number) {
   state.lightness = lightness;
@@ -322,7 +275,7 @@ function onMessage(req: Message, _sender: any, res: any): boolean {
       sendTabMessage(UPDATE_CONTENT);
     }; break;
     case RESET: {
-      // onReset();
+      onReset();
     }; break;
     // case 'updateStrings': onUpdateStrings(); break;
   }
