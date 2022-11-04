@@ -45,6 +45,7 @@ function onChangeColors(changeColors: boolean) {
   } else {
     state.hosts = [...state.hosts.filter((host) => host !== state.activeTabHostname)];
   }
+  updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
   chrome.storage.sync.set({ 'colorChangerState': state });
 }
@@ -191,7 +192,6 @@ function createContextMenu() {
 function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chrome.tabs.Tab) {
   if (info.menuItemId === CHANGE_COLORS) {
     onChangeColors(!!info.checked)
-    updateContextMenu();
   }
 }
 
