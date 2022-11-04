@@ -134,20 +134,20 @@ function validateTab(tab: chrome.tabs.Tab) {
 //   });
 // }
 
-function onStorageChanged(changes: object, areaName: string) {
-  console.log('changes', changes);
-  console.log('areaName', areaName);
-  // getStorage(null, state => {
-  // if state is empty, return
-  // state can be empty when clearing storage
-  // if (Object.keys(state).length === 0 && state.constructor === Object) {
-  //   return;
-  // }
+// function onStorageChanged(changes: object, areaName: string) {
+//   console.log('changes', changes);
+//   console.log('areaName', areaName);
+//   // getStorage(null, state => {
+//   // if state is empty, return
+//   // state can be empty when clearing storage
+//   // if (Object.keys(state).length === 0 && state.constructor === Object) {
+//   //   return;
+//   // }
 
-  // on every change of state, update the context menu
-  // updateContextMenu(state.changeColors, state.always);
-  // });
-}
+//   // on every change of state, update the context menu
+//   // updateContextMenu(state.changeColors, state.always);
+//   // });
+// }
 
 function onUpdateChosenColor(swatch: CanvasSwatch) {
   switch (state.activeBtn) {
@@ -337,8 +337,8 @@ function clearStorage() {
 // --------------------------------------------------------------------------------------------- listeners
 chrome.tabs.onActivated.addListener(onTabActivated);
 chrome.runtime.onMessage.addListener(onMessage);
-chrome.storage.onChanged.addListener(onStorageChanged);
 chrome.runtime.onInstalled.addListener(onInstalled);
+// chrome.storage.onChanged.addListener(onStorageChanged);
 
 // --------------------------------------------------------------------------------------------- init
 /** If state hasn't been previously set in storage, initialize it, otherwise overwrite the default state. */
