@@ -75,8 +75,6 @@ function classListChanged(mutationList: MutationRecord[], obs: MutationObserver)
 
 function addClass() {
   let html = document.documentElement;
-  if (!html) return;
-
   if (!html.classList.contains(className)) {
     html.classList.add(className);
   }
@@ -86,8 +84,6 @@ function addClass() {
 
 function removeClass() {
   let html = document.documentElement;
-  if (!html) return;
-
   html.classList.remove(className);
   observer.disconnect();
 }
