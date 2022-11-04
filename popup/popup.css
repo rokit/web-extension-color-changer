@@ -13,6 +13,19 @@ body, html {
   width: 410px;
 }
 
+button {
+  padding: 10px;
+}
+
+button.active-btn {
+  background-color: #fff;
+}
+
+.active-swatch {
+  /* border: 2px solid #000; */
+  /* border-color: #aaa; */
+}
+
 #content {
   padding: 10px;
 }
@@ -84,19 +97,6 @@ canvas {
 
 #link_swatch {
   grid-area: link_swatch;
-}
-
-button {
-  padding: 10px;
-}
-
-.active-btn {
-  background-color: #fff;
-}
-
-.active-swatch {
-  /* border: 2px solid #000; */
-  /* border-color: #aaa; */
 }
 
 .slide-container {
