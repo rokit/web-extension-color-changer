@@ -125,6 +125,7 @@ function onReset() {
   state.activeBtn = defaultState.activeBtn;
   state.lightness = defaultState.lightness;
 
+  updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
   chrome.storage.sync.set({ 'colorChangerState': state });
 }
