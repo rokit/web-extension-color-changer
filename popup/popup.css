@@ -24,6 +24,11 @@ p {
   padding: 5px;
 }
 
+footer {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
 button {
   padding: 8px;
 }
@@ -122,4 +127,8 @@ button.active-btn {
   cursor: pointer;
   background: #333;
   border-radius: 1.3px;
+}
+
+button#reset {
+  padding: 4px;
 }
