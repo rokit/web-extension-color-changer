@@ -1,8 +1,8 @@
 const urlParams = new URLSearchParams(window.location.search);
 const reason = urlParams.get('reason');
 
-const icon = document.getElementById('icon');
-const greeting = document.getElementById('greeting');
+const icon = <HTMLImageElement>document.getElementById('icon')!;
+const greeting = document.getElementById('greeting')!;
 
 // set image src from web_accessible_resources
 icon.src = chrome.extension.getURL("icons/icon.svg");
