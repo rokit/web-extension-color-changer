@@ -41,6 +41,9 @@ export function shouldChangeColors(state: State): boolean {
   }
 }
 
+/** Work around for not being able to await an async message with chrome.runtime in Firefox.
+ * https://bugzilla.mozilla.org/show_bug.cgi?id=1228044
+*/
 export function runtimeSendMessage(message: Message): Promise<any> {
   var bIsChrome = /Chrome/.test(navigator.userAgent);
   console.log('navigator.userAgent', navigator.userAgent);
