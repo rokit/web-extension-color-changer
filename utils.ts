@@ -1,4 +1,4 @@
-import { Color, State } from "./interfaces";
+import { Color, Message, State } from "./interfaces";
 
 export function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
   let color: Color = {
@@ -38,5 +38,15 @@ export function shouldChangeColors(state: State): boolean {
     return true;
   } else {
     return false;
+  }
+}
+
+export function runtimeSendMessage(message: Message): Promise<any> {
+  var bIsChrome = /Chrome/.test(navigator.userAgent);
+  console.log('navigator.userAgent', navigator.userAgent);
+  if (bIsChrome) {
+    return chrome.runtime.sendMessage(message);
+  } else {
+    return browser.runtime.sendMessage(message);
   }
 }
