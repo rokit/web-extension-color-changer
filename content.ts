@@ -1,6 +1,6 @@
 import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CONTENT } from "./constants";
 import { Message, State } from "./interfaces";
-import { shouldChangeColors } from "./utils";
+import { runtimeSendMessage, shouldChangeColors } from "./utils";
 
 var ccStyle = document.createElement('style');
 ccStyle.id = COLOR_CHANGER_STYLE_ID;
@@ -113,7 +113,7 @@ function onMessage(req: Message, sender, res) {
 }
 
 async function init() {
-  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
+  let state = await runtimeSendMessage({ message: GET_STATE });
   updateContent(state);
 }
 
