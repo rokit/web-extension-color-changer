@@ -210,8 +210,8 @@ function onInstalled(details: any) {
   }
 }
 
-// function showAboutPage(reason) {
-//   chrome.tabs.create({ url: chrome.extension.getURL(`about/about.html?reason=${reason}`) });
+// function showAboutPage(reason: string) {
+//   chrome.tabs.create({ url: chrome.runtime.getURL(`about/about.html?reason=${reason}`) });
 // }
 
 // --------------------------------------------------------------------------------------------- storage
