@@ -3,8 +3,8 @@
   "version": "4.0.0",
   "description": "Change a page's text, background, and link colors to your liking.",
   "scripts": {
-    "build": "powershell Remove-Item $env:COLOR_CHANGER_DIST -Recurse -Force && parcel build manifest.json --config @parcel/config-webextension",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prebuild": "rimraf ./dist/*",
+    "build": "parcel build manifest.json --config @parcel/config-webextension"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
     "@parcel/config-webextension": "^2.7.0",
     "@types/chrome": "^0.0.200",
     "@types/firefox-webext-browser": "^94.0.1",
-    "parcel": "^2.7.0"
+    "parcel": "^2.7.0",
+    "rimraf": "^3.0.2"
   }
 }
