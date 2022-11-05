@@ -2,7 +2,7 @@
 *.txt
 
 /node_modules
-/dist
+/dist/*
 .parcel-cache
 
 manifest.json
