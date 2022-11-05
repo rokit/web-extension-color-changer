@@ -14,11 +14,12 @@
     {
       "run_at": "document_start",
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.ts"]
     }
   ],
   "web_accessible_resources": ["icons/icon.svg"],
-  "background": { "scripts": ["background.js"] },
+  "content_security_policy": "script-src 'self'; object-src 'self'; default-src 'self'",
+  "background": { "scripts": ["background.ts"] },
   "permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
   "browser_action": {
     "default_popup": "popup/popup.html",
@@ -27,6 +28,11 @@
       "32": "icons/icon-32.png",
       "48": "icons/icon-48.png",
       "128": "icons/icon-128.png"
+    }
+  },
+  "applications": {
+    "gecko": {
+      "id": "@colorchanger"
     }
   }
 }
