@@ -6,22 +6,22 @@ import { setHslStrings, shouldChangeColors } from "./utils";
 let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
 
 // --------------------------------------------------------------------------------------------- actions
-function onMessage(req: Message, _sender: any, res: any): boolean {
-  switch (req.message) {
+function onMessage(message: Message, _sender: any, sendResponse: any) {
+  switch (message.message) {
     case GET_STATE: {
-      res(state);
+      sendResponse(state)
     }; break;
     case CHANGE_COLORS: {
-      onChangeColors(req.payload);
+      onChangeColors(message.payload);
     }; break;
     case SET_ACTIVE_BUTTON: {
-      onSetActiveButton(req.payload);
+      onSetActiveButton(message.payload);
     }; break;
     case UPDATE_CHOSEN_COLOR: {
-      onUpdateChosenColor(req.payload);
+      onUpdateChosenColor(message.payload);
     }; break;
     case CHANGE_LIGHTNESS: {
-      onChangeLightness(req.payload);
+      onChangeLightness(message.payload);
     }; break;
     case RESET: {
       onReset();
@@ -167,8 +167,8 @@ async function sendTabMessage(message: Message) {
   if (!state.activeTabId) return;
   try {
     await chrome.tabs.sendMessage(state.activeTabId, message);
-  } catch (e) {
-    console.log("sendTabMessage error", e);
+  } catch (err) {
+    console.log("sendTabMessage error", err);
     console.log("refreshing tab", state.activeTabHostname);
     await chrome.tabs.reload(state.activeTabId);
   }
