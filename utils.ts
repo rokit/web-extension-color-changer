@@ -46,7 +46,6 @@ export function shouldChangeColors(state: State): boolean {
 */
 export function runtimeSendMessage(message: Message): Promise<any> {
   var bIsChrome = /Chrome/.test(navigator.userAgent);
-  console.log('navigator.userAgent', navigator.userAgent);
   if (bIsChrome) {
     return chrome.runtime.sendMessage(message);
   } else {
