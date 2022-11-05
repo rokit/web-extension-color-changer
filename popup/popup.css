@@ -7,22 +7,29 @@
   padding: 0px;
 }
 
-body, html {
+body {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 16px;
   width: 410px;
+  padding: 10px;
+}
+
+canvas {
+  margin: auto;
+  height: 300px;
+  width: 100%;
+}
+
+p {
+  padding: 5px;
 }
 
 button {
-  padding: 10px;
+  padding: 8px;
 }
 
 button.active-btn {
   background-color: #fff;
-}
-
-#content {
-  padding: 10px;
 }
 
 #checkbox-container {
@@ -48,26 +55,12 @@ button.active-btn {
   background-color: #ddd;
 }
 
-#cc-div {
-  grid-area: cc-div;
-}
-
-#always-div {
-  grid-area: always-div;
-}
-
-canvas {
-  margin: auto;
-  height: 300px;
-  width: 100%;
-}
-
 #colors {
   display: grid;
   grid-template: [row1-start] "fore fore_swatch"auto [row1-end] [row2-start] "back back_swatch"auto [row2-end] [row3-start] "link link_swatch"auto [row3-end] / 80% auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 #fore {
@@ -129,50 +122,4 @@ canvas {
   cursor: pointer;
   background: #333;
   border-radius: 1.3px;
-}
-
-footer {
-  position: absolute;
-  background-color: #bbb;
-  color: #ccc;
-  bottom: -88px;
-  height: 100px;
-  width: 100%;
-  transition: bottom 200ms;
-}
-
-footer:hover {
-  bottom: 0px;
-}
-
-#divider {
-  height: 10px;
-}
-
-#thumb {
-  position: relative;
-  background-color: white;
-  top: -10px;
-  left: -10px;
-  width: 20px;
-  height: 20px;
-  transform: rotate(45deg);
-}
-
-footer section {
-  display: grid;
-  grid-template-areas: "donate always-on reset";
-  grid-template-rows: 1fr 1fr 1fr;
-  grid-template-columns: 1fr;
-  grid-gap: 10px;
-  padding: 10px;
-}
-
-#donate {
-  grid-area: donate;
-  color: #222;
-}
-
-#reset {
-  grid-area: reset;
 }
