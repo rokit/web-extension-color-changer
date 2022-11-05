@@ -1,6 +1,6 @@
 import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
 import { CanvasSwatch, State } from "../interfaces";
-import { shouldChangeColors } from "../utils";
+import { runtimeSendMessage, shouldChangeColors } from "../utils";
 
 let lightnessSlider = <HTMLInputElement>document.getElementById("lightness")!;
 let lightnessValue = document.getElementById("lightness-value")!;
@@ -17,11 +17,11 @@ let backSwatch = document.getElementById(`${BACK_BTN}-swatch`)!;
 let linkSwatch = document.getElementById(`${LINK_BTN}-swatch`)!;
 
 changeColorsCheckbox.onclick = () => {
-  chrome.runtime.sendMessage({ message: CHANGE_COLORS, payload: changeColorsCheckbox.checked });
+  runtimeSendMessage({ message: CHANGE_COLORS, payload: changeColorsCheckbox.checked });
 };
 
 resetBtn.onclick = function () {
-  chrome.runtime.sendMessage({ message: RESET });
+  runtimeSendMessage({ message: RESET });
 }
 
 lightnessSlider.addEventListener('input', function () {
@@ -30,17 +30,17 @@ lightnessSlider.addEventListener('input', function () {
 
 lightnessSlider.addEventListener('change', function () {
   lightnessValue.childNodes[0].nodeValue = `${this.value}%`;
-  chrome.runtime.sendMessage({ message: CHANGE_LIGHTNESS, payload: parseInt(this.value) });
+  runtimeSendMessage({ message: CHANGE_LIGHTNESS, payload: parseInt(this.value) });
 })
 
 function onClickForeground() {
-  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: FORE_BTN });
+  runtimeSendMessage({ message: SET_ACTIVE_BUTTON, payload: FORE_BTN });
 }
 function onClickBackground() {
-  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: BACK_BTN });
+  runtimeSendMessage({ message: SET_ACTIVE_BUTTON, payload: BACK_BTN });
 }
 function onClickLink() {
-  chrome.runtime.sendMessage({ message: SET_ACTIVE_BUTTON, payload: LINK_BTN });
+  runtimeSendMessage({ message: SET_ACTIVE_BUTTON, payload: LINK_BTN });
 }
 
 foreSwatch.onclick = onClickForeground;
@@ -225,11 +225,11 @@ function checkCollision(swatches, x, y) {
 canvas.onclick = function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
   if (!swatch) return;
-  chrome.runtime.sendMessage({ message: UPDATE_CHOSEN_COLOR, payload: swatch });
+  runtimeSendMessage({ message: UPDATE_CHOSEN_COLOR, payload: swatch });
 }
 
 canvas.onmouseout = async function () {
-  let state = await chrome.runtime.sendMessage({ message: GET_STATE });
+  let state = await runtimeSendMessage({ message: GET_STATE });
   hoverId = null;
   drawCanvas(state);
 }
@@ -238,7 +238,7 @@ canvas.onmousemove = async function (e) {
   var swatch = checkCollision(swatches, e.offsetX, e.offsetY);
 
   if (swatch) {
-    let state = await chrome.runtime.sendMessage({ message: GET_STATE });
+    let state = await runtimeSendMessage({ message: GET_STATE });
     hoverId = swatch.id;
 
     drawCanvas(state);
@@ -256,7 +256,7 @@ canvas.onmousemove = async function (e) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function updateUi() {
-  let state: State = await chrome.runtime.sendMessage({ message: GET_STATE });
+  let state: State = await runtimeSendMessage({ message: GET_STATE });
 
   foreSwatch.style.background = state.fg.hsl;
   backSwatch.style.background = state.bg.hsl;
