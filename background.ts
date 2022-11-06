@@ -175,7 +175,13 @@ function validateTab(tab: chrome.tabs.Tab) {
   let url = new URL(tab.url);
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
-    // state.activeTabId = null;
+    state.activeTabHostname = "";
+    state.invalidUrl = true;
+    chrome.storage.sync.set({ 'colorChangerState': state });
+    return;
+  }
+
+  if (url.hostname === "addons.mozilla.org") {
     state.activeTabHostname = "";
     state.invalidUrl = true;
     chrome.storage.sync.set({ 'colorChangerState': state });
