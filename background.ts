@@ -34,17 +34,23 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
 }
 
 function onChangeColors(changeColors: boolean) {
-  if (!state.activeTabHostname || !state.activeTabId) {
-    console.log('Invalid host or id');
-    console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
+  console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
+  if (!state.activeTabHostname) {
+    console.log('No hostname');
     return
   };
+
+  if (!state.activeTabId) {
+    console.log('No tab ID.');
+    return;
+  }
 
   if (changeColors && !state.hosts.includes(state.activeTabHostname)) {
     state.hosts.push(state.activeTabHostname);
   } else {
     state.hosts = [...state.hosts.filter((host) => host !== state.activeTabHostname)];
   }
+
   updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
   chrome.storage.sync.set({ 'colorChangerState': state });
@@ -133,17 +139,26 @@ function onReset() {
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
 function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
-  chrome.tabs.get(tabInfo.tabId, (tab: chrome.tabs.Tab) => validateTab(tab));
+  state.activeTabId = tabInfo.tabId;
+  console.log('tab activated', tabInfo);
+  chrome.storage.sync.set({ 'colorChangerState': state });
+  // let tab = await browser.tabs.get(tabInfo.tabId);
+  // console.log('tab', tab);
 }
+
+function onTabUpdated(tabId: number, changeInfo: object, tab: chrome.tabs.Tab) {
+  if (state.activeTabId === tabId && tab.url) {
+    validateTab(tab);
+  }
+}
+
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
-  if (!tab.id || !tab.url) {
-    state.activeTabId = null;
-    state.activeTabHostname = "";
-    chrome.storage.sync.set({ 'colorChangerState': state });
-    return;
-  }
+  if (!tab.url) {
+    // This should never be called since onTabUpdated ensure we have a url.
+    return
+  };
 
   let url = new URL(tab.url);
 
@@ -154,7 +169,6 @@ function validateTab(tab: chrome.tabs.Tab) {
     return;
   }
 
-  state.activeTabId = tab.id;
   state.activeTabHostname = url.hostname;
 
   updateContextMenu();
@@ -170,7 +184,7 @@ async function sendTabMessage(message: Message) {
   } catch (err) {
     console.log("sendTabMessage error", err);
     console.log("refreshing tab", state.activeTabHostname);
-    await chrome.tabs.reload(state.activeTabId);
+    // await chrome.tabs.reload(state.activeTabId);
   }
 }
 
@@ -237,6 +251,7 @@ function clearStorage() {
 
 // --------------------------------------------------------------------------------------------- listeners
 chrome.tabs.onActivated.addListener(onTabActivated);
+chrome.tabs.onUpdated.addListener(onTabUpdated);
 chrome.runtime.onMessage.addListener(onMessage);
 chrome.runtime.onInstalled.addListener(onInstalled);
 
