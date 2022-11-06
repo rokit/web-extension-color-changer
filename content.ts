@@ -1,4 +1,4 @@
-import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, CONTENT_CONNECTED, GET_STATE, UPDATE_CONTENT } from "./constants";
+import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CONTENT } from "./constants";
 import { Message, State } from "./interfaces";
 import { runtimeSendMessage, shouldChangeColors } from "./utils";
 
@@ -103,17 +103,16 @@ function updateContent(state: State) {
   }
 }
 
-function onMessage(req: Message, sender, res) {
-  switch (req.message) {
+function onMessage(message: Message, _sender: any, res: any) {
+  switch (message.message) {
     case UPDATE_CONTENT: {
-      updateContent(req.payload);
+      updateContent(message.payload);
     }; break;
     default: break;
   }
 }
 
 async function init() {
-  runtimeSendMessage({ message: CONTENT_CONNECTED });
   let state = await runtimeSendMessage({ message: GET_STATE });
   updateContent(state);
 }
