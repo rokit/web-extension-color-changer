@@ -194,6 +194,7 @@ function validateTab(tab: chrome.tabs.Tab) {
 async function sendTabMessage(message: Message) {
   if (!state.activeTabId) return;
   try {
+    console.log('Sent content message.');
     await chrome.tabs.sendMessage(state.activeTabId, message);
   } catch (err) {
     console.log("sendTabMessage error", err);
