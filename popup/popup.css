@@ -7,9 +7,12 @@
   padding: 0px;
 }
 
-body {
+html {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 16px;
+}
+
+body {
   width: 410px;
   padding: 10px;
 }
@@ -99,15 +102,16 @@ button.active-btn {
 }
 
 #lightness-value {
-  flex: 2;
+  width: 20%;
   text-align: center;
-  color: #333333;
   font-size: 1.4rem;
+  color: #333333;
   text-emphasis: center;
+  margin: auto;
 }
 
 .slider {
-  flex: 8;
+  width: 80%;
 }
 
 .slider:hover {
