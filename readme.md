@@ -1,6 +1,6 @@
 # Color Changer Web Extension
 
-## Build steps (Windows)
+## Build steps
 
 Built with Node 16.13.1, though it should work with the latest LTS version.
 
