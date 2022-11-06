@@ -4,7 +4,11 @@
   "description": "Change a page's text, background, and link colors to your liking.",
   "scripts": {
     "prebuild": "rimraf ./dist/*",
-    "build": "parcel build manifest.json --config @parcel/config-webextension"
+    "build": "parcel build manifest.json --config @parcel/config-webextension",
+    "copy-ff-manifest": "node ./scripts/copy-manifest.js manifest.ff.json",
+    "copy-chrome-manifest": "node ./scripts/copy-manifest.js manifest.chrome.json",
+    "build:ff": "npm run copy-ff-manifest && npm run build",
+    "build:chrome": "npm run copy-chrome-manifest && npm run build"
   },
   "repository": {
     "type": "git",
@@ -20,6 +24,7 @@
     "@parcel/config-webextension": "^2.7.0",
     "@types/chrome": "^0.0.200",
     "@types/firefox-webext-browser": "^94.0.1",
+    "@types/node": "^18.11.9",
     "parcel": "^2.7.0",
     "rimraf": "^3.0.2"
   }
