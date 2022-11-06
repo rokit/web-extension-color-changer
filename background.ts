@@ -26,10 +26,10 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     case RESET: {
       onReset();
     }; break;
-    case CONTENT_CONNECTED: {
-      state.lostConnection = false;
-      chrome.storage.sync.set({ 'colorChangerState': state });
-    }; break;
+    // case CONTENT_CONNECTED: {
+    //   state.lostConnection = false;
+    //   chrome.storage.sync.set({ 'colorChangerState': state });
+    // }; break;
     default: break;
   }
 
@@ -161,6 +161,10 @@ function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
+  state.invalidUrl = false;
+  state.lostConnection = false;
+  chrome.storage.sync.set({ 'colorChangerState': state });
+
   // console.log('validate tab', tab);
   if (!tab.url) {
     // This may be null until the tab is updated.
