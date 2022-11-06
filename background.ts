@@ -173,27 +173,34 @@ function validateTab(tab: chrome.tabs.Tab) {
   };
 
   let url = new URL(tab.url);
+  console.log('url.hostname', url.hostname);
+
+  if (!url.hostname) {
+    setInvalidUrl()
+    return;
+  }
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
-    state.activeTabHostname = "";
-    state.invalidUrl = true;
-    chrome.storage.sync.set({ 'colorChangerState': state });
+    setInvalidUrl()
     return;
   }
 
   if (url.hostname === "addons.mozilla.org") {
-    state.activeTabHostname = "";
-    state.invalidUrl = true;
-    chrome.storage.sync.set({ 'colorChangerState': state });
+    setInvalidUrl()
     return;
   }
 
-  // let validUrl = tab.url?.includes("https://") || tab.url?.includes("http://");
   state.activeTabHostname = url.hostname;
   chrome.storage.sync.set({ 'colorChangerState': state });
 
   updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+}
+
+function setInvalidUrl() {
+  state.activeTabHostname = "";
+  state.invalidUrl = true;
+  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
