@@ -1,5 +1,4 @@
-*.zip
-
+manifest.json
 /node_modules
 /notes
 /zips
