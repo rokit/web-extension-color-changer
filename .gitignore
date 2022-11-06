@@ -2,5 +2,6 @@
 
 /node_modules
 /notes
+/zips
 /dist/*
 .parcel-cache
