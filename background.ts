@@ -1,5 +1,5 @@
 
-import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
+import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, CONTENT_CONNECTED, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State } from "./interfaces";
 import { setHslStrings, shouldChangeColors } from "./utils";
 
@@ -25,6 +25,10 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     }; break;
     case RESET: {
       onReset();
+    }; break;
+    case CONTENT_CONNECTED: {
+      state.lostConnection = false;
+      chrome.storage.sync.set({ 'colorChangerState': state });
     }; break;
     default: break;
   }
@@ -130,6 +134,8 @@ function onReset() {
   state.li = defaultState.li;
   state.activeBtn = defaultState.activeBtn;
   state.lightness = defaultState.lightness;
+  state.lostConnection = defaultState.lostConnection;
+  state.invalidUrl = defaultState.invalidUrl;
 
   updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
@@ -166,6 +172,7 @@ function validateTab(tab: chrome.tabs.Tab) {
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
     // state.activeTabId = null;
     state.activeTabHostname = "";
+    state.invalidUrl = true;
     chrome.storage.sync.set({ 'colorChangerState': state });
     return;
   }
@@ -186,6 +193,8 @@ async function sendTabMessage(message: Message) {
   } catch (err) {
     console.log("sendTabMessage error", err);
     console.log("refreshing tab", state.activeTabHostname);
+    state.lostConnection = true;
+    chrome.storage.sync.set({ 'colorChangerState': state });
     // await chrome.tabs.reload(state.activeTabId);
   }
 }

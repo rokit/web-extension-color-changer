@@ -7,6 +7,8 @@ export interface State {
   activeBtn: string;
   lightness: number;
   hosts: string[];
+  lostConnection: boolean;
+  invalidUrl: boolean;
 }
 
 export interface Swatch {

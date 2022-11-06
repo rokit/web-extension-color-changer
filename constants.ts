@@ -8,6 +8,7 @@ export const SET_ACTIVE_BUTTON = "SET_ACTIVE_BUTTON";
 export const UPDATE_CHOSEN_COLOR = "UPDATE_CHOSEN_COLOR";
 export const CHANGE_LIGHTNESS = "CHANGE_LIGHTNESS";
 export const RESET = "RESET";
+export const CONTENT_CONNECTED = "CONTENT_CONNECTED";
 
 export const FORE_BTN = "fore";
 export const BACK_BTN = "back";
@@ -25,4 +26,6 @@ export const DEFAULT_STATE: State = {
   activeBtn: FORE_BTN,
   lightness: 80,
   hosts: [],
+  lostConnection: false,
+  invalidUrl: false,
 }

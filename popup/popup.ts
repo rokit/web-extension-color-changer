@@ -6,6 +6,7 @@ let lightnessSlider = <HTMLInputElement>document.getElementById("lightness")!;
 let lightnessValue = document.getElementById("lightness-value")!;
 
 let changeColorsCheckbox = <HTMLInputElement>document.getElementById("change-colors")!;
+let changeColorsLabel = <HTMLInputElement>document.getElementById("change-colors-label")!;
 
 let foreBtn = document.getElementById(FORE_BTN)!;
 let backBtn = document.getElementById(BACK_BTN)!;
@@ -265,6 +266,17 @@ async function updateUi() {
   changeColorsCheckbox.checked = shouldChangeColors(state);
   lightnessSlider.value = state.lightness.toString();
   lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
+
+  if (state.invalidUrl) {
+    changeColorsCheckbox.setAttribute("disabled", "disabled");
+    changeColorsLabel.textContent = "Color Changer can't work on this page.";
+  } else if (state.lostConnection) {
+    changeColorsCheckbox.setAttribute("disabled", "disabled");
+    changeColorsLabel.textContent = "Please reload this page.";
+  } else {
+    changeColorsCheckbox.removeAttribute("disabled");
+    changeColorsLabel.textContent = "Change Colors";
+  }
 
   setActiveColorButton(state);
   drawCanvas(state);
