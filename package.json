@@ -1,6 +1,6 @@
 {
   "name": "color-changer",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "description": "Change a page's text, background, and link colors to your liking.",
   "scripts": {
     "prebuild": "rimraf ./dist/*",
