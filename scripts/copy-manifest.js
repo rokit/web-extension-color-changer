@@ -17,5 +17,5 @@ fs.copyFile(source, manifestJson, (error) => {
     return;
   }
 
-  console.log(`Copied contents of ${args[0]} to ${manifestJson}`);
+  console.log(`Copied contents of ${source} to ${manifestJson}`);
 });
