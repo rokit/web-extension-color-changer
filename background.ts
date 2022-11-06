@@ -142,6 +142,7 @@ function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
   console.log('tab activated');
   state.activeTabId = tabInfo.tabId;
   chrome.storage.sync.set({ 'colorChangerState': state });
+  chrome.tabs.get(tabInfo.tabId, validateTab);
 }
 
 function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
@@ -154,9 +155,10 @@ function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
+  // console.log('validate tab', tab);
   if (!tab.url) {
-    // This should never be called since onTabUpdated ensures we have a url.
-    return
+    // This may be null until the tab is updated.
+    return;
   };
 
   let url = new URL(tab.url);
