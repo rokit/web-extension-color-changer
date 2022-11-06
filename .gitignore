@@ -1,8 +1,6 @@
 *.zip
-*.txt
 
 /node_modules
+/notes
 /dist/*
 .parcel-cache
-
-manifest.json
