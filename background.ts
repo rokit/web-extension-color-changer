@@ -246,22 +246,6 @@ function onInstalled(details: any) {
 // }
 
 // --------------------------------------------------------------------------------------------- storage
-function getStorageAsync(): Promise<State | undefined> {
-  // Immediately return a promise and start asynchronous work
-  return new Promise((resolve, reject) => {
-    // Asynchronously fetch all data from storage.sync.
-    chrome.storage.sync.get(['colorChangerState'], (result) => {
-      // Pass any observed errors down the promise chain.
-      if (chrome.runtime.lastError) {
-        return reject(chrome.runtime.lastError);
-      }
-
-      // Pass the data retrieved from storage down the promise chain.
-      resolve(result.colorChangerState);
-    });
-  });
-}
-
 function clearStorage() {
   chrome.storage.sync.remove("colorChangerState");
 }
@@ -275,12 +259,12 @@ chrome.runtime.onInstalled.addListener(onInstalled);
 // --------------------------------------------------------------------------------------------- init
 /** Get state from storage if it exists. If not, create default state. */
 async function initServiceWorker() {
-  let storageState = await getStorageAsync();
-  if (storageState) {
-    state = storageState;
+  let storage = await chrome.storage.sync.get(['colorChangerState']);
+  if (storage.colorChangerState) {
+    state = storage.colorChangerState;
   }
 
-  chrome.storage.sync.set({ 'colorChangerState': state });
+  await chrome.storage.sync.set({ 'colorChangerState': state });
 
   console.log('state', state);
   createContextMenu();
