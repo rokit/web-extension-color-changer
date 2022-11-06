@@ -1,5 +1,5 @@
 export interface State {
-  activeTabId: number | null;
+  activeTabId: number;
   activeTabHostname: string;
   fg: Color;
   bg: Color;

@@ -17,7 +17,7 @@ export const COLOR_CHANGER_STYLE_ID = "color-changer-style";
 export const COLOR_CHANGER_CLASS_NAME = "color-changer-v4";
 
 export const DEFAULT_STATE: State = {
-  activeTabId: null,
+  activeTabId: -1,
   activeTabHostname: "",
   fg: createColor(0, 0, 80, 'zero'),
   bg: createColor(0, 0, 25, 'zero'),

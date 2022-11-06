@@ -144,10 +144,10 @@ function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
   chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
-function onTabUpdated(tabId: number, changeInfo: object, tab: chrome.tabs.Tab) {
-  // console.log('tabUdpated', tab);
-  let validUrl = tab.url?.includes("https://") || tab.url?.includes("http://");
-  if (state.activeTabId === tabId && validUrl) {
+function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
+  console.log('tabUdpated', tab);
+  console.log('changeInfo', changeInfo);
+  if (state.activeTabId === tabId && changeInfo.url) {
     validateTab(tab);
   }
 }
@@ -155,7 +155,7 @@ function onTabUpdated(tabId: number, changeInfo: object, tab: chrome.tabs.Tab) {
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
   if (!tab.url) {
-    // This should never be called since onTabUpdated ensure we have a url.
+    // This should never be called since onTabUpdated ensures we have a url.
     return
   };
 
@@ -163,11 +163,12 @@ function validateTab(tab: chrome.tabs.Tab) {
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
     // state.activeTabId = null;
-    // state.activeTabHostname = "";
-    // chrome.storage.sync.set({ 'colorChangerState': state });
+    state.activeTabHostname = "";
+    chrome.storage.sync.set({ 'colorChangerState': state });
     return;
   }
 
+  // let validUrl = tab.url?.includes("https://") || tab.url?.includes("http://");
   state.activeTabHostname = url.hostname;
   chrome.storage.sync.set({ 'colorChangerState': state });
 
