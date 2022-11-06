@@ -260,14 +260,14 @@ chrome.runtime.onInstalled.addListener(onInstalled);
 /** Get state from storage if it exists. If not, create default state. */
 async function initServiceWorker() {
   let storage = await chrome.storage.sync.get(['colorChangerState']);
-  if (storage.colorChangerState) {
+  if (storage?.colorChangerState) {
     state = storage.colorChangerState;
   }
 
-  await chrome.storage.sync.set({ 'colorChangerState': state });
-
   console.log('state', state);
   createContextMenu();
+
+  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 initServiceWorker();
