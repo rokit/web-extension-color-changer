@@ -139,19 +139,18 @@ function onReset() {
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
 function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
+  console.log('tab activated');
   state.activeTabId = tabInfo.tabId;
-  console.log('tab activated', tabInfo);
   chrome.storage.sync.set({ 'colorChangerState': state });
-  // let tab = await browser.tabs.get(tabInfo.tabId);
-  // console.log('tab', tab);
 }
 
 function onTabUpdated(tabId: number, changeInfo: object, tab: chrome.tabs.Tab) {
-  if (state.activeTabId === tabId && tab.url) {
+  // console.log('tabUdpated', tab);
+  let validUrl = tab.url?.includes("https://") || tab.url?.includes("http://");
+  if (state.activeTabId === tabId && validUrl) {
     validateTab(tab);
   }
 }
-
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
@@ -163,17 +162,17 @@ function validateTab(tab: chrome.tabs.Tab) {
   let url = new URL(tab.url);
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
-    state.activeTabId = null;
-    state.activeTabHostname = "";
-    chrome.storage.sync.set({ 'colorChangerState': state });
+    // state.activeTabId = null;
+    // state.activeTabHostname = "";
+    // chrome.storage.sync.set({ 'colorChangerState': state });
     return;
   }
 
   state.activeTabHostname = url.hostname;
+  chrome.storage.sync.set({ 'colorChangerState': state });
 
   updateContextMenu();
   sendTabMessage({ message: UPDATE_CONTENT, payload: state });
-  chrome.storage.sync.set({ 'colorChangerState': state });
 }
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
