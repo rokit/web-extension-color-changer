@@ -34,7 +34,6 @@ $destinationSourcePath  = $destinationFolder + "\\" + "${browser}." + $manifest.
 # create source zip
 Compress-Archive -Path $files -DestinationPath $destinationSourcePath -Force
 `, { 'shell': 'powershell.exe' }, (error, stdout, stderr) => {
-  // do whatever with stdout
   console.log('stdout', stdout);
   console.log('error', error);
 })
