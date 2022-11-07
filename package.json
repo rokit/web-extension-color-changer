@@ -8,7 +8,9 @@
     "copy-ff-manifest": "node ./scripts/copy-manifest.js manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js manifest.chrome.json",
     "build:ff": "npm run copy-ff-manifest && npm run build",
-    "build:chrome": "npm run copy-chrome-manifest && npm run build"
+    "build:chrome": "npm run copy-chrome-manifest && npm run build",
+    "zip:ff": "node ./scripts/zip.js firefox",
+    "zip:chrome": "node ./scripts/zip.js chrome"
   },
   "repository": {
     "type": "git",
