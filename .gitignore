@@ -4,3 +4,4 @@ manifest.json
 /zips
 /dist/*
 .parcel-cache
+.env

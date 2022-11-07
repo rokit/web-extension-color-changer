@@ -25,6 +25,7 @@
     "@types/chrome": "^0.0.200",
     "@types/firefox-webext-browser": "^94.0.1",
     "@types/node": "^18.11.9",
+    "dotenv": "^16.0.3",
     "parcel": "^2.7.0",
     "rimraf": "^3.0.2"
   }
