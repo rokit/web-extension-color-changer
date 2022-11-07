@@ -9,7 +9,7 @@ if (args.length === 0) {
 
 let browser = args[0];
 
-exec(`# create zip files for firefox submission
+exec(`# create zip files for submission
 #
 #
 
@@ -17,7 +17,7 @@ exec(`# create zip files for firefox submission
 $manifest = Get-Content manifest.json | ConvertFrom-Json; $manifest.version;
 
 # create folder
-$destinationFolder = "${process.env.COLOR_CHANGER_ZIP_FOLDER}" + $manifest.version;
+$destinationFolder = "${process.env.COLOR_CHANGER_ZIP_DESTINATION_FOLDER}" + $manifest.version;
 md -Force $destinationFolder;
 
 # set destination path
