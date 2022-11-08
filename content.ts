@@ -29,6 +29,18 @@ function updateCss(state: State) {
     border-color: ${state.bg.lightnessShift} !important;
   }
 
+  .${COLOR_CHANGER_CLASS_NAME}${not} input,
+  .${COLOR_CHANGER_CLASS_NAME}${not} input *,
+  .${COLOR_CHANGER_CLASS_NAME}${not} textarea,
+  .${COLOR_CHANGER_CLASS_NAME}${not} textarea *,
+  .${COLOR_CHANGER_CLASS_NAME}${not} pre,
+  .${COLOR_CHANGER_CLASS_NAME}${not} pre *,
+  .${COLOR_CHANGER_CLASS_NAME}${not} code,
+  .${COLOR_CHANGER_CLASS_NAME}${not} code *
+  {
+    background-color: ${state.bg.lightnessShift};
+  }
+
   .${COLOR_CHANGER_CLASS_NAME} button,
   .${COLOR_CHANGER_CLASS_NAME} button *
   {
