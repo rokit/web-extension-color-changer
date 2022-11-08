@@ -13,44 +13,47 @@ var css = "";
 function updateCss(state: State) {
   if (!state) return;
 
-  let not = ':not(img, video, svg, .rc-VideoMiniPlayer)';
+  let courseraVideos = " #vjs_video_1 *";
+  let youtubeVideos = ".ytd-rich-item-renderer *";
+  let youtubeSidebar = "#guide-content *";
+  let not = `:not(img, video, svg, ${courseraVideos}, ${youtubeVideos}, ${youtubeSidebar})`;
 
   css = `
   html.${COLOR_CHANGER_CLASS_NAME},
   html.${COLOR_CHANGER_CLASS_NAME} body,
-  html.${COLOR_CHANGER_CLASS_NAME} * ${not}
+  html.${COLOR_CHANGER_CLASS_NAME} ${not}
   {
     color: ${state.fg.hsl};
     background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
 
-  html.${COLOR_CHANGER_CLASS_NAME} button,
-  html.${COLOR_CHANGER_CLASS_NAME} button *
+  .${COLOR_CHANGER_CLASS_NAME} button,
+  .${COLOR_CHANGER_CLASS_NAME} button *
   {
     color: ${state.li.hsl} !important;
     background-color: transparent !important;
   }
-  html.${COLOR_CHANGER_CLASS_NAME} a,
-  html.${COLOR_CHANGER_CLASS_NAME} a *
+  .${COLOR_CHANGER_CLASS_NAME} a,
+  .${COLOR_CHANGER_CLASS_NAME} a *
   {
     color: ${state.li.hsl} !important;
     background-color: transparent !important;
   }
-  html.${COLOR_CHANGER_CLASS_NAME} a:hover,
-  html.${COLOR_CHANGER_CLASS_NAME} a:hover *
+  .${COLOR_CHANGER_CLASS_NAME} a:hover,
+  .${COLOR_CHANGER_CLASS_NAME} a:hover *
   {
     color: ${state.li.hueHovered} !important;
     background-color: transparent !important;
   }
-  html.${COLOR_CHANGER_CLASS_NAME} a:active,
-  html.${COLOR_CHANGER_CLASS_NAME} a:active *
+  .${COLOR_CHANGER_CLASS_NAME} a:active,
+  .${COLOR_CHANGER_CLASS_NAME} a:active *
   {
     color: ${state.li.hueVisited} !important;
     background-color: transparent !important;
   }
-  html.${COLOR_CHANGER_CLASS_NAME} a:visited,
-  html.${COLOR_CHANGER_CLASS_NAME} a:visited *
+  .${COLOR_CHANGER_CLASS_NAME} a:visited,
+  .${COLOR_CHANGER_CLASS_NAME} a:visited *
   {
     color: ${state.li.hueVisited} !important;
     background-color: transparent !important;
