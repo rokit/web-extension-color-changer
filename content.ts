@@ -2,29 +2,30 @@ import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CON
 import { Message, State } from "./interfaces";
 import { runtimeSendMessage, shouldChangeColors } from "./utils";
 
-var ccStyle = document.createElement('style');
+let ccStyle = document.createElement('style');
 ccStyle.id = COLOR_CHANGER_STYLE_ID;
 
-var observer = new MutationObserver(classListChanged);
-var observerConfig = { attributes: true, attributeFilter: ["class"] };
+let observer = new MutationObserver(classListChanged);
+let observerConfig = { attributes: true, attributeFilter: ["class"] };
 
-var css = "";
+let css = "";
 
 function updateCss(state: State) {
   if (!state) return;
 
   let courseraVideos = " #vjs_video_1 *";
   let youtubeVideos = ".ytd-rich-item-renderer *";
-  let youtubeSidebar = "#guide-content *";
-  let not = `:not(img, video, svg, ${courseraVideos}, ${youtubeVideos}, ${youtubeSidebar})`;
+  let youtubeSidebar = ".ytd-guide-renderer *";
+  let youtubeSearchHeader = ".ytd-masthead *";
+  let not = `:not(img, video, svg, ${courseraVideos}, ${youtubeVideos}, ${youtubeSidebar}, ${youtubeSearchHeader})`;
 
   css = `
   html.${COLOR_CHANGER_CLASS_NAME},
-  html.${COLOR_CHANGER_CLASS_NAME} body,
-  html.${COLOR_CHANGER_CLASS_NAME} ${not}
+  .${COLOR_CHANGER_CLASS_NAME} body,
+  .${COLOR_CHANGER_CLASS_NAME} ${not}
   {
     color: ${state.fg.hsl};
-    background-color: ${state.bg.hsl} !important;
+    background-color: ${state.bg.hsl};
     border-color: ${state.bg.lightnessShift} !important;
   }
 
