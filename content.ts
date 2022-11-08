@@ -20,7 +20,7 @@ function updateCss(state: State) {
   let not = `:not(img, video, svg, ${courseraVideos}, ${youtubeVideos}, ${youtubeSidebar}, ${youtubeSearchHeader})`;
 
   css = `
-  html.${COLOR_CHANGER_CLASS_NAME},
+  .${COLOR_CHANGER_CLASS_NAME},
   .${COLOR_CHANGER_CLASS_NAME} body,
   .${COLOR_CHANGER_CLASS_NAME} ${not}
   {
