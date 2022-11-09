@@ -1,5 +1,7 @@
 import { Color, Message, State } from "./interfaces";
 
+export const isChrome = /Chrome/.test(navigator.userAgent);
+
 export function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
   let color: Color = {
     swatch: {
@@ -45,10 +47,25 @@ export function shouldChangeColors(state: State): boolean {
  * https://bugzilla.mozilla.org/show_bug.cgi?id=1228044
 */
 export function runtimeSendMessage(message: Message): Promise<any> {
-  var bIsChrome = /Chrome/.test(navigator.userAgent);
-  if (bIsChrome) {
+  if (isChrome) {
     return chrome.runtime.sendMessage(message);
   } else {
     return browser.runtime.sendMessage(message);
+  }
+}
+
+export function saveState(state: State) {
+  if (isChrome) {
+    chrome.storage.sync.set({ 'colorChangerState': state });
+  } else {
+    browser.storage.sync.set({ 'colorChangerState': state });
+  }
+}
+
+export function getState() {
+  if (isChrome) {
+    return chrome.storage.sync.get(['colorChangerState']);
+  } else {
+    return browser.storage.sync.get(['colorChangerState']);
   }
 }
