@@ -13,12 +13,13 @@ let css = "";
 function updateCss(state: State) {
   if (!state) return;
 
-  let courseraVideos = " #vjs_video_1 *";
+  let courseraVideos = ".rc-VideoMiniPlayer *";
   let youtubePlayer = "#player *";
+  let youtubeThumbnail = ".ytd-rich-item-renderer *";
   let youtubeSidebar = ".ytd-guide-renderer *";
   let youtubeSearchHeader = ".ytd-masthead *";
   let youtubeShorts = "#shorts-inner-container *"
-  let not = `:not(img, video, svg, ${courseraVideos}, ${youtubePlayer}, ${youtubeSidebar}, ${youtubeSearchHeader}, ${youtubeShorts})`;
+  let not = `:not(img, video, svg, ${courseraVideos}, ${youtubePlayer}, ${youtubeThumbnail}, ${youtubeSidebar}, ${youtubeSearchHeader}, ${youtubeShorts})`;
   let notId = ":not(#increase-specificity)";
 
   css = `
