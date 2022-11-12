@@ -14,59 +14,61 @@ function updateCss(state: State) {
   if (!state) return;
 
   let courseraVideos = " #vjs_video_1 *";
-  let youtubeVideos = ".ytd-rich-item-renderer *";
+  let youtubePlayer = "#player *";
   let youtubeSidebar = ".ytd-guide-renderer *";
   let youtubeSearchHeader = ".ytd-masthead *";
-  let not = `:not(img, video, svg, ${courseraVideos}, ${youtubeVideos}, ${youtubeSidebar}, ${youtubeSearchHeader})`;
+  let youtubeShorts = "#shorts-inner-container *"
+  let not = `:not(img, video, svg, ${courseraVideos}, ${youtubePlayer}, ${youtubeSidebar}, ${youtubeSearchHeader}, ${youtubeShorts})`;
+  let notId = ":not(#increase-specificity)";
 
   css = `
   .${COLOR_CHANGER_CLASS_NAME},
   .${COLOR_CHANGER_CLASS_NAME} body,
   .${COLOR_CHANGER_CLASS_NAME} ${not}
   {
-    color: ${state.fg.hsl};
-    background-color: ${state.bg.hsl};
+    color: ${state.fg.hsl} !important;
+    background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.lightnessShift} !important;
   }
 
-  .${COLOR_CHANGER_CLASS_NAME}${not} input,
-  .${COLOR_CHANGER_CLASS_NAME}${not} input *,
-  .${COLOR_CHANGER_CLASS_NAME}${not} textarea,
-  .${COLOR_CHANGER_CLASS_NAME}${not} textarea *,
-  .${COLOR_CHANGER_CLASS_NAME}${not} pre,
-  .${COLOR_CHANGER_CLASS_NAME}${not} pre *,
-  .${COLOR_CHANGER_CLASS_NAME}${not} code,
-  .${COLOR_CHANGER_CLASS_NAME}${not} code *
+  .${COLOR_CHANGER_CLASS_NAME}${notId} input,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} input *,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} textarea,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} textarea *,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} pre,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} pre *,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} code,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} code *
   {
-    background-color: ${state.bg.lightnessShift};
+    background-color: ${state.bg.lightnessShift} !important;
   }
 
-  .${COLOR_CHANGER_CLASS_NAME} button,
-  .${COLOR_CHANGER_CLASS_NAME} button *
+  .${COLOR_CHANGER_CLASS_NAME}${notId} button,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} button *
   {
     color: ${state.li.hsl} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME} a,
-  .${COLOR_CHANGER_CLASS_NAME} a *
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a *
   {
     color: ${state.li.hsl} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME} a:hover,
-  .${COLOR_CHANGER_CLASS_NAME} a:hover *
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a:hover,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a:hover *
   {
     color: ${state.li.hueHovered} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME} a:active,
-  .${COLOR_CHANGER_CLASS_NAME} a:active *
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a:active,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a:active *
   {
     color: ${state.li.hueVisited} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME} a:visited,
-  .${COLOR_CHANGER_CLASS_NAME} a:visited *
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a:visited,
+  .${COLOR_CHANGER_CLASS_NAME}${notId} a:visited *
   {
     color: ${state.li.hueVisited} !important;
     background-color: transparent !important;
