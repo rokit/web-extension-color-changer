@@ -9,6 +9,7 @@ export const UPDATE_CHOSEN_COLOR = "UPDATE_CHOSEN_COLOR";
 export const CHANGE_LIGHTNESS = "CHANGE_LIGHTNESS";
 export const RESET = "RESET";
 export const CONTENT_CONNECTED = "CONTENT_CONNECTED";
+export const INVALID_TAB = -9999;
 
 export const FORE_BTN = "fore";
 export const BACK_BTN = "back";
@@ -18,7 +19,7 @@ export const COLOR_CHANGER_STYLE_ID = "color-changer-style";
 export const COLOR_CHANGER_CLASS_NAME = "color-changer-v4";
 
 export const DEFAULT_STATE: State = {
-  activeTabId: -1,
+  activeTabId: INVALID_TAB,
   activeTabHostname: "",
   fg: createColor(0, 0, 80, 'zero'),
   bg: createColor(0, 0, 25, 'zero'),

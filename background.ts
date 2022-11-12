@@ -1,5 +1,5 @@
 
-import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, CONTENT_CONNECTED, DEFAULT_STATE, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
+import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, CONTENT_CONNECTED, DEFAULT_STATE, FORE_BTN, GET_STATE, INVALID_TAB, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State } from "./interfaces";
 import { getState, saveState, setHslStrings, shouldChangeColors } from "./utils";
 
@@ -40,12 +40,12 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
 function onChangeColors(changeColors: boolean) {
   console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
   if (!state.activeTabHostname) {
-    console.log('No hostname');
+    console.log('onChangeColors - No hostname');
     return
   };
 
   if (!state.activeTabId) {
-    console.log('No tab ID.');
+    console.log('onChangeColors - No tab ID.');
     return;
   }
 
@@ -154,8 +154,8 @@ function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
 function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
   console.log('tabUdpated', tab);
   console.log('changeInfo', changeInfo);
-  if (state.activeTabId === -10) {
-    // TabID can be default if the browser was first loaded.
+  if (state.activeTabId === INVALID_TAB) {
+    // Tab ID can be invalid if the browser was first loaded.
     state.activeTabId = tabId;
     validateTab(tab);
   } else if (state.activeTabId === tabId) {
@@ -186,7 +186,7 @@ function validateTab(tab: chrome.tabs.Tab) {
   }
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
-    console.log('Invalid protocol', url.protocol, url.hostname);
+    console.log('Invalid protocol', url.protocol);
     setInvalidUrl()
     return;
   }
@@ -285,7 +285,7 @@ async function initServiceWorker() {
   if (storage?.colorChangerState) {
     state = storage.colorChangerState;
   }
-  state.activeTabId = -10;
+  state.activeTabId = INVALID_TAB;
   state.activeTabHostname = "";
 
   console.log('state', state);

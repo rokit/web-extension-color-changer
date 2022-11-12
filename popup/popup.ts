@@ -1,4 +1,4 @@
-import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, FORE_BTN, GET_STATE, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
+import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, FORE_BTN, GET_STATE, INVALID_TAB, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR } from "../constants";
 import { CanvasSwatch, State } from "../interfaces";
 import { runtimeSendMessage, shouldChangeColors } from "../utils";
 
@@ -267,7 +267,10 @@ async function updateUi() {
   lightnessSlider.value = state.lightness.toString();
   lightnessValue.childNodes[0].nodeValue = `${state.lightness}%`;
 
-  if (state.invalidUrl) {
+  if (state.activeTabId === INVALID_TAB) {
+    changeColorsCheckbox.setAttribute("disabled", "disabled");
+    changeColorsLabel.textContent = "Please reload this tab or activate a new tab.";
+  } else if (state.invalidUrl) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
     changeColorsLabel.textContent = "Color Changer can't work on this page.";
   } else if (state.lostConnection) {
