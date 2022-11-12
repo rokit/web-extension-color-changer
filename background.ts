@@ -145,7 +145,7 @@ function onReset() {
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
 function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
-  console.log('tab activated');
+  console.log('tab activated', tabInfo.tabId);
   state.activeTabId = tabInfo.tabId;
   saveState(state);
   chrome.tabs.get(tabInfo.tabId, validateTab);
@@ -154,7 +154,11 @@ function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
 function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
   console.log('tabUdpated', tab);
   console.log('changeInfo', changeInfo);
-  if (state.activeTabId === tabId) {
+  if (state.activeTabId === -10) {
+    // TabID can be default if the browser was first loaded.
+    state.activeTabId = tabId;
+    validateTab(tab);
+  } else if (state.activeTabId === tabId) {
     validateTab(tab);
   }
 }
@@ -176,16 +180,19 @@ function validateTab(tab: chrome.tabs.Tab) {
   console.log('url.hostname', url.hostname);
 
   if (!url.hostname) {
+    console.log('Invalid hostname', url.hostname);
     setInvalidUrl()
     return;
   }
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
+    console.log('Invalid protocol', url.protocol, url.hostname);
     setInvalidUrl()
     return;
   }
 
   if (url.hostname === "addons.mozilla.org") {
+    console.log('Invalid hostname', url.hostname);
     setInvalidUrl()
     return;
   }
@@ -205,16 +212,18 @@ function setInvalidUrl() {
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 async function sendTabMessage(message: Message) {
-  if (!state.activeTabId) return;
+  if (!state.activeTabId) {
+    console.log('No active tab ID.');
+    return
+  };
+
   try {
     console.log('Sent content message.');
     await chrome.tabs.sendMessage(state.activeTabId, message);
   } catch (err) {
     console.log("sendTabMessage error", err);
-    console.log("refreshing tab", state.activeTabHostname);
     state.lostConnection = true;
     saveState(state);
-    // await chrome.tabs.reload(state.activeTabId);
   }
 }
 
@@ -276,6 +285,8 @@ async function initServiceWorker() {
   if (storage?.colorChangerState) {
     state = storage.colorChangerState;
   }
+  state.activeTabId = -10;
+  state.activeTabHostname = "";
 
   console.log('state', state);
   createContextMenu();
