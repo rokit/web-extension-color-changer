@@ -1,7 +1,7 @@
 
 import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, CONTENT_CONNECTED, DEFAULT_STATE, FORE_BTN, GET_STATE, INVALID_TAB, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
 import { CanvasSwatch, Color, Message, State } from "./interfaces";
-import { getState, saveState, setHslStrings, shouldChangeColors } from "./utils";
+import { getState, saveState, setHslStrings, shouldChangeColors, tabsQuery } from "./utils";
 
 let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
 
@@ -285,12 +285,23 @@ async function initServiceWorker() {
   if (storage?.colorChangerState) {
     state = storage.colorChangerState;
   }
+
+  // Initialize tabs.
   state.activeTabId = INVALID_TAB;
   state.activeTabHostname = "";
 
-  console.log('state', state);
-  createContextMenu();
+  let tabs = await tabsQuery({ currentWindow: true, active: true });
+  if (tabs.length > 0) {
+    let tab = tabs[0];
+    if (tab.id) {
+      state.activeTabId = tab.id;
+      validateTab(tab);
+    }
+  }
 
+  console.log('state', state);
+
+  createContextMenu();
   saveState(state);
 }
 

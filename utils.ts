@@ -69,3 +69,11 @@ export function getState() {
     return browser.storage.sync.get(['colorChangerState']);
   }
 }
+
+export function tabsQuery(query: any) {
+  if (isChrome) {
+    return chrome.tabs.query(query);
+  } else {
+    return browser.tabs.query(query) as Promise<chrome.tabs.Tab[]>;
+  }
+}
