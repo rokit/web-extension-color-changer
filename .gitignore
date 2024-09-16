@@ -3,7 +3,7 @@ content-styles.css
 /node_modules
 /notes
 /zips
-/dist/*
+/dist
 .parcel-cache
 .env
 notes.txt
