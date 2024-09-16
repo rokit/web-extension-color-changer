@@ -10,6 +10,7 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
+  "background": { "scripts": ["background.ts"] },
   "content_scripts": [
     {
       "run_at": "document_start",
@@ -17,10 +18,9 @@
       "js": ["content.ts"]
     }
   ],
+  "permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
   "web_accessible_resources": ["icons/icon.svg"],
   "content_security_policy": "script-src 'self'; object-src 'self'; default-src 'self'",
-  "background": { "scripts": ["background.ts"] },
-  "permissions": ["storage", "tabs", "activeTab", "contextMenus", "<all_urls>"],
   "browser_action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
