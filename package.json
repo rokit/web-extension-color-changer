@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "prebuild": "rimraf ./dist/*",
     "copy-ff-manifest": "node ./scripts/copy-manifest.js manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js manifest.chrome.json",
     "build:ff": "npm run copy-ff-manifest && npm run build",
