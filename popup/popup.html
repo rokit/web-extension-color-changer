@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html>
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="square-color-picker.css" />
   </head>
 
   <body>
@@ -15,18 +16,26 @@
         <input type="checkbox" id="change-colors" name="change-colors" />
       </div>
 
-      <canvas id="cc-canvas"></canvas>
-
-      <div class="slide-container">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value="50"
-          class="slider"
-          id="lightness"
-        />
-        <div id="lightness-value">50%</div>
+      <div id="color-picker">
+        <div id="square-hsv">
+          <div id="hue"></div>
+          <div id="hue-overlay"></div>
+          <canvas id="square-canvas" draggable="false"></canvas>
+          <img
+            id="square-reticle"
+            src="/assets/reticle.svg"
+            draggable="false"
+          />
+          <img
+            id="hue-reticle"
+            src="/assets/hue-reticle.svg"
+            draggable="false"
+          />
+        </div>
+        <div id="hex-field">
+          <label for="hex" title="Enter hex code for color.">#:</label>
+          <input id="hex-input" type="text" value="FF0000" maxlength="6" />
+        </div>
       </div>
 
       <section id="colors">

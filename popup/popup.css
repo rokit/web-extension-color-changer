@@ -1,7 +1,3 @@
-/* button::-moz-focus-inner {
-  border: 0;
-} */
-
 * {
   margin: 0px;
   padding: 0px;
@@ -9,18 +5,12 @@
 
 html {
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 body {
   width: 410px;
   padding: 10px;
-}
-
-canvas {
-  margin: auto;
-  height: 300px;
-  width: 100%;
 }
 
 p {
@@ -65,7 +55,7 @@ button.active-btn {
 
 #colors {
   display: grid;
-  grid-template: [row1-start] "fore fore_swatch"auto [row1-end] [row2-start] "back back_swatch"auto [row2-end] [row3-start] "link link_swatch"auto [row3-end] / 80% auto;
+  grid-template: [row1-start] "fore fore_swatch" auto [row1-end] [row2-start] "back back_swatch" auto [row2-end] [row3-start] "link link_swatch" auto [row3-end] / 80% auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   margin-bottom: 10px;
@@ -116,21 +106,6 @@ button.active-btn {
 
 .slider:hover {
   opacity: 1;
-}
-
-.slider::-webkit-slider-thumb, .slider::-moz-range-thumb {
-  border-radius: 10000%;
-  width: 25px;
-  height: 25px;
-  cursor: pointer;
-}
-
-.slider::-webkit-slider-runnable-track, .slider::-moz-range-track {
-  width: 100%;
-  height: 2px;
-  cursor: pointer;
-  background: #333;
-  border-radius: 1.3px;
 }
 
 button#reset {

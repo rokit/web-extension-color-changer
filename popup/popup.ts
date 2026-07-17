@@ -13,13 +13,13 @@ let selectedValue = 0;
 let isHueMouseDown = false;
 let isSquareMouseDown = false;
 
-let colorPickerSize = 300;
+let colorPickerSize = 250;
 let cpHalfWidth = colorPickerSize * 0.5;
 let canvasSize = Math.round(colorPickerSize * 0.51);
-let hueReticleDistance = colorPickerSize * 0.485;
+let hueReticleDistance = colorPickerSize * 0.52;
 
 let squareHsvElement = document.getElementById("square-hsv")! as HTMLDivElement;
-let canvas = document.getElementById("cc-canvas")! as HTMLCanvasElement;
+let canvas = document.getElementById("square-canvas")! as HTMLCanvasElement;
 let hueElement = document.getElementById("hue")!;
 let squareReticleElement = document.getElementById("square-reticle")!;
 let hueReticleElement = document.getElementById("hue-reticle")!;
@@ -118,7 +118,6 @@ function updateSquareReticle(e: MouseEvent) {
     0
   );
 
-  // console.log("s", selectedSaturation, "v", selectedValue);
   hsvToHexInput();
   updateSquareReticleElement();
 }
@@ -199,6 +198,7 @@ function hsvToHexInput() {
 }
 
 ///////////////////////////////
+
 let changeColorsCheckbox = document.getElementById("change-colors")! as HTMLInputElement;
 let changeColorsLabel = document.getElementById("change-colors-label")! as HTMLInputElement;
 
