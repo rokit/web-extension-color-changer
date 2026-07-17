@@ -1,5 +1,5 @@
 import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CONTENT } from "./constants";
-import { Message, State } from "./interfaces";
+import { type Message, type State } from "./interfaces";
 import { runtimeSendMessage, shouldChangeColors } from "./utils";
 
 let ccStyle = document.createElement('style');

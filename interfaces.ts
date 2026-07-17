@@ -43,3 +43,13 @@ export interface CanvasSwatch {
   x: number;
   y: number;
 }
+
+export type Point = {
+  x: number;
+  y: number;
+}
+
+export type TabActiveInfo = {
+  tabId: number;
+  windowId: number;
+}

@@ -1,6 +1,26 @@
-import { Color, Message, State } from "./interfaces";
+import { type Color, type Message, type State } from "./interfaces";
 
 export const isChrome = /Chrome/.test(navigator.userAgent);
+
+const DEG_TO_RAD = Math.PI / 180;
+const RAD_TO_DEG = 180 / Math.PI;
+
+export function radToDeg(radians: number) { return radians * RAD_TO_DEG; }
+export function degToRad(deg: number) { return deg * DEG_TO_RAD; }
+
+export function mapRange(
+  value: number,
+  fromLow: number,
+  fromHigh: number,
+  toLow: number,
+  toHigh: number
+): number {
+  let highMinusLow = fromHigh - fromLow;
+  if (highMinusLow === 0) {
+    highMinusLow = Number.MIN_VALUE;
+  }
+  return toLow + ((value - fromLow) * (toHigh - toLow)) / highMinusLow;
+}
 
 export function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
   let color: Color = {

@@ -1,4 +1,4 @@
-import { State } from "./interfaces";
+import { type State } from "./interfaces";
 import { createColor } from "./utils";
 
 export const GET_STATE = "GET_STATE";

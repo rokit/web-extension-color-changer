@@ -1,6 +1,6 @@
 
 import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, CONTENT_CONNECTED, DEFAULT_STATE, FORE_BTN, GET_STATE, INVALID_TAB, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
-import { CanvasSwatch, Color, Message, State } from "./interfaces";
+import { type CanvasSwatch, type Color, type Message, type State, type TabActiveInfo } from "./interfaces";
 import { getState, saveState, setHslStrings, shouldChangeColors, tabsQuery } from "./utils";
 
 let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
@@ -145,7 +145,7 @@ function onReset() {
 
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
-function onTabActivated(tabInfo: chrome.tabs.TabActiveInfo) {
+function onTabActivated(tabInfo: TabActiveInfo) {
   logs && console.log('tab activated', tabInfo.tabId);
   state.activeTabId = tabInfo.tabId;
   saveState(state);
