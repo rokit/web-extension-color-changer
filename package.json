@@ -23,12 +23,10 @@
   },
   "homepage": "https://github.com/rokit/web-extension-color-changer#readme",
   "devDependencies": {
-    "@parcel/config-webextension": "^2.7.0",
-    "@types/chrome": "^0.0.200",
-    "@types/firefox-webext-browser": "^94.0.1",
-    "@types/node": "^18.11.9",
-    "dotenv": "^16.0.3",
-    "parcel": "^2.7.0",
-    "rimraf": "^3.0.2"
+    "@types/chrome": "^0.2.2",
+    "@types/firefox-webext-browser": "^143.0.0",
+    "@types/node": "^26.1.1",
+    "dotenv": "^17.4.2",
+    "rimraf": "^6.1.3"
   }
 }
