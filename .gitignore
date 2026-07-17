@@ -3,6 +3,8 @@ content-styles.css
 /notes
 /zips
 /dist
+/dist.bak
+/dist.vite
 .parcel-cache
 .env
 notes.md
