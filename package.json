@@ -5,7 +5,6 @@
   "types": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
     "preview": "vite preview",
     "copy-ff-manifest": "node ./scripts/copy-manifest.js src/manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js src/manifest.chrome.json",
