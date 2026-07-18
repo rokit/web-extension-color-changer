@@ -1,6 +1,6 @@
 import { type Color, type Message, type State } from "./interfaces";
 
-export const isChrome = /Chrome/.test(navigator.userAgent);
+// export const isChrome = /Chrome/.test(navigator.userAgent);
 
 const DEG_TO_RAD = Math.PI / 180;
 const RAD_TO_DEG = 180 / Math.PI;
