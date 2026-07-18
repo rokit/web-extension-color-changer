@@ -212,10 +212,10 @@ async function sendTabMessage(message: Message) {
   };
 
   try {
-    c.SHOULD_CONSOLE_LOG && console.log('Sent content message.');
+    c.SHOULD_CONSOLE_LOG && console.log('cc background - sendTabMessage: ', message);
     await browser.tabs.sendMessage(state.activeTabId, message);
   } catch (err) {
-    c.SHOULD_CONSOLE_LOG && console.log("sendTabMessage error", err);
+    c.SHOULD_CONSOLE_LOG && console.log("cc background - sendTabMessage error: ", err);
     state.lostConnection = true;
     browser.storage.sync.set({ 'colorChangerState': state });
   }
