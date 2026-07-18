@@ -6,7 +6,7 @@ export const UPDATE_CONTENT = "UPDATE_CONTENT";
 export const CHANGE_COLORS = "CHANGE_COLORS";
 export const SET_ACTIVE_BUTTON = "SET_ACTIVE_BUTTON";
 export const UPDATE_CHOSEN_COLOR = "UPDATE_CHOSEN_COLOR";
-export const CHANGE_LIGHTNESS = "CHANGE_LIGHTNESS";
+export const UPDATE_COLOR = "UPDATE_COLOR";
 export const RESET = "RESET";
 export const CONTENT_CONNECTED = "CONTENT_CONNECTED";
 export const INVALID_TAB = -9999;
@@ -21,11 +21,10 @@ export const COLOR_CHANGER_CLASS_NAME = "color-changer-v4";
 export const DEFAULT_STATE: State = {
   activeTabId: INVALID_TAB,
   activeTabHostname: "",
-  fg: createColor(0, 0, 80, 'zero'),
-  bg: createColor(0, 0, 25, 'zero'),
-  li: createColor(68, 80, 80, '2-6'),
+  fg: createColor(0, 0, 80),
+  bg: createColor(0, 0, 25),
+  li: createColor(68, 80, 80),
   activeBtn: FORE_BTN,
-  lightness: 80,
   hosts: [],
   lostConnection: false,
   invalidUrl: false,

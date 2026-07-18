@@ -5,23 +5,17 @@ export interface State {
   bg: Color;
   li: Color;
   activeBtn: string;
-  lightness: number;
   hosts: string[];
   lostConnection: boolean;
   invalidUrl: boolean;
 }
 
-export interface Swatch {
-  hue: number;
-  saturation: number;
-  lightness: number;
-  chosenId: string;
-}
-
 export interface Color {
-  swatch: Swatch,
-  hsl: string;
-  lightnessShift: string;
+  hue: number,
+  saturation: number,
+  value: number,
+  hsv: string;
+  valueShift: string;
   hueHovered: string;
   hueVisited: string;
   alpha: string;

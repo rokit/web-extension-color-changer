@@ -118,8 +118,9 @@ function updateSquareReticle(e: MouseEvent) {
     0
   );
 
-  hsvToHexInput();
+  let hex = hsvToHexInput();
   updateSquareReticleElement();
+  runtimeSendMessage({ message: c.UPDATE_COLOR, payload: hex });
 }
 
 function updateHueReticle(e: MouseEvent) {
@@ -139,8 +140,9 @@ function updateHueReticle(e: MouseEvent) {
   hueReticle.x = hueReticleDistance * Math.cos(angle);
   hueReticle.y = hueReticleDistance * Math.sin(angle);
 
-  hsvToHexInput();
+  let hex = hsvToHexInput();
   updateHueReticleElement();
+  runtimeSendMessage({ message: c.UPDATE_COLOR, payload: hex });
   drawColorPicker();
 }
 
@@ -195,6 +197,7 @@ function hsvToHexInput() {
   let hex = convert.hsv.hex(selectedHue, selectedSaturation, selectedValue);
   hexInputElement.classList.remove("hexError");
   hexInputElement.value = hex;
+  return hex;
 }
 
 ///////////////////////////////
@@ -246,9 +249,9 @@ async function setActiveColorButton(state: State) {
 async function updateUi() {
   let state: State = await runtimeSendMessage({ message: c.GET_STATE });
 
-  foreSwatch.style.background = state.fg.hsl;
-  backSwatch.style.background = state.bg.hsl;
-  linkSwatch.style.background = state.li.hsl;
+  foreSwatch.style.background = state.fg.hsv;
+  backSwatch.style.background = state.bg.hsv;
+  linkSwatch.style.background = state.li.hsv;
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
 

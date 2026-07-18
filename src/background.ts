@@ -63,15 +63,6 @@ function onChangeColors(changeColors: boolean) {
 
 function onSetActiveButton(button: string) {
   state.activeBtn = button;
-
-  if (button == c.FORE_BTN) {
-    state.lightness = state.fg.swatch.lightness;
-  } else if (button == c.BACK_BTN) {
-    state.lightness = state.bg.swatch.lightness;
-  } else if (button == c.LINK_BTN) {
-    state.lightness = state.li.swatch.lightness;
-  }
-
   saveState(state);
 }
 
@@ -132,7 +123,6 @@ function onReset() {
   state.bg = defaultState.bg;
   state.li = defaultState.li;
   state.activeBtn = defaultState.activeBtn;
-  state.lightness = defaultState.lightness;
   state.lostConnection = defaultState.lostConnection;
   state.invalidUrl = defaultState.invalidUrl;
 

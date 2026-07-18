@@ -30,9 +30,9 @@ function updateCss(state: State) {
   .${COLOR_CHANGER_CLASS_NAME} body,
   .${COLOR_CHANGER_CLASS_NAME} ${not}
   {
-    color: ${state.fg.hsl} !important;
-    background-color: ${state.bg.hsl} !important;
-    border-color: ${state.bg.lightnessShift} !important;
+    color: ${state.fg.hsv} !important;
+    background-color: ${state.bg.hsv} !important;
+    border-color: ${state.bg.valueShift} !important;
   }
 
   .${COLOR_CHANGER_CLASS_NAME}${notId} input,
@@ -44,19 +44,19 @@ function updateCss(state: State) {
   .${COLOR_CHANGER_CLASS_NAME}${notId} code,
   .${COLOR_CHANGER_CLASS_NAME}${notId} code *
   {
-    background-color: ${state.bg.lightnessShift} !important;
+    background-color: ${state.bg.valueShift} !important;
   }
 
   .${COLOR_CHANGER_CLASS_NAME}${notId} button,
   .${COLOR_CHANGER_CLASS_NAME}${notId} button *
   {
-    color: ${state.li.hsl} !important;
+    color: ${state.li.hsv} !important;
     background-color: transparent !important;
   }
   .${COLOR_CHANGER_CLASS_NAME}${notId} a,
   .${COLOR_CHANGER_CLASS_NAME}${notId} a *
   {
-    color: ${state.li.hsl} !important;
+    color: ${state.li.hsv} !important;
     background-color: transparent !important;
   }
   .${COLOR_CHANGER_CLASS_NAME}${notId} a:hover,

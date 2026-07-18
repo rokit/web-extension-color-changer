@@ -22,16 +22,13 @@ export function mapRange(
   return toLow + ((value - fromLow) * (toHigh - toLow)) / highMinusLow;
 }
 
-export function createColor(hue: number, saturation: number, lightness: number, chosenId: string): Color {
+export function createColor(hue: number, saturation: number, value: number) {
   let color: Color = {
-    swatch: {
-      hue,
-      saturation,
-      lightness,
-      chosenId,
-    },
-    hsl: "",
-    lightnessShift: "",
+    hue,
+    saturation,
+    value,
+    hsv: "",
+    valueShift: "",
     hueHovered: "",
     hueVisited: "",
     alpha: "",
@@ -41,15 +38,15 @@ export function createColor(hue: number, saturation: number, lightness: number, 
 }
 
 export function setHslStrings(color: Color) {
-  color.hsl = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%)`;
-  if (color.swatch.lightness >= 50) {
-    color.lightnessShift = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness - 10}%)`;
+  color.hsv = `hsl(${color.hue}, ${color.saturation}%, ${color.value}%)`;
+  if (color.value >= 50) {
+    color.valueShift = `hsl(${color.hue}, ${color.saturation}%, ${color.value - 10}%)`;
   } else {
-    color.lightnessShift = `hsl(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness + 10}%)`;
+    color.valueShift = `hsl(${color.hue}, ${color.saturation}%, ${color.value + 10}%)`;
   }
-  color.hueHovered = `hsl(${color.swatch.hue + 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
-  color.hueVisited = `hsl(${color.swatch.hue - 40 % 360}, ${color.swatch.saturation + 20}%, ${color.swatch.lightness}%)`;
-  color.alpha = `hsla(${color.swatch.hue}, ${color.swatch.saturation}%, ${color.swatch.lightness}%, 0.5)`;
+  color.hueHovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
+  color.hueVisited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
+  color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.value}%, 0.5)`;
 }
 
 export function shouldChangeColors(state: State): boolean {
