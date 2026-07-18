@@ -1,7 +1,7 @@
 
 import * as c from "./constants";
-import { type Color, type Message, type State, type TabActiveInfo } from "./interfaces";
-import { setHsvStrings, shouldChangeColors } from "./utils";
+import { type Message, type State, type TabActiveInfo } from "./interfaces";
+import { setHslStrings, shouldChangeColors } from "./utils";
 
 if (!globalThis.browser) {
   // @ts-ignore
@@ -76,19 +76,19 @@ function onUpdateColor(hue: number, saturation: number, value: number) {
       state.fg.hue = hue;
       state.fg.saturation = saturation;
       state.fg.value = value;
-      setHsvStrings(state.fg);
+      setHslStrings(state.fg);
     } break;
     case c.BACK_BTN: {
       state.bg.hue = hue;
       state.bg.saturation = saturation;
       state.bg.value = value;
-      setHsvStrings(state.bg);
+      setHslStrings(state.bg);
     } break;
     case c.LINK_BTN: {
       state.li.hue = hue;
       state.li.saturation = saturation;
       state.li.value = value;
-      setHsvStrings(state.li);
+      setHslStrings(state.li);
     } break;
     default: break;
   }

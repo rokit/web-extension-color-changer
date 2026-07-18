@@ -37,8 +37,8 @@ function updateCss(state: State) {
   .${c.COLOR_CHANGER_CLASS_NAME} body,
   .${c.COLOR_CHANGER_CLASS_NAME} ${not}
   {
-    color: ${state.fg.hsv} !important;
-    background-color: ${state.bg.hsv} !important;
+    color: ${state.fg.hsl} !important;
+    background-color: ${state.bg.hsl} !important;
     border-color: ${state.bg.valueShift} !important;
   }
 
@@ -57,13 +57,13 @@ function updateCss(state: State) {
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} button,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} button *
   {
-    color: ${state.li.hsv} !important;
+    color: ${state.li.hsl} !important;
     background-color: transparent !important;
   }
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a *
   {
-    color: ${state.li.hsv} !important;
+    color: ${state.li.hsl} !important;
     background-color: transparent !important;
   }
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:hover,

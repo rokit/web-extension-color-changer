@@ -1,3 +1,4 @@
+import convert from "color-convert";
 import { type Color, type Message, type State } from "./interfaces";
 
 // export const isChrome = /Chrome/.test(navigator.userAgent);
@@ -27,26 +28,31 @@ export function createColor(hue: number, saturation: number, value: number) {
     hue,
     saturation,
     value,
-    hsv: "",
+    hsl: "",
     valueShift: "",
     hueHovered: "",
     hueVisited: "",
     alpha: "",
   }
-  setHsvStrings(color);
+  setHslStrings(color);
   return color;
 }
 
-export function setHsvStrings(color: Color) {
-  color.hsv = `hsv(${color.hue}, ${color.saturation}%, ${color.value}%)`;
-  if (color.value >= 50) {
-    color.valueShift = `hsv(${color.hue}, ${color.saturation}%, ${color.value - 10}%)`;
+export function setHslStrings(color: Color) {
+  let hsl = convert.hsv.hsl(color.hue, color.saturation, color.value);
+  let h = hsl[0];
+  let s = hsl[1];
+  let l = hsl[2];
+
+  color.hsl = `hsl(${h}, ${s}%, ${l}%)`;
+  if (l >= 50) {
+    color.valueShift = `hsl(${h}, ${s}%, ${l - 10}%)`;
   } else {
-    color.valueShift = `hsv(${color.hue}, ${color.saturation}%, ${color.value + 10}%)`;
+    color.valueShift = `hsl(${h}, ${s}%, ${l + 10}%)`;
   }
-  color.hueHovered = `hsv(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
-  color.hueVisited = `hsv(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
-  color.alpha = `hsva(${color.hue}, ${color.saturation}%, ${color.value}%, 0.5)`;
+  color.hueHovered = `hsl(${h + 40 % 360}, ${s + 20}%, ${l}%)`;
+  color.hueVisited = `hsl(${h - 40 % 360}, ${s + 20}%, ${l}%)`;
+  color.alpha = `hsla(${h}, ${s}%, ${l}%, 0.5)`;
 }
 
 export function shouldChangeColors(state: State): boolean {

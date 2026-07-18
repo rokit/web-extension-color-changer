@@ -14,7 +14,7 @@ export interface Color {
   hue: number,
   saturation: number,
   value: number,
-  hsv: string;
+  hsl: string;
   valueShift: string;
   hueHovered: string;
   hueVisited: string;

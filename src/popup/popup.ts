@@ -282,9 +282,9 @@ function updateColorPickerFromState(state: State) {
 async function updateUi() {
   let state: State = await browser.runtime.sendMessage({ message: c.GET_STATE });
 
-  foreSwatch.style.background = state.fg.hsv;
-  backSwatch.style.background = state.bg.hsv;
-  linkSwatch.style.background = state.li.hsv;
+  foreSwatch.style.background = state.fg.hsl;
+  backSwatch.style.background = state.bg.hsl;
+  linkSwatch.style.background = state.li.hsl;
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
   setActiveColorButton(state);
