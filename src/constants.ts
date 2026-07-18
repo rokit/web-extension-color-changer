@@ -17,7 +17,7 @@ export const BACK_BTN = "back";
 export const LINK_BTN = "link";
 
 export const COLOR_CHANGER_STYLE_ID = "color-changer-style";
-export const COLOR_CHANGER_CLASS_NAME = "color-changer-v4";
+export const COLOR_CHANGER_CLASS_NAME = "color-changer-v5";
 
 export const DEFAULT_STATE: State = {
   activeTabId: INVALID_TAB,
