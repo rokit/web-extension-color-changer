@@ -10,7 +10,7 @@ export default defineConfig({
         outDir: resolve(__dirname, "dist"),
         emptyOutDir: true,
         minify: false,
-        rollupOptions: {
+        rolldownOptions: {
             input: {
                 popup: "popup/popup.html",
                 background: "background.ts",
