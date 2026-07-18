@@ -1,6 +1,8 @@
-import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CONTENT } from "./constants";
+import * as c from "./constants";
 import { type Message, type State } from "./interfaces";
 import { shouldChangeColors } from "./utils";
+
+c.SHOULD_CONSOLE_LOG && console.log('cc content - loaded content script');
 
 if (!globalThis.browser) {
   // @ts-ignore
@@ -8,7 +10,7 @@ if (!globalThis.browser) {
 }
 
 let ccStyle = document.createElement('style');
-ccStyle.id = COLOR_CHANGER_STYLE_ID;
+ccStyle.id = c.COLOR_CHANGER_STYLE_ID;
 
 let observer = new MutationObserver(classListChanged);
 let observerConfig = { attributes: true, attributeFilter: ["class"] };
@@ -31,53 +33,53 @@ function updateCss(state: State) {
   let notId = ":not(#increase-specificity)";
 
   css = `
-  .${COLOR_CHANGER_CLASS_NAME},
-  .${COLOR_CHANGER_CLASS_NAME} body,
-  .${COLOR_CHANGER_CLASS_NAME} ${not}
+  .${c.COLOR_CHANGER_CLASS_NAME},
+  .${c.COLOR_CHANGER_CLASS_NAME} body,
+  .${c.COLOR_CHANGER_CLASS_NAME} ${not}
   {
     color: ${state.fg.hsv} !important;
     background-color: ${state.bg.hsv} !important;
     border-color: ${state.bg.valueShift} !important;
   }
 
-  .${COLOR_CHANGER_CLASS_NAME}${notId} input,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} input *,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} textarea,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} textarea *,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} pre,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} pre *,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} code,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} code *
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} input,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} input *,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} textarea,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} textarea *,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} pre,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} pre *,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} code,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} code *
   {
     background-color: ${state.bg.valueShift} !important;
   }
 
-  .${COLOR_CHANGER_CLASS_NAME}${notId} button,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} button *
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} button,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} button *
   {
     color: ${state.li.hsv} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a *
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a *
   {
     color: ${state.li.hsv} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a:hover,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a:hover *
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:hover,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:hover *
   {
     color: ${state.li.hueHovered} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a:active,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a:active *
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:active,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:active *
   {
     color: ${state.li.hueVisited} !important;
     background-color: transparent !important;
   }
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a:visited,
-  .${COLOR_CHANGER_CLASS_NAME}${notId} a:visited *
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:visited,
+  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:visited *
   {
     color: ${state.li.hueVisited} !important;
     background-color: transparent !important;
@@ -91,8 +93,8 @@ function classListChanged(mutationList: MutationRecord[], obs: MutationObserver)
 
 function addClass() {
   let html = document.documentElement;
-  if (!html.classList.contains(COLOR_CHANGER_CLASS_NAME)) {
-    html.classList.add(COLOR_CHANGER_CLASS_NAME);
+  if (!html.classList.contains(c.COLOR_CHANGER_CLASS_NAME)) {
+    html.classList.add(c.COLOR_CHANGER_CLASS_NAME);
   }
 
   observer.observe(html, observerConfig);
@@ -100,7 +102,7 @@ function addClass() {
 
 function removeClass() {
   let html = document.documentElement;
-  html.classList.remove(COLOR_CHANGER_CLASS_NAME);
+  html.classList.remove(c.COLOR_CHANGER_CLASS_NAME);
   observer.disconnect();
 }
 
@@ -122,7 +124,7 @@ function updateContent(state: State) {
 
 function onMessage(message: Message, _sender: any, res: any) {
   switch (message.message) {
-    case UPDATE_CONTENT: {
+    case c.UPDATE_CONTENT: {
       updateContent(message.payload);
     }; break;
     default: break;
@@ -130,7 +132,7 @@ function onMessage(message: Message, _sender: any, res: any) {
 }
 
 async function init() {
-  let state = await browser.runtime.sendMessage({ message: GET_STATE });
+  let state = await browser.runtime.sendMessage({ message: c.GET_STATE });
   updateContent(state);
 }
 
