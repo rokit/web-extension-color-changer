@@ -21,7 +21,7 @@ let isSquareMouseDown = false;
 let colorPickerSize = 250;
 let cpHalfWidth = colorPickerSize * 0.5;
 let canvasSize = Math.round(colorPickerSize * 0.51);
-let hueReticleDistance = colorPickerSize * 0.52;
+let hueReticleDistance = colorPickerSize * 0.50;
 
 let squareHsvElement = document.getElementById("square-hsv")! as HTMLDivElement;
 let canvas = document.getElementById("square-canvas")! as HTMLCanvasElement;
@@ -75,7 +75,7 @@ hexInputElement.oninput = () => {
   hexInputValue = hexInputValue.replace(" ", "");
   hexInputElement.value = hexInputValue;
 
-  let regex = /^(?:[0-9a-fA-F]{3}){1,2}$/;
+  let regex = /^(?:[0-9a-fA-F]{6})$/;
   if (regex.test(hexInputValue)) {
     hexInputElement.classList.remove("hexError");
   } else {
@@ -90,6 +90,7 @@ hexInputElement.oninput = () => {
 
   updateReticlesFromHsv();
   drawColorPicker();
+  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
 }
 
 function updateReticlesFromHsv() {
