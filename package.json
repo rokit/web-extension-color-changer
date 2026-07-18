@@ -11,7 +11,8 @@
     "copy-ff-manifest": "node ./scripts/copy-manifest.js src/manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js src/manifest.chrome.json",
     "zip:ff": "node ./scripts/zip.js firefox",
-    "zip:chrome": "node ./scripts/zip.js chrome"
+    "zip:chrome": "node ./scripts/zip.js chrome",
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "dotenv": "^17.4.2",
     "rimraf": "^6.1.3",
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vitest": "^4.1.10"
   }
 }
