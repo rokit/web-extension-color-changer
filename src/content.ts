@@ -107,12 +107,13 @@ function removeClass() {
 }
 
 function updateContent(state: State) {
+  c.SHOULD_CONSOLE_LOG && console.log('update content state:', state);
   if (shouldChangeColors(state)) {
     updateCss(state);
 
     ccStyle.textContent = css;
 
-    if (!document.getElementById("color-changer-style")) {
+    if (!document.getElementById(c.COLOR_CHANGER_STYLE_ID)) {
       document.head.appendChild(ccStyle);
     }
 

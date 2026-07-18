@@ -26,7 +26,7 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
       // onUpdateChosenColor(message.payload);
     }; break;
     case c.UPDATE_COLOR: {
-      onChangeColor(message.payload);
+      onUpdateColor(message.payload.hue, message.payload.saturation, message.payload.value);
     }; break;
     case c.RESET: {
       onReset();
@@ -70,47 +70,28 @@ function onSetActiveButton(button: string) {
   browser.storage.sync.set({ 'colorChangerState': state });
 }
 
-function onUpdateChosenColor() {
-  // switch (state.activeBtn) {
-  //   case c.FORE_BTN: {
-  //     updateColor(state.fg, swatch);
-  //   } break;
-  //   case c.BACK_BTN: {
-  //     updateColor(state.bg, swatch);
-  //   } break;
-  //   case c.LINK_BTN: {
-  //     updateColor(state.li, swatch);
-  //   } break;
-  //   default: break;
-  // }
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  browser.storage.sync.set({ 'colorChangerState': state });
-}
-
-function updateColor(color: Color) {
-  // color.swatch.hue = swatch.hue;
-  // color.swatch.saturation = swatch.saturation;
-  // color.swatch.lightness = swatch.lightness;
-  // color.swatch.chosenId = swatch.id;
-  setHsvStrings(color);
-}
-
-function onChangeColor(color: string) {
-  // switch (state.activeBtn) {
-  //   case c.FORE_BTN: {
-  //     state.fg.swatch.lightness = lightness;
-  //     setHslStrings(state.fg);
-  //   } break;
-  //   case c.BACK_BTN: {
-  //     state.bg.swatch.lightness = lightness;
-  //     setHslStrings(state.bg);
-  //   } break;
-  //   case c.LINK_BTN: {
-  //     state.li.swatch.lightness = lightness;
-  //     setHslStrings(state.li);
-  //   } break;
-  //   default: break;
-  // }
+function onUpdateColor(hue: number, saturation: number, value: number) {
+  switch (state.activeBtn) {
+    case c.FORE_BTN: {
+      state.fg.hue = hue;
+      state.fg.saturation = saturation;
+      state.fg.value = value;
+      setHsvStrings(state.fg);
+    } break;
+    case c.BACK_BTN: {
+      state.bg.hue = hue;
+      state.bg.saturation = saturation;
+      state.bg.value = value;
+      setHsvStrings(state.bg);
+    } break;
+    case c.LINK_BTN: {
+      state.li.hue = hue;
+      state.li.saturation = saturation;
+      state.li.value = value;
+      setHsvStrings(state.li);
+    } break;
+    default: break;
+  }
 
   browser.storage.sync.set({ 'colorChangerState': state });
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });

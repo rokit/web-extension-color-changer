@@ -1,5 +1,5 @@
 import * as c from "../constants";
-import { type State } from "../interfaces";
+import { type Color, type State } from "../interfaces";
 import { shouldChangeColors } from "../utils";
 
 import { type Point } from "../interfaces";
@@ -88,6 +88,11 @@ hexInputElement.oninput = () => {
   selectedSaturation = hsv[1];
   selectedValue = hsv[2];
 
+  updateReticlesFromHsv();
+  drawColorPicker();
+}
+
+function updateReticlesFromHsv() {
   squareReticle.x = mapRange(selectedSaturation, 0, 100, 0, canvas.width);
   squareReticle.y = mapRange(selectedValue, 0, 100, canvas.height, 0);
   updateSquareReticleElement();
@@ -95,8 +100,6 @@ hexInputElement.oninput = () => {
   hueReticle.x = hueReticleDistance * Math.cos(degToRad(selectedHue));
   hueReticle.y = hueReticleDistance * Math.sin(degToRad(selectedHue));
   updateHueReticleElement();
-
-  drawColorPicker();
 }
 
 function updateSquareReticle(e: MouseEvent) {
@@ -123,9 +126,9 @@ function updateSquareReticle(e: MouseEvent) {
     0
   );
 
-  let hex = hsvToHexInput();
+  hsvToHexInput();
   updateSquareReticleElement();
-  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: hex });
+  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
 }
 
 function updateHueReticle(e: MouseEvent) {
@@ -145,9 +148,9 @@ function updateHueReticle(e: MouseEvent) {
   hueReticle.x = hueReticleDistance * Math.cos(angle);
   hueReticle.y = hueReticleDistance * Math.sin(angle);
 
-  let hex = hsvToHexInput();
+  hsvToHexInput();
   updateHueReticleElement();
-  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: hex });
+  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue, } });
   drawColorPicker();
 }
 
@@ -174,11 +177,9 @@ function updateHueReticleElement() {
 }
 
 function drawColorPicker() {
-  ctx.clearRect(0, 0, colorPickerSize, colorPickerSize);
-
   const cwidth = canvas.width;
-  const imgData = ctx.createImageData(cwidth, cwidth);
-  const data = imgData.data;
+  ctx.clearRect(0, 0, cwidth, cwidth);
+  const imageData = ctx.createImageData(cwidth, cwidth);
 
   for (let y = 0; y < cwidth; y++) {
     for (let x = 0; x < cwidth; x++) {
@@ -188,21 +189,20 @@ function drawColorPicker() {
 
       const pixelIndex = (y * cwidth + x) * 4;
 
-      data[pixelIndex] = rgb[0];
-      data[pixelIndex + 1] = rgb[1];
-      data[pixelIndex + 2] = rgb[2];
-      data[pixelIndex + 3] = 255;
+      imageData.data[pixelIndex] = rgb[0];
+      imageData.data[pixelIndex + 1] = rgb[1];
+      imageData.data[pixelIndex + 2] = rgb[2];
+      imageData.data[pixelIndex + 3] = 255;
     }
   }
 
-  ctx.putImageData(imgData, 0, 0);
+  ctx.putImageData(imageData, 0, 0);
 }
 
 function hsvToHexInput() {
   let hex = convert.hsv.hex(selectedHue, selectedSaturation, selectedValue);
   hexInputElement.classList.remove("hexError");
   hexInputElement.value = hex;
-  return hex;
 }
 
 ///////////////////////////////
@@ -251,6 +251,34 @@ async function setActiveColorButton(state: State) {
   document.getElementById(state.activeBtn)!.classList.add("active-btn");
 }
 
+function updateColorPickerFromState(state: State) {
+  switch (state.activeBtn) {
+    case c.FORE_BTN: {
+      let { hue, value, saturation } = state.fg;
+      selectedHue = hue;
+      selectedValue = value;
+      selectedSaturation = saturation;
+    } break;
+    case c.BACK_BTN: {
+      let { hue, value, saturation } = state.bg;
+      selectedHue = hue;
+      selectedValue = value;
+      selectedSaturation = saturation;
+    } break;
+    case c.LINK_BTN: {
+      let { hue, value, saturation } = state.li;
+      selectedHue = hue;
+      selectedValue = value;
+      selectedSaturation = saturation;
+    } break;
+    default: break;
+  }
+
+  hsvToHexInput();
+  updateReticlesFromHsv();
+  drawColorPicker();
+}
+
 async function updateUi() {
   let state: State = await browser.runtime.sendMessage({ message: c.GET_STATE });
 
@@ -259,6 +287,8 @@ async function updateUi() {
   linkSwatch.style.background = state.li.hsv;
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
+  setActiveColorButton(state);
+  updateColorPickerFromState(state);
 
   if (state.activeTabId === c.INVALID_TAB) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
@@ -273,8 +303,6 @@ async function updateUi() {
     changeColorsCheckbox.removeAttribute("disabled");
     changeColorsLabel.textContent = "Change Colors";
   }
-
-  setActiveColorButton(state);
 }
 
 updateDocumentCpCenter();
