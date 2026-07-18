@@ -1,30 +1,30 @@
 
-import { BACK_BTN, CHANGE_COLORS, CHANGE_LIGHTNESS, CONTENT_CONNECTED, DEFAULT_STATE, FORE_BTN, GET_STATE, INVALID_TAB, LINK_BTN, RESET, SET_ACTIVE_BUTTON, UPDATE_CHOSEN_COLOR, UPDATE_CONTENT } from "./constants";
-import { type CanvasSwatch, type Color, type Message, type State, type TabActiveInfo } from "./interfaces";
+import * as c from "./constants";
+import { type Color, type Message, type State, type TabActiveInfo } from "./interfaces";
 import { getState, saveState, setHslStrings, shouldChangeColors, tabsQuery } from "./utils";
 
-let state: State = JSON.parse(JSON.stringify(DEFAULT_STATE));
-const logs = false;
+let state: State = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
+const logs = true;
 
 // --------------------------------------------------------------------------------------------- actions
 function onMessage(message: Message, _sender: any, sendResponse: any) {
   switch (message.message) {
-    case GET_STATE: {
+    case c.GET_STATE: {
       sendResponse(state)
     }; break;
-    case CHANGE_COLORS: {
+    case c.CHANGE_COLORS: {
       onChangeColors(message.payload);
     }; break;
-    case SET_ACTIVE_BUTTON: {
+    case c.SET_ACTIVE_BUTTON: {
       onSetActiveButton(message.payload);
     }; break;
-    case UPDATE_CHOSEN_COLOR: {
-      onUpdateChosenColor(message.payload);
+    case c.UPDATE_CHOSEN_COLOR: {
+      // onUpdateChosenColor(message.payload);
     }; break;
-    case CHANGE_LIGHTNESS: {
-      onChangeLightness(message.payload);
+    case c.UPDATE_COLOR: {
+      onChangeColor(message.payload);
     }; break;
-    case RESET: {
+    case c.RESET: {
       onReset();
     }; break;
     // case CONTENT_CONNECTED: {
@@ -57,70 +57,68 @@ function onChangeColors(changeColors: boolean) {
   }
 
   updateContextMenu();
-  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
   saveState(state);
 }
 
 function onSetActiveButton(button: string) {
   state.activeBtn = button;
 
-  if (button == FORE_BTN) {
+  if (button == c.FORE_BTN) {
     state.lightness = state.fg.swatch.lightness;
-  } else if (button == BACK_BTN) {
+  } else if (button == c.BACK_BTN) {
     state.lightness = state.bg.swatch.lightness;
-  } else if (button == LINK_BTN) {
+  } else if (button == c.LINK_BTN) {
     state.lightness = state.li.swatch.lightness;
   }
 
   saveState(state);
 }
 
-function onUpdateChosenColor(swatch: CanvasSwatch) {
-  switch (state.activeBtn) {
-    case FORE_BTN: {
-      updateColor(state.fg, swatch);
-    } break;
-    case BACK_BTN: {
-      updateColor(state.bg, swatch);
-    } break;
-    case LINK_BTN: {
-      updateColor(state.li, swatch);
-    } break;
-    default: break;
-  }
-  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+function onUpdateChosenColor() {
+  // switch (state.activeBtn) {
+  //   case c.FORE_BTN: {
+  //     updateColor(state.fg, swatch);
+  //   } break;
+  //   case c.BACK_BTN: {
+  //     updateColor(state.bg, swatch);
+  //   } break;
+  //   case c.LINK_BTN: {
+  //     updateColor(state.li, swatch);
+  //   } break;
+  //   default: break;
+  // }
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
   saveState(state);
 }
 
-function updateColor(color: Color, swatch: CanvasSwatch) {
-  color.swatch.hue = swatch.hue;
-  color.swatch.saturation = swatch.saturation;
-  color.swatch.lightness = swatch.lightness;
-  color.swatch.chosenId = swatch.id;
+function updateColor(color: Color) {
+  // color.swatch.hue = swatch.hue;
+  // color.swatch.saturation = swatch.saturation;
+  // color.swatch.lightness = swatch.lightness;
+  // color.swatch.chosenId = swatch.id;
   setHslStrings(color);
 }
 
-function onChangeLightness(lightness: number) {
-  state.lightness = lightness;
-
-  switch (state.activeBtn) {
-    case FORE_BTN: {
-      state.fg.swatch.lightness = lightness;
-      setHslStrings(state.fg);
-    } break;
-    case BACK_BTN: {
-      state.bg.swatch.lightness = lightness;
-      setHslStrings(state.bg);
-    } break;
-    case LINK_BTN: {
-      state.li.swatch.lightness = lightness;
-      setHslStrings(state.li);
-    } break;
-    default: break;
-  }
+function onChangeColor(color: string) {
+  // switch (state.activeBtn) {
+  //   case c.FORE_BTN: {
+  //     state.fg.swatch.lightness = lightness;
+  //     setHslStrings(state.fg);
+  //   } break;
+  //   case c.BACK_BTN: {
+  //     state.bg.swatch.lightness = lightness;
+  //     setHslStrings(state.bg);
+  //   } break;
+  //   case c.LINK_BTN: {
+  //     state.li.swatch.lightness = lightness;
+  //     setHslStrings(state.li);
+  //   } break;
+  //   default: break;
+  // }
 
   saveState(state);
-  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
 }
 
 /** Sets back to defaults. Does not reset:
@@ -128,7 +126,7 @@ function onChangeLightness(lightness: number) {
  * activeTabHostname
 */
 function onReset() {
-  let defaultState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  let defaultState = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
   state.hosts = defaultState.hosts;
   state.fg = defaultState.fg;
   state.bg = defaultState.bg;
@@ -139,7 +137,7 @@ function onReset() {
   state.invalidUrl = defaultState.invalidUrl;
 
   updateContextMenu();
-  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
   saveState(state);
 }
 
@@ -155,7 +153,7 @@ function onTabActivated(tabInfo: TabActiveInfo) {
 function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
   logs && console.log('tabUdpated', tab);
   logs && console.log('changeInfo', changeInfo);
-  if (state.activeTabId === INVALID_TAB) {
+  if (state.activeTabId === c.INVALID_TAB) {
     // Tab ID can be invalid if the browser was first loaded.
     state.activeTabId = tabId;
     validateTab(tab);
@@ -202,7 +200,7 @@ function validateTab(tab: chrome.tabs.Tab) {
   saveState(state);
 
   updateContextMenu();
-  sendTabMessage({ message: UPDATE_CONTENT, payload: state });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
 }
 
 function setInvalidUrl() {
@@ -231,7 +229,7 @@ async function sendTabMessage(message: Message) {
 // --------------------------------------------------------------------------------------------- context menu
 function createContextMenu() {
   let menu: object = {
-    id: CHANGE_COLORS,
+    id: c.CHANGE_COLORS,
     title: "Change Colors",
     type: "checkbox",
     checked: shouldChangeColors(state),
@@ -244,13 +242,13 @@ function createContextMenu() {
 }
 
 function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chrome.tabs.Tab) {
-  if (info.menuItemId === CHANGE_COLORS) {
+  if (info.menuItemId === c.CHANGE_COLORS) {
     onChangeColors(!!info.checked)
   }
 }
 
 function updateContextMenu() {
-  chrome.contextMenus.update(CHANGE_COLORS, { checked: shouldChangeColors(state) });
+  chrome.contextMenus.update(c.CHANGE_COLORS, { checked: shouldChangeColors(state) });
 }
 
 // --------------------------------------------------------------------------------------------- installed
@@ -288,7 +286,7 @@ async function initServiceWorker() {
   }
 
   // Initialize tabs.
-  state.activeTabId = INVALID_TAB;
+  state.activeTabId = c.INVALID_TAB;
   state.activeTabHostname = "";
 
   let tabs = await tabsQuery({ currentWindow: true, active: true });
