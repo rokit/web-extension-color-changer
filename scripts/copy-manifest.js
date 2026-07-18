@@ -8,7 +8,7 @@ if (args.length === 0) {
 }
 
 const source = args[0];
-const manifestJson = "manifest.json";
+const manifestJson = "dist/manifest.json";
 
 // copy contents from source file to destination file
 fs.copyFile(source, manifestJson, (error) => {
@@ -17,5 +17,5 @@ fs.copyFile(source, manifestJson, (error) => {
     return;
   }
 
-  console.log(`Copied contents of ${source} to ${manifestJson}`);
+  console.log(`Copied ${source} to ${manifestJson}`);
 });
