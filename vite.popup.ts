@@ -14,7 +14,6 @@ export default defineConfig({
             input: {
                 popup: "popup/popup.html",
                 background: "background.ts",
-                content: "content.ts",
             },
             output: {
                 entryFileNames: (assetInfo) => {

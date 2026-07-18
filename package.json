@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "copy-ff-manifest": "node ./scripts/copy-manifest.js src/manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js src/manifest.chrome.json",
-    "build:ff": "tsc && vite build && npm run copy-ff-manifest",
+    "build:ff": "tsc && vite build --config vite.popup.ts && vite build --config vite.content.ts && npm run copy-ff-manifest",
     "build:chrome": "npm run copy-chrome-manifest && npm run build",
     "zip:ff": "node ./scripts/zip.js firefox",
     "zip:chrome": "node ./scripts/zip.js chrome"
