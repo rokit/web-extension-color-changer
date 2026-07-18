@@ -1,16 +1,9 @@
 import { expect, test } from "vitest";
-import { hexToHsv, hsvToHex } from "./src/utils";
-
-// test("conversions are the same", () => {
-//   let hex = "9FCACB";
-//   let hsv = convert.hex.hsv(hex);
-//   let newHex = convert.hsv.hex(hsv);
-//   expect(hex).toBe(newHex);
-// });
+import convert from "color-convert";
 
 test("round-trip conversion matches original", () => {
   let hex1 = "9FCACB";
-  let hsv = hexToHsv(hex1);
-  let hex2 = hsvToHex(hsv.h, hsv.s, hsv.v);
+  let hsv = convert.hex.hsv.raw(hex1);
+  let hex2 = convert.hsv.hex(hsv);
   expect(hex1).toBe(hex2);
 });

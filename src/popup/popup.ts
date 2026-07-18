@@ -83,7 +83,7 @@ hexInputElement.oninput = () => {
     return;
   }
 
-  let hsv = convert.hex.hsv(hexInputValue);
+  let hsv = convert.hex.hsv.raw(hexInputValue);
   selectedHue = hsv[0];
   selectedSaturation = hsv[1];
   selectedValue = hsv[2];

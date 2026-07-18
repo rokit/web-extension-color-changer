@@ -39,7 +39,7 @@ export function createColor(hue: number, saturation: number, value: number) {
 }
 
 export function setHslStrings(color: Color) {
-  let hsl = convert.hsv.hsl(color.hue, color.saturation, color.value);
+  let hsl = convert.hsv.hsl.raw(color.hue, color.saturation, color.value);
   let h = hsl[0];
   let s = hsl[1];
   let l = hsl[2];
