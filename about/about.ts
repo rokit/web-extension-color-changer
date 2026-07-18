@@ -5,7 +5,7 @@ const icon = <HTMLImageElement>document.getElementById('icon')!;
 const greeting = document.getElementById('greeting')!;
 
 // set image src from web_accessible_resources
-icon.src = chrome.extension.getURL("icons/icon.svg");
+icon.src = browser.extension.getURL("icons/icon.svg");
 
 // set greeting
 switch (reason) {

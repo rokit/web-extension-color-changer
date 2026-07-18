@@ -1,6 +1,11 @@
 import { COLOR_CHANGER_CLASS_NAME, COLOR_CHANGER_STYLE_ID, GET_STATE, UPDATE_CONTENT } from "./constants";
 import { type Message, type State } from "./interfaces";
-import { runtimeSendMessage, shouldChangeColors } from "./utils";
+import { shouldChangeColors } from "./utils";
+
+if (!globalThis.browser) {
+  // @ts-ignore
+  globalThis.browser = chrome;
+}
 
 let ccStyle = document.createElement('style');
 ccStyle.id = COLOR_CHANGER_STYLE_ID;
@@ -125,10 +130,10 @@ function onMessage(message: Message, _sender: any, res: any) {
 }
 
 async function init() {
-  let state = await runtimeSendMessage({ message: GET_STATE });
+  let state = await browser.runtime.sendMessage({ message: GET_STATE });
   updateContent(state);
 }
 
-chrome.runtime.onMessage.addListener(onMessage);
+browser.runtime.onMessage.addListener(onMessage);
 
 init();

@@ -1,7 +1,12 @@
 
 import * as c from "./constants";
 import { type Color, type Message, type State, type TabActiveInfo } from "./interfaces";
-import { getState, saveState, setHslStrings, shouldChangeColors, tabsQuery } from "./utils";
+import { setHslStrings, shouldChangeColors } from "./utils";
+
+if (!globalThis.browser) {
+  // @ts-ignore
+  globalThis.browser = chrome;
+}
 
 let state: State = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
 
@@ -28,7 +33,7 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     }; break;
     // case CONTENT_CONNECTED: {
     //   state.lostConnection = false;
-    //   saveState(state);
+    //   browser.storage.sync.set({ 'colorChangerState': state });
     // }; break;
     default: break;
   }
@@ -57,12 +62,12 @@ function onChangeColors(changeColors: boolean) {
 
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 }
 
 function onSetActiveButton(button: string) {
   state.activeBtn = button;
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 }
 
 function onUpdateChosenColor() {
@@ -79,7 +84,7 @@ function onUpdateChosenColor() {
   //   default: break;
   // }
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 }
 
 function updateColor(color: Color) {
@@ -107,7 +112,7 @@ function onChangeColor(color: string) {
   //   default: break;
   // }
 
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
 }
 
@@ -127,19 +132,20 @@ function onReset() {
 
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 }
 
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
-function onTabActivated(tabInfo: TabActiveInfo) {
+async function onTabActivated(tabInfo: TabActiveInfo) {
   c.SHOULD_CONSOLE_LOG && console.log('tab activated', tabInfo.tabId);
   state.activeTabId = tabInfo.tabId;
-  saveState(state);
-  chrome.tabs.get(tabInfo.tabId, validateTab);
+  browser.storage.sync.set({ 'colorChangerState': state });
+  let tab = await browser.tabs.get(tabInfo.tabId);
+  validateTab(tab);
 }
 
-function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
+function onTabUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab) {
   c.SHOULD_CONSOLE_LOG && console.log('tabUdpated', tab);
   c.SHOULD_CONSOLE_LOG && console.log('changeInfo', changeInfo);
   if (state.activeTabId === c.INVALID_TAB) {
@@ -152,11 +158,11 @@ function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
 }
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
-function validateTab(tab: chrome.tabs.Tab) {
+function validateTab(tab: browser.tabs.Tab) {
   c.SHOULD_CONSOLE_LOG && console.log('validating tab', tab);
   state.invalidUrl = false;
   state.lostConnection = false;
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 
   // c.SHOULD_CONSOLE_LOG && console.log('validate tab', tab);
   if (!tab.url) {
@@ -186,7 +192,7 @@ function validateTab(tab: chrome.tabs.Tab) {
   }
 
   state.activeTabHostname = url.hostname;
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
@@ -195,7 +201,7 @@ function validateTab(tab: chrome.tabs.Tab) {
 function setInvalidUrl() {
   state.activeTabHostname = "";
   state.invalidUrl = true;
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 }
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
@@ -207,11 +213,11 @@ async function sendTabMessage(message: Message) {
 
   try {
     c.SHOULD_CONSOLE_LOG && console.log('Sent content message.');
-    await chrome.tabs.sendMessage(state.activeTabId, message);
+    await browser.tabs.sendMessage(state.activeTabId, message);
   } catch (err) {
     c.SHOULD_CONSOLE_LOG && console.log("sendTabMessage error", err);
     state.lostConnection = true;
-    saveState(state);
+    browser.storage.sync.set({ 'colorChangerState': state });
   }
 }
 
@@ -224,20 +230,20 @@ function createContextMenu() {
     checked: shouldChangeColors(state),
   };
 
-  chrome.contextMenus.removeAll();
-  chrome.contextMenus.create(menu);
-  chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
-  chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
+  browser.contextMenus.removeAll();
+  browser.contextMenus.create(menu);
+  browser.contextMenus.onClicked.removeListener(onContextMenuClicked);
+  browser.contextMenus.onClicked.addListener(onContextMenuClicked);
 }
 
-function onContextMenuClicked(info: chrome.contextMenus.OnClickData, _tab?: chrome.tabs.Tab) {
+function onContextMenuClicked(info: browser.contextMenus.OnClickData, _tab?: browser.tabs.Tab) {
   if (info.menuItemId === c.CHANGE_COLORS) {
     onChangeColors(!!info.checked)
   }
 }
 
 function updateContextMenu() {
-  chrome.contextMenus.update(c.CHANGE_COLORS, { checked: shouldChangeColors(state) });
+  browser.contextMenus.update(c.CHANGE_COLORS, { checked: shouldChangeColors(state) });
 }
 
 // --------------------------------------------------------------------------------------------- installed
@@ -252,24 +258,24 @@ function onInstalled(details: any) {
 }
 
 // function showAboutPage(reason: string) {
-//   chrome.tabs.create({ url: chrome.runtime.getURL(`about/about.html?reason=${reason}`) });
+//   browser.tabs.create({ url: browser.runtime.getURL(`about/about.html?reason=${reason}`) });
 // }
 
 // --------------------------------------------------------------------------------------------- storage
 function clearStorage() {
-  chrome.storage.sync.remove("colorChangerState");
+  browser.storage.sync.remove("colorChangerState");
 }
 
 // --------------------------------------------------------------------------------------------- listeners
-chrome.tabs.onActivated.addListener(onTabActivated);
-chrome.tabs.onUpdated.addListener(onTabUpdated);
-chrome.runtime.onMessage.addListener(onMessage);
-chrome.runtime.onInstalled.addListener(onInstalled);
+browser.tabs.onActivated.addListener(onTabActivated);
+browser.tabs.onUpdated.addListener(onTabUpdated);
+browser.runtime.onMessage.addListener(onMessage);
+browser.runtime.onInstalled.addListener(onInstalled);
 
 // --------------------------------------------------------------------------------------------- init
 /** Get state from storage if it exists. If not, create default state. */
 async function initServiceWorker() {
-  let storage = await getState();
+  let storage = await browser.storage.sync.get(['colorChangerState']);
   if (storage?.colorChangerState) {
     state = storage.colorChangerState;
   }
@@ -278,7 +284,8 @@ async function initServiceWorker() {
   state.activeTabId = c.INVALID_TAB;
   state.activeTabHostname = "";
 
-  let tabs = await tabsQuery({ currentWindow: true, active: true });
+  let tabs = await browser.tabs.query({ currentWindow: true, active: true });
+
   if (tabs.length > 0) {
     let tab = tabs[0];
     if (tab.id) {
@@ -290,14 +297,14 @@ async function initServiceWorker() {
   c.SHOULD_CONSOLE_LOG && console.log('state', state);
 
   createContextMenu();
-  saveState(state);
+  browser.storage.sync.set({ 'colorChangerState': state });
 }
 
 initServiceWorker();
 
 // can potentially use this to check for errors
 // function hasError() {
-//   if (bIsChrome && chrome.runtime.lastError) {
+//   if (bIsChrome && browser.runtime.lastError) {
 //       return true;
 //   } else if (browser.runtime.lastError) {
 //     return true;

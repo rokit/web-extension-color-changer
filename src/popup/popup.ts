@@ -1,10 +1,15 @@
 import * as c from "../constants";
 import { type State } from "../interfaces";
-import { runtimeSendMessage, shouldChangeColors } from "../utils";
+import { shouldChangeColors } from "../utils";
 
 import { type Point } from "../interfaces";
 import convert from 'color-convert';
 import { degToRad, radToDeg, mapRange } from "../utils";
+
+if (!globalThis.browser) {
+  // @ts-ignore
+  globalThis.browser = chrome;
+}
 
 let selectedHue = 0;
 let selectedSaturation = 0;
@@ -120,7 +125,7 @@ function updateSquareReticle(e: MouseEvent) {
 
   let hex = hsvToHexInput();
   updateSquareReticleElement();
-  runtimeSendMessage({ message: c.UPDATE_COLOR, payload: hex });
+  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: hex });
 }
 
 function updateHueReticle(e: MouseEvent) {
@@ -142,7 +147,7 @@ function updateHueReticle(e: MouseEvent) {
 
   let hex = hsvToHexInput();
   updateHueReticleElement();
-  runtimeSendMessage({ message: c.UPDATE_COLOR, payload: hex });
+  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: hex });
   drawColorPicker();
 }
 
@@ -215,21 +220,21 @@ let backSwatch = document.getElementById(`${c.BACK_BTN}-swatch`)! as HTMLDivElem
 let linkSwatch = document.getElementById(`${c.LINK_BTN}-swatch`)! as HTMLDivElement;
 
 changeColorsCheckbox.onclick = () => {
-  runtimeSendMessage({ message: c.CHANGE_COLORS, payload: changeColorsCheckbox.checked });
+  browser.runtime.sendMessage({ message: c.CHANGE_COLORS, payload: changeColorsCheckbox.checked });
 };
 
 resetBtn.onclick = function () {
-  runtimeSendMessage({ message: c.RESET });
+  browser.runtime.sendMessage({ message: c.RESET });
 }
 
 function onClickForeground() {
-  runtimeSendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.FORE_BTN });
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.FORE_BTN });
 }
 function onClickBackground() {
-  runtimeSendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.BACK_BTN });
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.BACK_BTN });
 }
 function onClickLink() {
-  runtimeSendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_BTN });
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_BTN });
 }
 
 foreSwatch.onclick = onClickForeground;
@@ -247,7 +252,7 @@ async function setActiveColorButton(state: State) {
 }
 
 async function updateUi() {
-  let state: State = await runtimeSendMessage({ message: c.GET_STATE });
+  let state: State = await browser.runtime.sendMessage({ message: c.GET_STATE });
 
   foreSwatch.style.background = state.fg.hsv;
   backSwatch.style.background = state.bg.hsv;
@@ -277,6 +282,6 @@ updateSquareReticleElement();
 updateHueReticleElement();
 drawColorPicker();
 
-chrome.storage.onChanged.addListener(updateUi);
+browser.storage.onChanged.addListener(updateUi);
 
 window.onload = updateUi;
