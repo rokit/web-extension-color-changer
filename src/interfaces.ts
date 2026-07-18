@@ -32,18 +32,6 @@ export interface Message {
   payload?: any;
 }
 
-export interface CanvasSwatch {
-  hovered: boolean;
-  hsl: string;
-  hue: number;
-  id: string;
-  lightness: number;
-  radius: number;
-  saturation: number;
-  x: number;
-  y: number;
-}
-
 export type Point = {
   x: number;
   y: number;
