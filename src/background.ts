@@ -4,7 +4,6 @@ import { type Color, type Message, type State, type TabActiveInfo } from "./inte
 import { getState, saveState, setHslStrings, shouldChangeColors, tabsQuery } from "./utils";
 
 let state: State = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
-const logs = true;
 
 // --------------------------------------------------------------------------------------------- actions
 function onMessage(message: Message, _sender: any, sendResponse: any) {
@@ -39,14 +38,14 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
 }
 
 function onChangeColors(changeColors: boolean) {
-  logs && console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
+  c.SHOULD_CONSOLE_LOG && console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
   if (!state.activeTabHostname) {
-    logs && console.log('onChangeColors - No hostname');
+    c.SHOULD_CONSOLE_LOG && console.log('onChangeColors - No hostname');
     return
   };
 
   if (!state.activeTabId) {
-    logs && console.log('onChangeColors - No tab ID.');
+    c.SHOULD_CONSOLE_LOG && console.log('onChangeColors - No tab ID.');
     return;
   }
 
@@ -117,7 +116,7 @@ function onChangeColor(color: string) {
  * activeTabHostname
 */
 function onReset() {
-  let defaultState = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
+  let defaultState = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
   state.hosts = defaultState.hosts;
   state.fg = defaultState.fg;
   state.bg = defaultState.bg;
@@ -134,15 +133,15 @@ function onReset() {
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
 function onTabActivated(tabInfo: TabActiveInfo) {
-  logs && console.log('tab activated', tabInfo.tabId);
+  c.SHOULD_CONSOLE_LOG && console.log('tab activated', tabInfo.tabId);
   state.activeTabId = tabInfo.tabId;
   saveState(state);
   chrome.tabs.get(tabInfo.tabId, validateTab);
 }
 
 function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
-  logs && console.log('tabUdpated', tab);
-  logs && console.log('changeInfo', changeInfo);
+  c.SHOULD_CONSOLE_LOG && console.log('tabUdpated', tab);
+  c.SHOULD_CONSOLE_LOG && console.log('changeInfo', changeInfo);
   if (state.activeTabId === c.INVALID_TAB) {
     // Tab ID can be invalid if the browser was first loaded.
     state.activeTabId = tabId;
@@ -154,34 +153,34 @@ function onTabUpdated(tabId: number, changeInfo: any, tab: chrome.tabs.Tab) {
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: chrome.tabs.Tab) {
-  logs && console.log('validating tab', tab);
+  c.SHOULD_CONSOLE_LOG && console.log('validating tab', tab);
   state.invalidUrl = false;
   state.lostConnection = false;
   saveState(state);
 
-  // logs && console.log('validate tab', tab);
+  // c.SHOULD_CONSOLE_LOG && console.log('validate tab', tab);
   if (!tab.url) {
     // This may be null until the tab is updated.
     return;
   };
 
   let url = new URL(tab.url);
-  logs && console.log('url.hostname', url.hostname);
+  c.SHOULD_CONSOLE_LOG && console.log('url.hostname', url.hostname);
 
   if (!url.hostname) {
-    logs && console.log('Invalid hostname', url.hostname);
+    c.SHOULD_CONSOLE_LOG && console.log('Invalid hostname', url.hostname);
     setInvalidUrl()
     return;
   }
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
-    logs && console.log('Invalid protocol', url.protocol);
+    c.SHOULD_CONSOLE_LOG && console.log('Invalid protocol', url.protocol);
     setInvalidUrl()
     return;
   }
 
   if (url.hostname === "addons.mozilla.org") {
-    logs && console.log('Invalid hostname', url.hostname);
+    c.SHOULD_CONSOLE_LOG && console.log('Invalid hostname', url.hostname);
     setInvalidUrl()
     return;
   }
@@ -202,15 +201,15 @@ function setInvalidUrl() {
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 async function sendTabMessage(message: Message) {
   if (!state.activeTabId) {
-    logs && console.log('No active tab ID.');
+    c.SHOULD_CONSOLE_LOG && console.log('No active tab ID.');
     return
   };
 
   try {
-    logs && console.log('Sent content message.');
+    c.SHOULD_CONSOLE_LOG && console.log('Sent content message.');
     await chrome.tabs.sendMessage(state.activeTabId, message);
   } catch (err) {
-    logs && console.log("sendTabMessage error", err);
+    c.SHOULD_CONSOLE_LOG && console.log("sendTabMessage error", err);
     state.lostConnection = true;
     saveState(state);
   }
@@ -288,7 +287,7 @@ async function initServiceWorker() {
     }
   }
 
-  logs && console.log('state', state);
+  c.SHOULD_CONSOLE_LOG && console.log('state', state);
 
   createContextMenu();
   saveState(state);
