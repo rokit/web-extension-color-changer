@@ -33,20 +33,20 @@ export function createColor(hue: number, saturation: number, value: number) {
     hueVisited: "",
     alpha: "",
   }
-  setHslStrings(color);
+  setHsvStrings(color);
   return color;
 }
 
-export function setHslStrings(color: Color) {
-  color.hsv = `hsl(${color.hue}, ${color.saturation}%, ${color.value}%)`;
+export function setHsvStrings(color: Color) {
+  color.hsv = `hsv(${color.hue}, ${color.saturation}%, ${color.value}%)`;
   if (color.value >= 50) {
-    color.valueShift = `hsl(${color.hue}, ${color.saturation}%, ${color.value - 10}%)`;
+    color.valueShift = `hsv(${color.hue}, ${color.saturation}%, ${color.value - 10}%)`;
   } else {
-    color.valueShift = `hsl(${color.hue}, ${color.saturation}%, ${color.value + 10}%)`;
+    color.valueShift = `hsv(${color.hue}, ${color.saturation}%, ${color.value + 10}%)`;
   }
-  color.hueHovered = `hsl(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
-  color.hueVisited = `hsl(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
-  color.alpha = `hsla(${color.hue}, ${color.saturation}%, ${color.value}%, 0.5)`;
+  color.hueHovered = `hsv(${color.hue + 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
+  color.hueVisited = `hsv(${color.hue - 40 % 360}, ${color.saturation + 20}%, ${color.value}%)`;
+  color.alpha = `hsva(${color.hue}, ${color.saturation}%, ${color.value}%, 0.5)`;
 }
 
 export function shouldChangeColors(state: State): boolean {

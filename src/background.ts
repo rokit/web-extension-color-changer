@@ -1,7 +1,7 @@
 
 import * as c from "./constants";
 import { type Color, type Message, type State, type TabActiveInfo } from "./interfaces";
-import { setHslStrings, shouldChangeColors } from "./utils";
+import { setHsvStrings, shouldChangeColors } from "./utils";
 
 if (!globalThis.browser) {
   // @ts-ignore
@@ -92,7 +92,7 @@ function updateColor(color: Color) {
   // color.swatch.saturation = swatch.saturation;
   // color.swatch.lightness = swatch.lightness;
   // color.swatch.chosenId = swatch.id;
-  setHslStrings(color);
+  setHsvStrings(color);
 }
 
 function onChangeColor(color: string) {
