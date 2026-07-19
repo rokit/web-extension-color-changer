@@ -10,19 +10,19 @@
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
-  "background": { "service_worker": "background.ts", "type": "module" },
+  "background": { "service_worker": "background.js", "type": "module" },
   "content_scripts": [
     {
       "run_at": "document_start",
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.ts"]
+      "js": ["content.js"]
     }
   ],
   "permissions": ["storage", "tabs", "activeTab", "contextMenus"],
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [
     {
-      "resources": ["icons/icon.svg"],
+      "resources": ["images/*.svg"],
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
@@ -33,6 +33,11 @@
       "32": "icons/icon-32.png",
       "48": "icons/icon-48.png",
       "128": "icons/icon-128.png"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@colorchanger"
     }
   }
 }
