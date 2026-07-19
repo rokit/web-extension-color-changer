@@ -1,6 +1,6 @@
 import * as c from "../constants";
-import { type Color, type State } from "../interfaces";
-import { roundToTenths, shouldChangeColors } from "../utils";
+import { type State } from "../interfaces";
+import { mockBrowser, shouldChangeColors } from "../utils";
 
 import { type Point } from "../interfaces";
 import convert from 'color-convert';
@@ -9,6 +9,8 @@ import { degToRad, radToDeg, mapRange } from "../utils";
 if (!globalThis.browser) {
   if (typeof window.chrome == "undefined") {
     // development mode
+    // @ts-ignore
+    // globalThis.browser = mockBrowser();
   } else {
     // @ts-ignore
     globalThis.browser = chrome;
@@ -46,9 +48,6 @@ let ctx = canvas.getContext("2d")!;
 squareHsvElement.style.width = colorPickerSize + "px";
 squareHsvElement.style.height = colorPickerSize + "px";
 
-let canvasRect = canvas.getBoundingClientRect();
-let cpRect = squareHsvElement.getBoundingClientRect();
-
 // The center point of the hsl picker relative to the browser view.
 let documentCpCenter: Point = { x: 0, y: 0 };
 let squareReticle: Point = { x: canvasSize, y: 0 };
@@ -56,6 +55,7 @@ let hueReticle: Point = { x: hueReticleDistance, y: 0 };
 
 function onHueMousedown(e: MouseEvent) {
   isHueMouseDown = true;
+  updateDocumentCpCenter();
   updateHueReticle(e);
 };
 
@@ -117,6 +117,8 @@ function updateReticlesFromHsv() {
 }
 
 function updateSquareReticle(e: MouseEvent) {
+  let canvasRect = canvas.getBoundingClientRect();
+
   squareReticle.x = e.clientX - canvasRect.x;
   squareReticle.y = e.clientY - canvasRect.y;
   squareReticle.x = Math.max(squareReticle.x, 0);
@@ -149,8 +151,6 @@ function updateSquareReticle(e: MouseEvent) {
 }
 
 function updateHueReticle(e: MouseEvent) {
-  updateDocumentCpCenter();
-
   // Get angle from delta x and y using center point.
   let angle = Math.atan2(
     e.clientY - documentCpCenter.y,
@@ -172,12 +172,16 @@ function updateHueReticle(e: MouseEvent) {
 }
 
 function updateDocumentCpCenter() {
+  let cpRect = squareHsvElement.getBoundingClientRect();
   documentCpCenter.x = cpRect.x + (cpHalfWidth);
   documentCpCenter.y = cpRect.y + (cpHalfWidth);
 }
 
 /** Updated relative to color picker. */
 function updateSquareReticleElement() {
+  let cpRect = squareHsvElement.getBoundingClientRect();
+  let canvasRect = canvas.getBoundingClientRect();
+
   let offsetX = canvasRect.x - cpRect.x;
   let offsetY = canvasRect.y - cpRect.y;
 
