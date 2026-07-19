@@ -5,8 +5,9 @@
   "types": "module",
   "scripts": {
     "dev": "vite",
-    "build:ff": "tsc && vite build --config vite.popup.ts && vite build --config vite.content.ts && npm run copy-ff-manifest",
-    "build:chrome": "npm run copy-chrome-manifest && npm run build",
+    "build:ff": "npm run build:extension && npm run copy-ff-manifest",
+    "build:chrome": "npm run build:extension && npm run copy-chrome-manifest",
+    "build:extension": "tsc && vite build --config vite.popup.ts && vite build --config vite.content.ts",
     "preview": "vite preview",
     "copy-ff-manifest": "node ./scripts/copy-manifest.js src/manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js src/manifest.chrome.json",
