@@ -72,7 +72,7 @@ canvas {
   height: 20px;
   z-index: 999;
   position: absolute;
-  pointer-events: none;
+  pointer-events: all;
   user-select: none;
 }
 

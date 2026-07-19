@@ -46,10 +46,13 @@ let documentCpCenter: Point = { x: 0, y: 0 };
 let squareReticle: Point = { x: canvasSize, y: 0 };
 let hueReticle: Point = { x: hueReticleDistance, y: 0 };
 
-hueElement.onmousedown = (e) => {
+function onHueMousedown(e: MouseEvent) {
   isHueMouseDown = true;
   updateHueReticle(e);
-}
+};
+
+hueElement.onmousedown = onHueMousedown;
+hueReticleElement.onmousedown = onHueMousedown;
 
 canvas.onmousedown = (e) => {
   isSquareMouseDown = true;
