@@ -257,22 +257,22 @@ async function setActiveColorButton(state: State) {
 function updateColorPickerFromState(state: State) {
   switch (state.activeBtn) {
     case c.FORE_BTN: {
-      let { hue, value, saturation } = state.fg;
+      let { hue, saturation, value } = state.fg;
       selectedHue = hue;
-      selectedValue = value;
       selectedSaturation = saturation;
+      selectedValue = value;
     } break;
     case c.BACK_BTN: {
-      let { hue, value, saturation } = state.bg;
+      let { hue, saturation, value } = state.bg;
       selectedHue = hue;
-      selectedValue = value;
       selectedSaturation = saturation;
+      selectedValue = value;
     } break;
     case c.LINK_BTN: {
-      let { hue, value, saturation } = state.li;
+      let { hue, saturation, value } = state.li;
       selectedHue = hue;
-      selectedValue = value;
       selectedSaturation = saturation;
+      selectedValue = value;
     } break;
     default: break;
   }
