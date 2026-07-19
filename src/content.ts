@@ -107,7 +107,7 @@ function removeClass() {
 }
 
 function updateContent(state: State) {
-  c.SHOULD_CONSOLE_LOG && console.log('update content state:', state);
+  // c.SHOULD_CONSOLE_LOG && console.log('update content state:', state);
   if (shouldChangeColors(state)) {
     updateCss(state);
 
