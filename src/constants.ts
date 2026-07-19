@@ -8,10 +8,8 @@ export const SAVE_STATE = "SAVE_STATE";
 export const UPDATE_CONTENT = "UPDATE_CONTENT";
 export const CHANGE_COLORS = "CHANGE_COLORS";
 export const SET_ACTIVE_BUTTON = "SET_ACTIVE_BUTTON";
-export const UPDATE_CHOSEN_COLOR = "UPDATE_CHOSEN_COLOR";
 export const UPDATE_COLOR = "UPDATE_COLOR";
 export const RESET = "RESET";
-export const CONTENT_CONNECTED = "CONTENT_CONNECTED";
 export const INVALID_TAB = -9999;
 
 export const FORE_BTN = "fore";

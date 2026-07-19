@@ -1,16 +1,17 @@
 import * as c from "../constants";
 import { type State } from "../interfaces";
-import { mockBrowser, shouldChangeColors } from "../utils";
+import { shouldChangeColors } from "../utils";
 
 import { type Point } from "../interfaces";
 import convert from 'color-convert';
 import { degToRad, radToDeg, mapRange } from "../utils";
+import { MockBrowser } from "../mockBrowser";
 
 if (!globalThis.browser) {
   if (typeof window.chrome == "undefined") {
     // development mode
     // @ts-ignore
-    // globalThis.browser = mockBrowser();
+    globalThis.browser = new MockBrowser();
   } else {
     // @ts-ignore
     globalThis.browser = chrome;

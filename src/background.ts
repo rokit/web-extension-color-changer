@@ -25,19 +25,12 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     case c.SET_ACTIVE_BUTTON: {
       onSetActiveButton(message.payload);
     }; break;
-    case c.UPDATE_CHOSEN_COLOR: {
-      // onUpdateChosenColor(message.payload);
-    }; break;
     case c.UPDATE_COLOR: {
       onUpdateColor(message.payload.hue, message.payload.saturation, message.payload.value);
     }; break;
     case c.RESET: {
       onReset();
     }; break;
-    // case CONTENT_CONNECTED: {
-    //   state.lostConnection = false;
-    //   browser.storage.sync.set({ 'colorChangerState': state });
-    // }; break;
     default: break;
   }
 }
