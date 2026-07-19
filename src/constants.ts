@@ -26,7 +26,7 @@ export const DEFAULT_STATE: State = {
   activeTabHostname: "",
   fg: createColor(0, 0, 80),
   bg: createColor(0, 0, 25),
-  li: createColor(68, 80, 80),
+  li: createColor(116, 33, 96),
   activeBtn: FORE_BTN,
   hosts: [],
   lostConnection: false,
