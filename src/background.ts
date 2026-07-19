@@ -40,9 +40,6 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     // }; break;
     default: break;
   }
-
-  // Allows the caller to await a response.
-  return true;
 }
 
 function onChangeColors(changeColors: boolean) {
