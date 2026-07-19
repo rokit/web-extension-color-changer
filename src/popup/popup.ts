@@ -313,8 +313,6 @@ async function updateUi() {
   linkSwatch.style.background = state.li.hsl;
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
-  setActiveColorButton(state);
-  updateColorPickerFromState(state);
 
   if (state.activeTabId === c.INVALID_TAB) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
@@ -329,6 +327,10 @@ async function updateUi() {
     changeColorsCheckbox.removeAttribute("disabled");
     changeColorsLabel.textContent = "Change Colors";
   }
+
+  updateDocumentCpCenter();
+  setActiveColorButton(state);
+  updateColorPickerFromState(state);
 }
 
 updateDocumentCpCenter();
