@@ -22,7 +22,7 @@
   "host_permissions": ["*://*/*"],
   "web_accessible_resources": [
     {
-      "resources": ["images/*.svg"],
+      "resources": ["images/*.svg", "icons/*"],
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
