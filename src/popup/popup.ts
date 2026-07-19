@@ -1,14 +1,18 @@
 import * as c from "../constants";
 import { type Color, type State } from "../interfaces";
-import { shouldChangeColors } from "../utils";
+import { roundToTenths, shouldChangeColors } from "../utils";
 
 import { type Point } from "../interfaces";
 import convert from 'color-convert';
 import { degToRad, radToDeg, mapRange } from "../utils";
 
 if (!globalThis.browser) {
-  // @ts-ignore
-  globalThis.browser = chrome;
+  if (typeof window.chrome == "undefined") {
+    // development mode
+  } else {
+    // @ts-ignore
+    globalThis.browser = chrome;
+  }
 }
 
 let selectedHue = 0;
@@ -29,6 +33,10 @@ let hueElement = document.getElementById("hue")!;
 let squareReticleElement = document.getElementById("square-reticle")!;
 let hueReticleElement = document.getElementById("hue-reticle")!;
 let hexInputElement = document.getElementById("hex-input")! as HTMLInputElement;
+
+let selectedHueElement = document.getElementById("selected-hue")! as HTMLSpanElement;
+let selectedSaturationElement = document.getElementById("selected-saturation")! as HTMLSpanElement;
+let selectedValueElement = document.getElementById("selected-value")! as HTMLSpanElement;
 
 canvas.width = canvasSize;
 canvas.height = canvasSize;
@@ -132,6 +140,9 @@ function updateSquareReticle(e: MouseEvent) {
     0
   );
 
+  selectedSaturation = roundToTenths(selectedSaturation);
+  selectedValue = roundToTenths(selectedValue);
+
   hsvToHexInput();
   updateSquareReticleElement();
   browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
@@ -149,10 +160,10 @@ function updateHueReticle(e: MouseEvent) {
   // Add 360 deg so we only deal with positive numbers.
   angle += 2 * Math.PI;
 
-  selectedHue = radToDeg(angle) % 360;
+  selectedHue = roundToTenths(radToDeg(angle) % 360);
 
-  hueReticle.x = hueReticleDistance * Math.cos(angle);
-  hueReticle.y = hueReticleDistance * Math.sin(angle);
+  hueReticle.x = hueReticleDistance * Math.cos(degToRad(selectedHue));
+  hueReticle.y = hueReticleDistance * Math.sin(degToRad(selectedHue));
 
   hsvToHexInput();
   updateHueReticleElement();
@@ -172,6 +183,9 @@ function updateSquareReticleElement() {
 
   squareReticleElement.style.left = `${squareReticle.x + offsetX}px`;
   squareReticleElement.style.top = `${squareReticle.y + offsetY}px`;
+
+  selectedSaturationElement.textContent = selectedSaturation.toFixed(1);
+  selectedValueElement.textContent = selectedValue.toFixed(1);
 }
 
 /** Updated relative to color picker. */
@@ -180,6 +194,8 @@ function updateHueReticleElement() {
   hueReticleElement.style.left = `${hueReticle.x + cpHalfWidth - halfReticleWidth}px`;
   hueReticleElement.style.top = `${hueReticle.y + cpHalfWidth - halfReticleWidth}px`;
   hueReticleElement.style.rotate = `${selectedHue}deg`
+
+  selectedHueElement.textContent = selectedHue.toFixed(1);
 }
 
 function drawColorPicker() {

@@ -66,6 +66,10 @@ export function shouldChangeColors(state: State): boolean {
   }
 }
 
+export function roundToTenths(num: number) {
+  return Math.round((num + Number.EPSILON) * 10) / 10;
+}
+
 // /** Workaround for not being able to await an async message with chrome.runtime in Firefox.
 //  * https://bugzilla.mozilla.org/show_bug.cgi?id=1228044
 // */
