@@ -204,12 +204,12 @@ async function sendTabMessage(message: Message) {
 
 // --------------------------------------------------------------------------------------------- context menu
 function createContextMenu() {
-  let menu: object = {
+  let menu = {
     id: c.CHANGE_COLORS,
     title: "Change Colors",
     type: "checkbox",
-    checked: shouldChangeColors(state),
-  };
+    checked: false,
+  } as object;
 
   browser.contextMenus.removeAll();
   browser.contextMenus.create(menu);
@@ -223,8 +223,12 @@ function onContextMenuClicked(info: browser.contextMenus.OnClickData, _tab?: bro
   }
 }
 
-function updateContextMenu() {
-  browser.contextMenus.update(c.CHANGE_COLORS, { checked: shouldChangeColors(state) });
+async function updateContextMenu() {
+  try {
+    await browser.contextMenus.update(c.CHANGE_COLORS, { checked: shouldChangeColors(state) });
+  } catch (e) {
+    c.SHOULD_CONSOLE_LOG && console.error('cc background - updateContextMenu: ', e);
+  }
 }
 
 // --------------------------------------------------------------------------------------------- installed
@@ -256,6 +260,8 @@ browser.runtime.onInstalled.addListener(onInstalled);
 // --------------------------------------------------------------------------------------------- init
 /** Get state from storage if it exists. If not, create default state. */
 async function initServiceWorker() {
+  createContextMenu();
+
   let storage = await browser.storage.sync.get(['colorChangerState']);
   if (storage?.colorChangerState) {
     state = storage.colorChangerState;
@@ -277,7 +283,7 @@ async function initServiceWorker() {
 
   c.SHOULD_CONSOLE_LOG && console.log('state', state);
 
-  createContextMenu();
+  updateContextMenu();
   browser.storage.sync.set({ 'colorChangerState': state });
 }
 
