@@ -59,6 +59,7 @@ canvas.onmousedown = (e) => {
 document.onmouseup = () => {
   isHueMouseDown = false;
   isSquareMouseDown = false;
+  browser.runtime.sendMessage({ message: c.SAVE_STATE });
 };
 
 document.onmousemove = (e: MouseEvent) => {
@@ -91,6 +92,7 @@ hexInputElement.oninput = () => {
   updateReticlesFromHsv();
   drawColorPicker();
   browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
+  browser.runtime.sendMessage({ message: c.SAVE_STATE });
 }
 
 function updateReticlesFromHsv() {

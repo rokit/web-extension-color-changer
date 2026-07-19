@@ -4,6 +4,7 @@ import { createColor } from "./utils";
 export const SHOULD_CONSOLE_LOG = true;
 
 export const GET_STATE = "GET_STATE";
+export const SAVE_STATE = "SAVE_STATE";
 export const UPDATE_CONTENT = "UPDATE_CONTENT";
 export const CHANGE_COLORS = "CHANGE_COLORS";
 export const SET_ACTIVE_BUTTON = "SET_ACTIVE_BUTTON";

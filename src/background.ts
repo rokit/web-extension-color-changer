@@ -16,6 +16,9 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     case c.GET_STATE: {
       sendResponse(state)
     }; break;
+    case c.SAVE_STATE: {
+      browser.storage.sync.set({ 'colorChangerState': state });
+    }; break;
     case c.CHANGE_COLORS: {
       onChangeColors(message.payload);
     }; break;
@@ -93,7 +96,6 @@ function onUpdateColor(hue: number, saturation: number, value: number) {
     default: break;
   }
 
-  browser.storage.sync.set({ 'colorChangerState': state });
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
 }
 
