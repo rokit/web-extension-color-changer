@@ -16,8 +16,8 @@ if (!globalThis.browser) {
 }
 
 let selectedHue = 0;
-let selectedSaturation = 0;
-let selectedValue = 0;
+let selectedSaturation = 100;
+let selectedValue = 100;
 
 let isHueMouseDown = false;
 let isSquareMouseDown = false;
@@ -140,8 +140,8 @@ function updateSquareReticle(e: MouseEvent) {
     0
   );
 
-  selectedSaturation = roundToTenths(selectedSaturation);
-  selectedValue = roundToTenths(selectedValue);
+  selectedSaturation = Math.round(selectedSaturation);
+  selectedValue = Math.round(selectedValue);
 
   hsvToHexInput();
   updateSquareReticleElement();
@@ -160,7 +160,7 @@ function updateHueReticle(e: MouseEvent) {
   // Add 360 deg so we only deal with positive numbers.
   angle += 2 * Math.PI;
 
-  selectedHue = roundToTenths(radToDeg(angle) % 360);
+  selectedHue = Math.round(radToDeg(angle) % 360);
 
   hueReticle.x = hueReticleDistance * Math.cos(degToRad(selectedHue));
   hueReticle.y = hueReticleDistance * Math.sin(degToRad(selectedHue));
@@ -184,8 +184,8 @@ function updateSquareReticleElement() {
   squareReticleElement.style.left = `${squareReticle.x + offsetX}px`;
   squareReticleElement.style.top = `${squareReticle.y + offsetY}px`;
 
-  selectedSaturationElement.textContent = selectedSaturation.toFixed(1);
-  selectedValueElement.textContent = selectedValue.toFixed(1);
+  selectedSaturationElement.textContent = selectedSaturation.toFixed(0);
+  selectedValueElement.textContent = selectedValue.toFixed(0);
 }
 
 /** Updated relative to color picker. */
@@ -195,7 +195,7 @@ function updateHueReticleElement() {
   hueReticleElement.style.top = `${hueReticle.y + cpHalfWidth - halfReticleWidth}px`;
   hueReticleElement.style.rotate = `${selectedHue}deg`
 
-  selectedHueElement.textContent = selectedHue.toFixed(1);
+  selectedHueElement.textContent = selectedHue.toFixed(0);
 }
 
 function drawColorPicker() {
