@@ -316,7 +316,7 @@ async function updateUi() {
     errorElement.textContent = "Color Changer can't work on this page.";
   } else if (state.lostConnection) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
-    errorElement.textContent = "Lost connection to tab. Try reloading the page. If the issue persists, extensions may be restricted on this page by your browser.";
+    errorElement.textContent = "Lost connection to tab. Try reloading the page. Your browser could also be preventing extensions from running on this page.";
   } else {
     changeColorsCheckbox.removeAttribute("disabled");
     errorElement.textContent = "";
