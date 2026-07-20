@@ -63,7 +63,7 @@ canvas {
 #square-reticle {
   width: 20px;
   height: 20px;
-  z-index: 999;
+  z-index: 1;
   position: absolute;
   transform: translate(-10px, -10px);
   pointer-events: none;
@@ -71,10 +71,10 @@ canvas {
 }
 
 #hue-reticle {
+  position: absolute;
+  z-index: 1;
   width: 20px;
   height: 20px;
-  z-index: 999;
-  position: absolute;
   pointer-events: all;
   user-select: none;
 }

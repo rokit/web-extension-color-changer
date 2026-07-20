@@ -9,6 +9,8 @@ html {
 }
 
 body {
+  position: relative;
+  width: 20rem;
   /* max-width: 800px;
   max-height: 600px; */
   padding: 10px;
@@ -32,6 +34,30 @@ button.active-btn {
   outline-offset: 3px;
 }
 
+#error {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  padding: 20px;
+  margin: 10px;
+  width: calc(20rem - 40px);
+  font-size: 1.2rem;
+  background-color: #ffabab;
+  box-shadow: 0px 4px 10px #00000066;
+  transition:
+    opacity 400ms,
+    transform 400ms;
+  transform: translateY(50px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#error.show {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
 #checkbox-container {
   display: flex;
   background-color: #eee;
@@ -52,10 +78,6 @@ button.active-btn {
 
 #checkbox-container:hover {
   background-color: #ddd;
-}
-
-#checkbox-container.error {
-  background-color: #ffabab;
 }
 
 #colors {

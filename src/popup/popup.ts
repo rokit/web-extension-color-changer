@@ -234,6 +234,7 @@ function updateHexInput() {
 let changeColorsCheckbox = document.getElementById("change-colors")! as HTMLInputElement;
 let changeColorsLabel = document.getElementById("change-colors-label")! as HTMLInputElement;
 let checkboxContainer = document.getElementById("checkbox-container")! as HTMLDivElement;
+let errorElement = document.getElementById("error")! as HTMLDivElement;
 
 let textBtn = document.getElementById(c.TEXT_KEY)! as HTMLButtonElement;
 let backgroundBtn = document.getElementById(c.BACKGROUND_KEY)! as HTMLButtonElement;
@@ -306,22 +307,20 @@ async function updateUi() {
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
 
+  errorElement.classList.add("show");
   if (state.activeTabId === c.INVALID_TAB) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
-    changeColorsLabel.textContent = "Invalid tab ID. Activate a new tab.";
-    checkboxContainer.classList.add("error");
+    errorElement.textContent = "Invalid tab ID. Activate a new tab.";
   } else if (state.invalidUrl) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
-    changeColorsLabel.textContent = "Color Changer can't work on this page.";
-    checkboxContainer.classList.add("error");
+    errorElement.textContent = "Color Changer can't work on this page.";
   } else if (state.lostConnection) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
-    changeColorsLabel.textContent = "Lost connection to tab. Try reloading the page. If the issue persists, extensions may be restricted on this page by your browser.";
-    checkboxContainer.classList.add("error");
+    errorElement.textContent = "Lost connection to tab. Try reloading the page. If the issue persists, extensions may be restricted on this page by your browser.";
   } else {
     changeColorsCheckbox.removeAttribute("disabled");
-    changeColorsLabel.textContent = "Change Colors";
-    checkboxContainer.classList.remove("error");
+    errorElement.textContent = "";
+    errorElement.classList.remove("show");
   }
 
   updateDocumentCpCenter();
