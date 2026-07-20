@@ -11,6 +11,8 @@
   display: flex;
   position: relative;
   user-select: none;
+  margin-top: 7px;
+  margin-bottom: 7px;
 }
 
 #hue {
