@@ -1,4 +1,4 @@
-export interface State {
+export type State = {
   activeTabId: number;
   activeTabHostname: string;
   fg: Color;
@@ -10,7 +10,7 @@ export interface State {
   invalidUrl: boolean;
 }
 
-export interface Color {
+export type Color = {
   hsv: Hsv,
   hslString: string;
   lightnessShift: string;
@@ -24,7 +24,7 @@ export type Hsv = {
   v: number,
 }
 
-export interface Message {
+export type Message = {
   message: string;
   payload?: any;
 }

@@ -1,10 +1,7 @@
 import * as c from "../constants";
-import { type State } from "../interfaces";
-import { shouldChangeColors } from "../utils";
-
-import { type Point } from "../interfaces";
+import { type State, type Point } from "../types";
+import { shouldChangeColors, degToRad, radToDeg, mapRange } from "../utils";
 import convert from 'color-convert';
-import { degToRad, radToDeg, mapRange } from "../utils";
 import { MockBrowser } from "../mockBrowser";
 
 if (!globalThis.browser) {

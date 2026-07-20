@@ -1,6 +1,6 @@
 
 import * as c from "./constants";
-import { type Message, type State, type TabActiveInfo } from "./interfaces";
+import { type Message, type State, type TabActiveInfo } from "./types";
 import { setHslStrings, shouldChangeColors } from "./utils";
 
 if (!globalThis.browser) {

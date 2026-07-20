@@ -1,4 +1,4 @@
-import { type State } from "./interfaces";
+import { type State } from "./types";
 import { createColor } from "./utils";
 
 export const SHOULD_CONSOLE_LOG = true;

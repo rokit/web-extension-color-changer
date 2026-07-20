@@ -1,5 +1,5 @@
 import * as c from "./constants";
-import type { State } from "./interfaces";
+import type { State } from "./types";
 import { setHslStrings } from "./utils";
 
 export class MockBrowser {

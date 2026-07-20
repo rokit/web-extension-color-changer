@@ -1,5 +1,5 @@
 import convert from "color-convert";
-import { type Color, type Message, type State } from "./interfaces";
+import { type Color, type State } from "./types";
 
 const DEG_TO_RAD = Math.PI / 180;
 const RAD_TO_DEG = 180 / Math.PI;
