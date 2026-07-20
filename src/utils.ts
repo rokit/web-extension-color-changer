@@ -30,8 +30,6 @@ export function createColor(hue: number, saturation: number, value: number) {
     },
     hslString: "",
     lightnessShift: "",
-    hueHovered: "",
-    hueVisited: "",
   }
   setHslStrings(color);
   return color;
@@ -49,8 +47,6 @@ export function setHslStrings(color: Color) {
   } else {
     color.lightnessShift = `hsl(${h}, ${s}%, ${l + 10}%)`;
   }
-  color.hueHovered = `hsl(${h + 40 % 360}, ${s + 20}%, ${l}%)`;
-  color.hueVisited = `hsl(${h - 40 % 360}, ${s + 20}%, ${l}%)`;
 }
 
 export function shouldChangeColors(state: State): boolean {

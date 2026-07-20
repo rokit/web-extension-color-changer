@@ -37,9 +37,9 @@ function updateCss(state: State) {
   .${c.COLOR_CHANGER_CLASS_NAME} body,
   .${c.COLOR_CHANGER_CLASS_NAME} ${not}
   {
-    color: ${state.fg.hslString} !important;
-    background-color: ${state.bg.hslString} !important;
-    border-color: ${state.bg.lightnessShift} !important;
+    color: ${state.text.hslString} !important;
+    background-color: ${state.background.hslString} !important;
+    border-color: ${state.background.lightnessShift} !important;
   }
 
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} input,
@@ -51,37 +51,37 @@ function updateCss(state: State) {
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} code,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} code *
   {
-    background-color: ${state.bg.lightnessShift} !important;
+    background-color: ${state.background.lightnessShift} !important;
   }
 
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} button,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} button *
   {
-    color: ${state.li.hslString} !important;
+    color: ${state.link.hslString} !important;
     background-color: transparent !important;
   }
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a *
   {
-    color: ${state.li.hslString} !important;
+    color: ${state.link.hslString} !important;
     background-color: transparent !important;
   }
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:hover,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:hover *
   {
-    color: ${state.li.hueHovered} !important;
+    color: ${state.linkHovered.hslString} !important;
     background-color: transparent !important;
   }
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:active,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:active *
   {
-    color: ${state.li.hueVisited} !important;
+    color: ${state.linkVisited.hslString} !important;
     background-color: transparent !important;
   }
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:visited,
   .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:visited *
   {
-    color: ${state.li.hueVisited} !important;
+    color: ${state.linkVisited.hslString} !important;
     background-color: transparent !important;
   }
 `;

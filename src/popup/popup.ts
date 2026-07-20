@@ -1,5 +1,5 @@
 import * as c from "../constants";
-import { type State, type Point } from "../types";
+import { type State, type Point, type Color } from "../types";
 import { shouldChangeColors, degToRad, radToDeg, mapRange } from "../utils";
 import convert from 'color-convert';
 import { MockBrowser } from "../mockBrowser";
@@ -234,14 +234,20 @@ function updateHexInput() {
 let changeColorsCheckbox = document.getElementById("change-colors")! as HTMLInputElement;
 let changeColorsLabel = document.getElementById("change-colors-label")! as HTMLInputElement;
 
-let foreBtn = document.getElementById(c.FORE_BTN)! as HTMLButtonElement;
-let backBtn = document.getElementById(c.BACK_BTN)! as HTMLButtonElement;
-let linkBtn = document.getElementById(c.LINK_BTN)! as HTMLButtonElement;
-let resetBtn = document.getElementById("reset")! as HTMLButtonElement;
+let textBtn = document.getElementById(c.TEXT_KEY)! as HTMLButtonElement;
+let backgroundBtn = document.getElementById(c.BACKGROUND_KEY)! as HTMLButtonElement;
+let linkBtn = document.getElementById(c.LINK_KEY)! as HTMLButtonElement;
+let linkHoveredBtn = document.getElementById(c.LINK_HOVERED_KEY)! as HTMLButtonElement;
+let linkVisitedBtn = document.getElementById(c.LINK_VISITED_KEY)! as HTMLButtonElement;
 
-let foreSwatch = document.getElementById(`${c.FORE_BTN}-swatch`)! as HTMLDivElement;
-let backSwatch = document.getElementById(`${c.BACK_BTN}-swatch`)! as HTMLDivElement;
-let linkSwatch = document.getElementById(`${c.LINK_BTN}-swatch`)! as HTMLDivElement;
+let textSwatch = document.getElementById(`${c.TEXT_KEY}-swatch`)! as HTMLDivElement;
+let backgroundSwatch = document.getElementById(`${c.BACKGROUND_KEY}-swatch`)! as HTMLDivElement;
+let linkSwatch = document.getElementById(`${c.LINK_KEY}-swatch`)! as HTMLDivElement;
+let linkHoveredSwatch = document.getElementById(`${c.LINK_HOVERED_KEY}-swatch`)! as HTMLDivElement;
+console.log('linkHoveredSwatch:', linkHoveredSwatch.id);
+let linkVisitedSwatch = document.getElementById(`${c.LINK_VISITED_KEY}-swatch`)! as HTMLDivElement;
+
+let resetBtn = document.getElementById("reset")! as HTMLButtonElement;
 
 changeColorsCheckbox.onclick = () => {
   browser.runtime.sendMessage({ message: c.CHANGE_COLORS, payload: changeColorsCheckbox.checked });
@@ -252,51 +258,48 @@ resetBtn.onclick = function () {
 }
 
 function onClickForeground() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.FORE_BTN });
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.TEXT_KEY });
 }
 function onClickBackground() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.BACK_BTN });
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.BACKGROUND_KEY });
 }
 function onClickLink() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_BTN });
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_KEY });
 }
 
-foreSwatch.onclick = onClickForeground;
-foreBtn.onclick = onClickForeground;
-backSwatch.onclick = onClickBackground;
-backBtn.onclick = onClickBackground;
-linkSwatch.onclick = onClickLink;
+function onClickLinkHovered() {
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_HOVERED_KEY });
+}
+
+function onClickLinkVisited() {
+  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_VISITED_KEY });
+}
+
+textBtn.onclick = onClickForeground;
+textSwatch.onclick = onClickForeground;
+backgroundBtn.onclick = onClickBackground;
+backgroundSwatch.onclick = onClickBackground;
 linkBtn.onclick = onClickLink;
+linkSwatch.onclick = onClickLink;
+linkHoveredBtn.onclick = onClickLinkHovered;
+linkHoveredSwatch.onclick = onClickLinkHovered;
+linkVisitedBtn.onclick = onClickLinkVisited;
+linkVisitedSwatch.onclick = onClickLinkVisited;
 
 async function setActiveColorButton(state: State) {
-  foreBtn.classList.remove("active-btn");
-  backBtn.classList.remove("active-btn");
+  textBtn.classList.remove("active-btn");
+  backgroundBtn.classList.remove("active-btn");
   linkBtn.classList.remove("active-btn");
+  linkHoveredBtn.classList.remove("active-btn");
+  linkVisitedBtn.classList.remove("active-btn");
   document.getElementById(state.activeBtn)!.classList.add("active-btn");
 }
 
 function updateColorPickerFromState(state: State) {
-  switch (state.activeBtn) {
-    case c.FORE_BTN: {
-      let { h, s, v } = state.fg.hsv;
-      selectedHue = h;
-      selectedSaturation = s;
-      selectedValue = v;
-    } break;
-    case c.BACK_BTN: {
-      let { h, s, v } = state.bg.hsv;
-      selectedHue = h;
-      selectedSaturation = s;
-      selectedValue = v;
-    } break;
-    case c.LINK_BTN: {
-      let { h, s, v } = state.li.hsv;
-      selectedHue = h;
-      selectedSaturation = s;
-      selectedValue = v;
-    } break;
-    default: break;
-  }
+  let color = state[state.activeBtn as keyof State] as Color;
+  selectedHue = color.hsv.h;
+  selectedSaturation = color.hsv.s;
+  selectedValue = color.hsv.v;
 
   updateHexInput();
   updateReticlesFromHsv();
@@ -306,9 +309,11 @@ function updateColorPickerFromState(state: State) {
 async function updateUi() {
   let state: State = await browser.runtime.sendMessage({ message: c.GET_STATE });
 
-  foreSwatch.style.background = state.fg.hslString;
-  backSwatch.style.background = state.bg.hslString;
-  linkSwatch.style.background = state.li.hslString;
+  textSwatch.style.background = state.text.hslString;
+  backgroundSwatch.style.background = state.background.hslString;
+  linkSwatch.style.background = state.link.hslString;
+  linkHoveredSwatch.style.background = state.linkHovered.hslString;
+  linkVisitedSwatch.style.background = state.linkVisited.hslString;
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
 

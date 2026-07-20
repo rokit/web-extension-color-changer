@@ -13,9 +13,11 @@ export const UPDATE_COLOR = "UPDATE_COLOR";
 export const RESET = "RESET";
 export const INVALID_TAB = -9999;
 
-export const FORE_BTN = "fore";
-export const BACK_BTN = "back";
-export const LINK_BTN = "link";
+export const TEXT_KEY = "text";
+export const BACKGROUND_KEY = "background";
+export const LINK_KEY = "link";
+export const LINK_HOVERED_KEY = "linkHovered";
+export const LINK_VISITED_KEY = "linkVisited";
 
 export const COLOR_CHANGER_STYLE_ID = "color-changer-style";
 export const COLOR_CHANGER_CLASS_NAME = "color-changer-v5";
@@ -24,10 +26,14 @@ export const DEFAULT_STATE: State = {
   version: "5.0.0",
   activeTabId: INVALID_TAB,
   activeTabHostname: "",
-  fg: createColor(0, 0, 80),
-  bg: createColor(0, 0, 25),
-  li: createColor(116, 33, 96),
-  activeBtn: FORE_BTN,
+
+  text: createColor(0, 0, 80),
+  background: createColor(0, 0, 25),
+  link: createColor(116, 33, 96),
+  linkHovered: createColor(146, 33, 96),
+  linkVisited: createColor(86, 33, 96),
+
+  activeBtn: TEXT_KEY,
   hosts: [],
   lostConnection: false,
   invalidUrl: false,

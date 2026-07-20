@@ -1,5 +1,5 @@
 import * as c from "./constants";
-import type { State } from "./types";
+import type { Color, State } from "./types";
 import { setHslStrings } from "./utils";
 
 export class MockBrowser {
@@ -29,27 +29,11 @@ export class MockBrowser {
                         this.state.activeBtn = message.payload;
                     }; break;
                     case c.UPDATE_COLOR: {
-                        switch (this.state.activeBtn) {
-                            case c.FORE_BTN: {
-                                this.state.fg.hsv.h = message.payload.hue;
-                                this.state.fg.hsv.s = message.payload.saturation;
-                                this.state.fg.hsv.v = message.payload.value;
-                                setHslStrings(this.state.fg);
-                            } break;
-                            case c.BACK_BTN: {
-                                this.state.bg.hsv.h = message.payload.hue;
-                                this.state.bg.hsv.s = message.payload.saturation;
-                                this.state.bg.hsv.v = message.payload.value;
-                                setHslStrings(this.state.bg);
-                            } break;
-                            case c.LINK_BTN: {
-                                this.state.li.hsv.h = message.payload.hue;
-                                this.state.li.hsv.s = message.payload.saturation;
-                                this.state.li.hsv.v = message.payload.value;
-                                setHslStrings(this.state.li);
-                            } break;
-                            default: break;
-                        }
+                        let color = this.state[this.state.activeBtn as keyof State] as Color;
+                        color.hsv.h = message.payload.hue;
+                        color.hsv.s = message.payload.saturation;
+                        color.hsv.v = message.payload.value;
+                        setHslStrings(color);
                     }; break;
                     case c.RESET: {
                         this.state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;

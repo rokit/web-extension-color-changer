@@ -1,6 +1,6 @@
 
 import * as c from "./constants";
-import { type Message, type State, type TabActiveInfo } from "./types";
+import { type Color, type Message, type State, type TabActiveInfo } from "./types";
 import { setHslStrings, shouldChangeColors } from "./utils";
 
 if (!globalThis.browser) {
@@ -64,27 +64,11 @@ function onSetActiveButton(button: string) {
 }
 
 function onUpdateColor(hue: number, saturation: number, value: number) {
-  switch (state.activeBtn) {
-    case c.FORE_BTN: {
-      state.fg.hsv.h = hue;
-      state.fg.hsv.s = saturation;
-      state.fg.hsv.v = value;
-      setHslStrings(state.fg);
-    } break;
-    case c.BACK_BTN: {
-      state.bg.hsv.h = hue;
-      state.bg.hsv.s = saturation;
-      state.bg.hsv.v = value;
-      setHslStrings(state.bg);
-    } break;
-    case c.LINK_BTN: {
-      state.li.hsv.h = hue;
-      state.li.hsv.s = saturation;
-      state.li.hsv.v = value;
-      setHslStrings(state.li);
-    } break;
-    default: break;
-  }
+  let color = state[state.activeBtn as keyof State] as Color;
+  color.hsv.h = hue;
+  color.hsv.s = saturation;
+  color.hsv.v = value;
+  setHslStrings(color);
 
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
 }

@@ -2,9 +2,13 @@ export type State = {
   version: string,
   activeTabId: number;
   activeTabHostname: string;
-  fg: Color;
-  bg: Color;
-  li: Color;
+
+  text: Color;
+  background: Color;
+  link: Color;
+  linkHovered: Color;
+  linkVisited: Color;
+
   activeBtn: string;
   hosts: string[];
   lostConnection: boolean;
@@ -15,8 +19,6 @@ export type Color = {
   hsv: Hsv,
   hslString: string;
   lightnessShift: string;
-  hueHovered: string;
-  hueVisited: string;
 }
 
 export type Hsv = {
