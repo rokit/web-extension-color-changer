@@ -59,8 +59,8 @@ button.active-btn {
   display: grid;
   grid-template-rows: 1fr 1fr 1fr;
   grid-template-columns: auto auto auto auto;
-  grid-column-gap: 20px;
-  grid-row-gap: 20px;
+  grid-column-gap: 0.5rem;
+  grid-row-gap: 1rem;
   margin-bottom: 10px;
   align-items: center;
 }
@@ -68,8 +68,8 @@ button.active-btn {
 #colors button {
   border: 1px solid #808080;
   display: inline-block;
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 5px;
 }
 
