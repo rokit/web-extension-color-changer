@@ -19,7 +19,7 @@ p {
 
 footer {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
 }
 
 button {
@@ -59,10 +59,58 @@ button.active-btn {
   padding-top: 10px;
   display: grid;
   grid-template-rows: 1fr 1fr 1fr;
-  grid-template-columns: 1.5fr 1fr 1.5fr 1fr;
+  grid-template-columns: auto auto auto auto;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   margin-bottom: 10px;
+}
+
+label[for="text"] {
+  order: 0;
+}
+
+#text {
+  order: 1;
+}
+
+label[for="link"] {
+  order: 2;
+}
+
+#link {
+  order: 3;
+}
+
+label[for="background"] {
+  order: 4;
+}
+
+#background {
+  order: 5;
+}
+
+label[for="linkHovered"] {
+  order: 7;
+}
+
+#linkHovered {
+  order: 8;
+}
+
+label[for="blank"] {
+  order: 9;
+}
+
+#blank {
+  order: 10;
+}
+
+label[for="linkVisited"] {
+  order: 11;
+}
+
+#linkVisited {
+  order: 12;
 }
 
 #colors button {
