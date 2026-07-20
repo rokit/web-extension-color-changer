@@ -78,6 +78,10 @@ button.active-btn {
   font-size: 1rem;
 }
 
+label[for="linkHovered"] {
+  margin-left: 20px;
+}
+
 button#reset {
   padding: 4px;
 }
