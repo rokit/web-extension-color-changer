@@ -3,6 +3,7 @@ import { createColor } from "./utils";
 
 export const SHOULD_CONSOLE_LOG = true;
 
+export const STORAGE_ID = "colorChangerState";
 export const GET_STATE = "GET_STATE";
 export const SAVE_STATE = "SAVE_STATE";
 export const UPDATE_CONTENT = "UPDATE_CONTENT";

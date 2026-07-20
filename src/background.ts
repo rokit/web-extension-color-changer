@@ -17,7 +17,7 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
       sendResponse(state)
     }; break;
     case c.SAVE_STATE: {
-      browser.storage.sync.set({ 'colorChangerState': state });
+      browser.storage.sync.set({ [c.STORAGE_ID]: state });
     }; break;
     case c.CHANGE_COLORS: {
       onChangeColors(message.payload);
@@ -55,12 +55,12 @@ function onChangeColors(changeColors: boolean) {
 
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 }
 
 function onSetActiveButton(button: string) {
   state.activeBtn = button;
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 }
 
 function onUpdateColor(hue: number, saturation: number, value: number) {
@@ -104,7 +104,7 @@ function onReset() {
 
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 }
 
 // --------------------------------------------------------------------------------------------- tabs
@@ -112,7 +112,7 @@ function onReset() {
 async function onTabActivated(tabInfo: TabActiveInfo) {
   c.SHOULD_CONSOLE_LOG && console.log('tab activated', tabInfo.tabId);
   state.activeTabId = tabInfo.tabId;
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
   let tab = await browser.tabs.get(tabInfo.tabId);
   validateTab(tab);
 }
@@ -134,7 +134,7 @@ function validateTab(tab: browser.tabs.Tab) {
   c.SHOULD_CONSOLE_LOG && console.log('validating tab', tab);
   state.invalidUrl = false;
   state.lostConnection = false;
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 
   // c.SHOULD_CONSOLE_LOG && console.log('validate tab', tab);
   if (!tab.url) {
@@ -164,7 +164,7 @@ function validateTab(tab: browser.tabs.Tab) {
   }
 
   state.activeTabHostname = url.hostname;
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
@@ -173,7 +173,7 @@ function validateTab(tab: browser.tabs.Tab) {
 function setInvalidUrl() {
   state.activeTabHostname = "";
   state.invalidUrl = true;
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 }
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
@@ -189,7 +189,7 @@ async function sendTabMessage(message: Message) {
   } catch (err) {
     c.SHOULD_CONSOLE_LOG && console.log("cc background - sendTabMessage error: ", err);
     state.lostConnection = true;
-    browser.storage.sync.set({ 'colorChangerState': state });
+    browser.storage.sync.set({ [c.STORAGE_ID]: state });
   }
 }
 
@@ -239,7 +239,7 @@ function onInstalled(details: any) {
 
 // --------------------------------------------------------------------------------------------- storage
 function clearStorage() {
-  browser.storage.sync.remove("colorChangerState");
+  browser.storage.sync.remove(c.STORAGE_ID);
 }
 
 // --------------------------------------------------------------------------------------------- listeners
@@ -253,9 +253,9 @@ browser.runtime.onInstalled.addListener(onInstalled);
 async function initServiceWorker() {
   createContextMenu();
 
-  let storage = await browser.storage.sync.get(['colorChangerState']);
-  if (storage.colorChangerState) {
-    state = storage.colorChangerState;
+  let storage = await browser.storage.sync.get([c.STORAGE_ID]);
+  if (storage[c.STORAGE_ID]) {
+    state = storage[c.STORAGE_ID];
   } else {
     state = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
   }
@@ -277,7 +277,7 @@ async function initServiceWorker() {
   c.SHOULD_CONSOLE_LOG && console.log('state', state);
 
   updateContextMenu();
-  browser.storage.sync.set({ 'colorChangerState': state });
+  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 }
 
 initServiceWorker();
