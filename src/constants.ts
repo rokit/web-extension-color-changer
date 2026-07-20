@@ -22,6 +22,22 @@ export const LINK_VISITED_KEY = "linkVisited";
 export const COLOR_CHANGER_STYLE_ID = "color-changer-style";
 export const COLOR_CHANGER_CLASS_NAME = "color-changer-v5";
 
+export const DISALLOWED_PROTOCOLS = [
+  "about:",
+  "chrome:",
+  "edge:",
+  "chrome-extension:",
+  "moz-extension:",
+  "view-source:",
+  "javascript:",
+  "data:",
+];
+
+export const DISALLOWED_HOSTNAMES = [
+  "addons.mozilla.org",
+  "chromewebstore.google.com",
+];
+
 export const DEFAULT_STATE: State = {
   version: "5.0.0",
   activeTabId: INVALID_TAB,

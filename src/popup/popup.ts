@@ -307,13 +307,13 @@ async function updateUi() {
 
   if (state.activeTabId === c.INVALID_TAB) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
-    changeColorsLabel.textContent = "Please reload this tab or activate a new tab.";
+    changeColorsLabel.textContent = "Invalid tab ID. Activate a new tab.";
   } else if (state.invalidUrl) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
     changeColorsLabel.textContent = "Color Changer can't work on this page.";
   } else if (state.lostConnection) {
     changeColorsCheckbox.setAttribute("disabled", "disabled");
-    changeColorsLabel.textContent = "Please reload this page.";
+    changeColorsLabel.textContent = "Lost connection to tab. Try reloading the page.";
   } else {
     changeColorsCheckbox.removeAttribute("disabled");
     changeColorsLabel.textContent = "Change Colors";

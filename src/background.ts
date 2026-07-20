@@ -128,22 +128,23 @@ function validateTab(tab: browser.tabs.Tab) {
 
   let url = new URL(tab.url);
   c.LOG && console.log('url.hostname', url.hostname);
+  c.LOG && console.log('url.protocol', url.protocol);
 
-  if (!url.hostname) {
-    c.LOG && console.log('Invalid hostname', url.hostname);
-    setInvalidUrl()
+  if (url.hostname == "") {
+    c.LOG && console.log('Empty hostname');
+    setInvalidUrl();
     return;
   }
 
-  if (url.protocol === 'chrome:' || url.protocol === 'about:') {
-    c.LOG && console.log('Invalid protocol', url.protocol);
-    setInvalidUrl()
+  if (c.DISALLOWED_PROTOCOLS.includes(url.protocol)) {
+    c.LOG && console.log('Disallowed protocol', url.protocol);
+    setInvalidUrl();
     return;
   }
 
-  if (url.hostname === "addons.mozilla.org") {
-    c.LOG && console.log('Invalid hostname', url.hostname);
-    setInvalidUrl()
+  if (c.DISALLOWED_HOSTNAMES.includes(url.hostname)) {
+    c.LOG && console.log('Disallowed hostname', url.hostname);
+    setInvalidUrl();
     return;
   }
 
@@ -171,7 +172,7 @@ async function sendTabMessage(message: Message) {
     c.LOG && console.log('cc background - sendTabMessage: ', message);
     await browser.tabs.sendMessage(state.activeTabId, message);
   } catch (err) {
-    c.LOG && console.log("cc background - sendTabMessage error: ", err);
+    c.LOG && console.error("cc background - sendTabMessage error: ", err);
     state.lostConnection = true;
     browser.storage.sync.set({ [c.STORAGE_ID]: state });
   }
