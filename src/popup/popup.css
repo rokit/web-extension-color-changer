@@ -65,54 +65,6 @@ button.active-btn {
   margin-bottom: 10px;
 }
 
-label[for="text"] {
-  order: 0;
-}
-
-#text {
-  order: 1;
-}
-
-label[for="link"] {
-  order: 2;
-}
-
-#link {
-  order: 3;
-}
-
-label[for="background"] {
-  order: 4;
-}
-
-#background {
-  order: 5;
-}
-
-label[for="linkHovered"] {
-  order: 7;
-}
-
-#linkHovered {
-  order: 8;
-}
-
-label[for="blank"] {
-  order: 9;
-}
-
-#blank {
-  order: 10;
-}
-
-label[for="linkVisited"] {
-  order: 11;
-}
-
-#linkVisited {
-  order: 12;
-}
-
 #colors button {
   border: none;
   display: inline-block;
