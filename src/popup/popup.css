@@ -27,7 +27,8 @@ button {
 }
 
 button.active-btn {
-  background-color: #fff;
+  outline: 1px solid blue;
+  outline-offset: 3px;
 }
 
 #checkbox-container {
@@ -54,58 +55,28 @@ button.active-btn {
 }
 
 #colors {
+  border-top: 1px solid #00000030;
+  padding-top: 10px;
   display: grid;
-  grid-template: [row1-start] "fore fore_swatch" auto [row1-end] [row2-start] "back back_swatch" auto [row2-end] [row3-start] "link link_swatch" auto [row3-end] / 80% auto;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 1.5fr 1fr 1.5fr 1fr;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   margin-bottom: 10px;
 }
 
-#fore {
-  grid-area: fore;
+#colors button {
+  border: none;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
 }
 
-#back {
-  grid-area: back;
-}
-
-#link {
-  grid-area: link;
-}
-
-#fore_swatch {
-  grid-area: fore_swatch;
-}
-
-#back_swatch {
-  grid-area: back_swatch;
-}
-
-#link_swatch {
-  grid-area: link_swatch;
-}
-
-.slide-container {
-  display: flex;
-  width: 100%;
-  margin: 10px 0;
-}
-
-#lightness-value {
-  width: 20%;
-  text-align: center;
-  font-size: 1.4rem;
-  color: #333333;
-  text-emphasis: center;
-  margin: auto;
-}
-
-.slider {
-  width: 80%;
-}
-
-.slider:hover {
-  opacity: 1;
+#colors label {
+  align-self: center;
+  justify-self: right;
+  font-size: 1rem;
 }
 
 button#reset {

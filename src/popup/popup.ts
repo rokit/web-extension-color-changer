@@ -240,13 +240,6 @@ let linkBtn = document.getElementById(c.LINK_KEY)! as HTMLButtonElement;
 let linkHoveredBtn = document.getElementById(c.LINK_HOVERED_KEY)! as HTMLButtonElement;
 let linkVisitedBtn = document.getElementById(c.LINK_VISITED_KEY)! as HTMLButtonElement;
 
-let textSwatch = document.getElementById(`${c.TEXT_KEY}-swatch`)! as HTMLDivElement;
-let backgroundSwatch = document.getElementById(`${c.BACKGROUND_KEY}-swatch`)! as HTMLDivElement;
-let linkSwatch = document.getElementById(`${c.LINK_KEY}-swatch`)! as HTMLDivElement;
-let linkHoveredSwatch = document.getElementById(`${c.LINK_HOVERED_KEY}-swatch`)! as HTMLDivElement;
-console.log('linkHoveredSwatch:', linkHoveredSwatch.id);
-let linkVisitedSwatch = document.getElementById(`${c.LINK_VISITED_KEY}-swatch`)! as HTMLDivElement;
-
 let resetBtn = document.getElementById("reset")! as HTMLButtonElement;
 
 changeColorsCheckbox.onclick = () => {
@@ -276,15 +269,10 @@ function onClickLinkVisited() {
 }
 
 textBtn.onclick = onClickForeground;
-textSwatch.onclick = onClickForeground;
 backgroundBtn.onclick = onClickBackground;
-backgroundSwatch.onclick = onClickBackground;
 linkBtn.onclick = onClickLink;
-linkSwatch.onclick = onClickLink;
 linkHoveredBtn.onclick = onClickLinkHovered;
-linkHoveredSwatch.onclick = onClickLinkHovered;
 linkVisitedBtn.onclick = onClickLinkVisited;
-linkVisitedSwatch.onclick = onClickLinkVisited;
 
 async function setActiveColorButton(state: State) {
   textBtn.classList.remove("active-btn");
@@ -309,11 +297,11 @@ function updateColorPickerFromState(state: State) {
 async function updateUi() {
   let state: State = await browser.runtime.sendMessage({ message: c.GET_STATE });
 
-  textSwatch.style.background = state.text.hslString;
-  backgroundSwatch.style.background = state.background.hslString;
-  linkSwatch.style.background = state.link.hslString;
-  linkHoveredSwatch.style.background = state.linkHovered.hslString;
-  linkVisitedSwatch.style.background = state.linkVisited.hslString;
+  textBtn.style.background = state.text.hslString;
+  backgroundBtn.style.background = state.background.hslString;
+  linkBtn.style.background = state.link.hslString;
+  linkHoveredBtn.style.background = state.linkHovered.hslString;
+  linkVisitedBtn.style.background = state.linkVisited.hslString;
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
 
