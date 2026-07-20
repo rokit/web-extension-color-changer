@@ -20,74 +20,63 @@ let css = "";
 function updateCss(state: State) {
   if (!state) return;
 
-  let courseraPlayer = ".rc-VideoMiniPlayer *";
-
-  // yt
-  let youtubePlayer = "#player *";
-  let youtubeFullscreenPlayer = "#player-container *";
-  let youtubeThumbnail = "ytd-video-renderer *";
-  let youtubeAppDrawer = "tp-yt-app-drawer *";
-  let youtubeRichShelfRenderer = "ytd-rich-shelf-renderer *";
-
-  // reddit
-  let mediaImg = "media-lightbox-img *";
-
-  // let not = `:not(img, video, svg, ${courseraPlayer}, ${youtubePlayer}, ${youtubeFullscreenPlayer}, ${youtubeThumbnail}, ${youtubeAppDrawer}, ${youtubeRichShelfRenderer}, ${mediaImg})`;
-  let notId = ":not(#increase-specificity)";
+  let is = ":not(#increase-specificity-yo)";
 
   css = `
-  .${c.COLOR_CHANGER_CLASS_NAME} *:not(html):not(body):has(img),
-  .${c.COLOR_CHANGER_CLASS_NAME} *:not(html):not(body):has(svg),
-  .${c.COLOR_CHANGER_CLASS_NAME} *:not(html):not(body):has(video)
-  {
-    background: transparent !important;
-  }
-
-  .${c.COLOR_CHANGER_CLASS_NAME}
+  .${c.COLOR_CHANGER_CLASS_NAME},
+  .${c.COLOR_CHANGER_CLASS_NAME} *
   {
     color: ${state.text.hslString} !important;
-    background-color: ${state.background.hslString} !important;
+    background: transparent !important;
     border-color: ${state.background.lightnessShift} !important;
   }
 
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} input,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} input *,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} textarea,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} textarea *,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} pre,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} pre *,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} code,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} code *
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} body,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} header,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} footer,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} nav
+  {
+    background-color: ${state.background.hslString} !important;
+  }
+
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} input,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} input *,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} textarea,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} textarea *,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} pre,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} pre *,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} code,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} code *
   {
     background-color: ${state.background.lightnessShift} !important;
   }
 
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} button,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} button *
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} button,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} button *
   {
     color: ${state.link.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a *
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a *
   {
     color: ${state.link.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:hover,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:hover *
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:hover,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:hover *
   {
     color: ${state.linkHovered.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:active,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:active *
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:active,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:active *
   {
     color: ${state.linkVisited.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:visited,
-  .${c.COLOR_CHANGER_CLASS_NAME}${notId} a:visited *
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:visited,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:visited *
   {
     color: ${state.linkVisited.hslString} !important;
     background-color: transparent !important;
