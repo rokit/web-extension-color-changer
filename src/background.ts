@@ -90,18 +90,17 @@ function onUpdateColor(hue: number, saturation: number, value: number) {
 }
 
 /** Sets back to defaults. Does not reset:
- * activeTabId
- * activeTabHostname
+ * - activeTabId
+ * - activeTabHostname
 */
 function onReset() {
-  let defaultState = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
-  state.hosts = defaultState.hosts;
-  state.fg = defaultState.fg;
-  state.bg = defaultState.bg;
-  state.li = defaultState.li;
-  state.activeBtn = defaultState.activeBtn;
-  state.lostConnection = defaultState.lostConnection;
-  state.invalidUrl = defaultState.invalidUrl;
+  // Properties to preserve between resets.
+  let activeTabId = state.activeTabId;
+  let activeTabHostname = state.activeTabHostname;
+
+  state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
+  state.activeTabId = activeTabId;
+  state.activeTabHostname = activeTabHostname;
 
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
@@ -255,8 +254,10 @@ async function initServiceWorker() {
   createContextMenu();
 
   let storage = await browser.storage.sync.get(['colorChangerState']);
-  if (storage?.colorChangerState) {
+  if (storage.colorChangerState) {
     state = storage.colorChangerState;
+  } else {
+    state = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
   }
 
   // Initialize tabs.
