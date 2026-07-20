@@ -1,7 +1,7 @@
 import { type State } from "./types";
 import { createColor } from "./utils";
 
-export const SHOULD_CONSOLE_LOG = true;
+export const LOG = true;
 
 export const STORAGE_ID = "colorChangerState";
 export const GET_STATE = "GET_STATE";

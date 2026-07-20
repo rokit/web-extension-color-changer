@@ -36,14 +36,14 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
 }
 
 function onChangeColors(changeColors: boolean) {
-  c.SHOULD_CONSOLE_LOG && console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
+  c.LOG && console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
   if (!state.activeTabHostname) {
-    c.SHOULD_CONSOLE_LOG && console.log('onChangeColors - No hostname');
+    c.LOG && console.log('onChangeColors - No hostname');
     return
   };
 
   if (!state.activeTabId) {
-    c.SHOULD_CONSOLE_LOG && console.log('onChangeColors - No tab ID.');
+    c.LOG && console.log('onChangeColors - No tab ID.');
     return;
   }
 
@@ -94,7 +94,7 @@ function onReset() {
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
 async function onTabActivated(tabInfo: TabActiveInfo) {
-  c.SHOULD_CONSOLE_LOG && console.log('tab activated', tabInfo.tabId);
+  c.LOG && console.log('tab activated', tabInfo.tabId);
   state.activeTabId = tabInfo.tabId;
   browser.storage.sync.set({ [c.STORAGE_ID]: state });
   let tab = await browser.tabs.get(tabInfo.tabId);
@@ -102,8 +102,8 @@ async function onTabActivated(tabInfo: TabActiveInfo) {
 }
 
 function onTabUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab) {
-  c.SHOULD_CONSOLE_LOG && console.log('tabUdpated', tab);
-  c.SHOULD_CONSOLE_LOG && console.log('changeInfo', changeInfo);
+  c.LOG && console.log('tabUdpated', tab);
+  c.LOG && console.log('changeInfo', changeInfo);
   if (state.activeTabId === c.INVALID_TAB) {
     // Tab ID can be invalid if the browser was first loaded.
     state.activeTabId = tabId;
@@ -115,7 +115,7 @@ function onTabUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab) {
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
 function validateTab(tab: browser.tabs.Tab) {
-  c.SHOULD_CONSOLE_LOG && console.log('validating tab', tab);
+  c.LOG && console.log('validating tab', tab);
   state.invalidUrl = false;
   state.lostConnection = false;
   browser.storage.sync.set({ [c.STORAGE_ID]: state });
@@ -127,22 +127,22 @@ function validateTab(tab: browser.tabs.Tab) {
   };
 
   let url = new URL(tab.url);
-  c.SHOULD_CONSOLE_LOG && console.log('url.hostname', url.hostname);
+  c.LOG && console.log('url.hostname', url.hostname);
 
   if (!url.hostname) {
-    c.SHOULD_CONSOLE_LOG && console.log('Invalid hostname', url.hostname);
+    c.LOG && console.log('Invalid hostname', url.hostname);
     setInvalidUrl()
     return;
   }
 
   if (url.protocol === 'chrome:' || url.protocol === 'about:') {
-    c.SHOULD_CONSOLE_LOG && console.log('Invalid protocol', url.protocol);
+    c.LOG && console.log('Invalid protocol', url.protocol);
     setInvalidUrl()
     return;
   }
 
   if (url.hostname === "addons.mozilla.org") {
-    c.SHOULD_CONSOLE_LOG && console.log('Invalid hostname', url.hostname);
+    c.LOG && console.log('Invalid hostname', url.hostname);
     setInvalidUrl()
     return;
   }
@@ -163,15 +163,15 @@ function setInvalidUrl() {
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 async function sendTabMessage(message: Message) {
   if (!state.activeTabId) {
-    c.SHOULD_CONSOLE_LOG && console.log('No active tab ID.');
+    c.LOG && console.log('No active tab ID.');
     return
   };
 
   try {
-    c.SHOULD_CONSOLE_LOG && console.log('cc background - sendTabMessage: ', message);
+    c.LOG && console.log('cc background - sendTabMessage: ', message);
     await browser.tabs.sendMessage(state.activeTabId, message);
   } catch (err) {
-    c.SHOULD_CONSOLE_LOG && console.log("cc background - sendTabMessage error: ", err);
+    c.LOG && console.log("cc background - sendTabMessage error: ", err);
     state.lostConnection = true;
     browser.storage.sync.set({ [c.STORAGE_ID]: state });
   }
@@ -202,7 +202,7 @@ async function updateContextMenu() {
   try {
     await browser.contextMenus.update(c.CHANGE_COLORS, { checked: shouldChangeColors(state) });
   } catch (e) {
-    c.SHOULD_CONSOLE_LOG && console.error('cc background - updateContextMenu: ', e);
+    c.LOG && console.error('cc background - updateContextMenu: ', e);
   }
 }
 
@@ -258,7 +258,7 @@ async function initServiceWorker() {
     }
   }
 
-  c.SHOULD_CONSOLE_LOG && console.log('state', state);
+  c.LOG && console.log('state', state);
 
   updateContextMenu();
   browser.storage.sync.set({ [c.STORAGE_ID]: state });

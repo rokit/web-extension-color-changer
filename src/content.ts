@@ -2,7 +2,7 @@ import * as c from "./constants";
 import { type Message, type State } from "./types";
 import { shouldChangeColors } from "./utils";
 
-c.SHOULD_CONSOLE_LOG && console.log('cc content - loaded content script');
+c.LOG && console.log('cc content - loaded content script');
 
 if (!globalThis.browser) {
   // @ts-ignore
