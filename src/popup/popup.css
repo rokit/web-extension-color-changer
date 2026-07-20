@@ -60,9 +60,10 @@ button.active-btn {
   display: grid;
   grid-template-rows: 1fr 1fr 1fr;
   grid-template-columns: auto auto auto auto;
-  grid-column-gap: 10px;
-  grid-row-gap: 10px;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
   margin-bottom: 10px;
+  align-items: center;
 }
 
 #colors button {
@@ -74,7 +75,7 @@ button.active-btn {
 }
 
 #colors label {
-  align-self: center;
+  text-align: right;
   justify-self: right;
   font-size: 1rem;
 }
