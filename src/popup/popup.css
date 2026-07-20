@@ -9,6 +9,8 @@ html {
 }
 
 body {
+  /* max-width: 800px;
+  max-height: 600px; */
   padding: 10px;
 }
 
@@ -50,6 +52,10 @@ button.active-btn {
 
 #checkbox-container:hover {
   background-color: #ddd;
+}
+
+#checkbox-container.error {
+  background-color: #ffabab;
 }
 
 #colors {
