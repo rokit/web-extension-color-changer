@@ -8,7 +8,7 @@ export class MockBrowser {
     runtime: object
 
     constructor() {
-        this.state = c.DEFAULT_STATE;
+        this.state = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
         this.state.activeTabId = 1;
         this.storage = {
             onChanged: {
