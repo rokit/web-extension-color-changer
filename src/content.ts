@@ -23,13 +23,11 @@ function updateCss(state: State) {
   let courseraPlayer = ".rc-VideoMiniPlayer *";
   let youtubePlayer = "#player *";
   let youtubeFullscreenPlayer = "#player-container *";
-  let youtubeThumbnail = ".ytd-rich-item-renderer *";
-  let youtubeSidebar = ".ytd-guide-renderer *";
-  let youtubeSearchHeader = ".ytd-masthead *";
-  let youtubeShorts = "#shorts-inner-container *"
-  let youtubeGrid = ".ytd-grid-renderer *";
+  let youtubeThumbnail = "ytd-video-renderer *";
+  let youtubeAppDrawer = "tp-yt-app-drawer *";
+  let youtubeRichShelfRenderer = "ytd-rich-shelf-renderer *";
 
-  let not = `:not(img, video, svg, ${courseraPlayer}, ${youtubePlayer}, ${youtubeFullscreenPlayer}, ${youtubeGrid}, ${youtubeThumbnail}, ${youtubeSidebar}, ${youtubeSearchHeader}, ${youtubeShorts})`;
+  let not = `:not(img, video, svg, ${courseraPlayer}, ${youtubePlayer}, ${youtubeFullscreenPlayer}, ${youtubeThumbnail}, ${youtubeAppDrawer}, ${youtubeRichShelfRenderer})`;
   let notId = ":not(#increase-specificity)";
 
   css = `
