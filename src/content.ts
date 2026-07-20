@@ -21,19 +21,29 @@ function updateCss(state: State) {
   if (!state) return;
 
   let courseraPlayer = ".rc-VideoMiniPlayer *";
+
+  // yt
   let youtubePlayer = "#player *";
   let youtubeFullscreenPlayer = "#player-container *";
   let youtubeThumbnail = "ytd-video-renderer *";
   let youtubeAppDrawer = "tp-yt-app-drawer *";
   let youtubeRichShelfRenderer = "ytd-rich-shelf-renderer *";
 
-  let not = `:not(img, video, svg, ${courseraPlayer}, ${youtubePlayer}, ${youtubeFullscreenPlayer}, ${youtubeThumbnail}, ${youtubeAppDrawer}, ${youtubeRichShelfRenderer})`;
+  // reddit
+  let mediaImg = "media-lightbox-img *";
+
+  // let not = `:not(img, video, svg, ${courseraPlayer}, ${youtubePlayer}, ${youtubeFullscreenPlayer}, ${youtubeThumbnail}, ${youtubeAppDrawer}, ${youtubeRichShelfRenderer}, ${mediaImg})`;
   let notId = ":not(#increase-specificity)";
 
   css = `
-  .${c.COLOR_CHANGER_CLASS_NAME},
-  .${c.COLOR_CHANGER_CLASS_NAME} body,
-  .${c.COLOR_CHANGER_CLASS_NAME} ${not}
+  .${c.COLOR_CHANGER_CLASS_NAME} *:not(html):not(body):has(img),
+  .${c.COLOR_CHANGER_CLASS_NAME} *:not(html):not(body):has(svg),
+  .${c.COLOR_CHANGER_CLASS_NAME} *:not(html):not(body):has(video)
+  {
+    background: transparent !important;
+  }
+
+  .${c.COLOR_CHANGER_CLASS_NAME}
   {
     color: ${state.text.hslString} !important;
     background-color: ${state.background.hslString} !important;
