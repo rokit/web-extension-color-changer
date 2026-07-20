@@ -67,3 +67,8 @@ export function shouldChangeColors(state: State): boolean {
 export function roundToTenths(num: number) {
   return Math.round((num + Number.EPSILON) * 10) / 10;
 }
+
+/** Try to preserve colors and hosts from old versions */
+export function migrateVersion(oldState: any, newState: State) {
+
+}
