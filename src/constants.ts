@@ -44,10 +44,10 @@ export const DEFAULT_STATE: State = {
   activeTabHostname: "",
 
   text: createColor(0, 0, 80),
-  background: createColor(0, 0, 25),
-  link: createColor(116, 33, 96),
-  linkHovered: createColor(146, 33, 96),
-  linkVisited: createColor(86, 33, 96),
+  background: createColor(0, 0, 18),
+  link: createColor(180, 33, 96),
+  linkHovered: createColor(120, 33, 96),
+  linkVisited: createColor(240, 33, 96),
 
   activeBtn: TEXT_KEY,
   hosts: [],
