@@ -146,7 +146,7 @@ function updateSquareReticle(e: MouseEvent) {
   selectedSaturation = Math.round(selectedSaturation);
   selectedValue = Math.round(selectedValue);
 
-  hsvToHexInput();
+  updateHexInput();
   updateSquareReticleElement();
   browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
 }
@@ -166,7 +166,7 @@ function updateHueReticle(e: MouseEvent) {
   hueReticle.x = hueReticleDistance * Math.cos(degToRad(selectedHue));
   hueReticle.y = hueReticleDistance * Math.sin(degToRad(selectedHue));
 
-  hsvToHexInput();
+  updateHexInput();
   updateHueReticleElement();
   browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue, } });
   drawColorPicker();
@@ -226,7 +226,7 @@ function drawColorPicker() {
   ctx.putImageData(imageData, 0, 0);
 }
 
-function hsvToHexInput() {
+function updateHexInput() {
   let hex = convert.hsv.hex(selectedHue, selectedSaturation, selectedValue);
   hexInputElement.classList.remove("hexError");
   hexInputElement.value = hex;
@@ -301,7 +301,7 @@ function updateColorPickerFromState(state: State) {
     default: break;
   }
 
-  hsvToHexInput();
+  updateHexInput();
   updateReticlesFromHsv();
   drawColorPicker();
 }
