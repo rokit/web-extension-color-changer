@@ -284,10 +284,8 @@ initServiceWorker();
 
 // can potentially use this to check for errors
 // function hasError() {
-//   if (bIsChrome && browser.runtime.lastError) {
+//   if (browser.runtime.lastError) {
 //       return true;
-//   } else if (browser.runtime.lastError) {
-//     return true;
 //   }
 //   return false;
 // }
