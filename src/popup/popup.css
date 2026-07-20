@@ -33,20 +33,19 @@ button.active-btn {
 #checkbox-container {
   display: flex;
   background-color: #eee;
+  align-items: center;
 }
 
 #checkbox-container label {
+  padding: 14px;
   flex: 1;
-  align-self: center;
-  padding: 14px 0 14px 10px;
   user-select: none;
 }
 
 #checkbox-container input[type="checkbox"] {
-  width: 30px;
-  height: 30px;
-  align-self: center;
-  margin-right: 10px;
+  margin: 14px;
+  width: 2rem;
+  height: 2rem;
 }
 
 #checkbox-container:hover {
