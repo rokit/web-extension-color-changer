@@ -25,34 +25,34 @@ export function mapRange(
 
 export function createColor(hue: number, saturation: number, value: number) {
   let color: Color = {
-    hue,
-    saturation,
-    value,
-    hsl: "",
-    valueShift: "",
+    hsv: {
+      h: hue,
+      s: saturation,
+      v: value,
+    },
+    hslString: "",
+    lightnessShift: "",
     hueHovered: "",
     hueVisited: "",
-    alpha: "",
   }
   setHslStrings(color);
   return color;
 }
 
 export function setHslStrings(color: Color) {
-  let hsl = convert.hsv.hsl.raw(color.hue, color.saturation, color.value);
+  let hsl = convert.hsv.hsl.raw(color.hsv.h, color.hsv.s, color.hsv.v);
   let h = hsl[0];
   let s = hsl[1];
   let l = hsl[2];
 
-  color.hsl = `hsl(${h}, ${s}%, ${l}%)`;
+  color.hslString = `hsl(${h}, ${s}%, ${l}%)`;
   if (l >= 50) {
-    color.valueShift = `hsl(${h}, ${s}%, ${l - 10}%)`;
+    color.lightnessShift = `hsl(${h}, ${s}%, ${l - 10}%)`;
   } else {
-    color.valueShift = `hsl(${h}, ${s}%, ${l + 10}%)`;
+    color.lightnessShift = `hsl(${h}, ${s}%, ${l + 10}%)`;
   }
   color.hueHovered = `hsl(${h + 40 % 360}, ${s + 20}%, ${l}%)`;
   color.hueVisited = `hsl(${h - 40 % 360}, ${s + 20}%, ${l}%)`;
-  color.alpha = `hsla(${h}, ${s}%, ${l}%, 0.5)`;
 }
 
 export function shouldChangeColors(state: State): boolean {

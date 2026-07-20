@@ -281,22 +281,22 @@ async function setActiveColorButton(state: State) {
 function updateColorPickerFromState(state: State) {
   switch (state.activeBtn) {
     case c.FORE_BTN: {
-      let { hue, saturation, value } = state.fg;
-      selectedHue = hue;
-      selectedSaturation = saturation;
-      selectedValue = value;
+      let { h, s, v } = state.fg.hsv;
+      selectedHue = h;
+      selectedSaturation = s;
+      selectedValue = v;
     } break;
     case c.BACK_BTN: {
-      let { hue, saturation, value } = state.bg;
-      selectedHue = hue;
-      selectedSaturation = saturation;
-      selectedValue = value;
+      let { h, s, v } = state.bg.hsv;
+      selectedHue = h;
+      selectedSaturation = s;
+      selectedValue = v;
     } break;
     case c.LINK_BTN: {
-      let { hue, saturation, value } = state.li;
-      selectedHue = hue;
-      selectedSaturation = saturation;
-      selectedValue = value;
+      let { h, s, v } = state.li.hsv;
+      selectedHue = h;
+      selectedSaturation = s;
+      selectedValue = v;
     } break;
     default: break;
   }
@@ -309,9 +309,9 @@ function updateColorPickerFromState(state: State) {
 async function updateUi() {
   let state: State = await browser.runtime.sendMessage({ message: c.GET_STATE });
 
-  foreSwatch.style.background = state.fg.hsl;
-  backSwatch.style.background = state.bg.hsl;
-  linkSwatch.style.background = state.li.hsl;
+  foreSwatch.style.background = state.fg.hslString;
+  backSwatch.style.background = state.bg.hslString;
+  linkSwatch.style.background = state.li.hslString;
 
   changeColorsCheckbox.checked = shouldChangeColors(state);
 

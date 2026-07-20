@@ -31,21 +31,21 @@ export class MockBrowser {
                     case c.UPDATE_COLOR: {
                         switch (this.state.activeBtn) {
                             case c.FORE_BTN: {
-                                this.state.fg.hue = message.payload.hue;
-                                this.state.fg.saturation = message.payload.saturation;
-                                this.state.fg.value = message.payload.value;
+                                this.state.fg.hsv.h = message.payload.hue;
+                                this.state.fg.hsv.s = message.payload.saturation;
+                                this.state.fg.hsv.v = message.payload.value;
                                 setHslStrings(this.state.fg);
                             } break;
                             case c.BACK_BTN: {
-                                this.state.bg.hue = message.payload.hue;
-                                this.state.bg.saturation = message.payload.saturation;
-                                this.state.bg.value = message.payload.value;
+                                this.state.bg.hsv.h = message.payload.hue;
+                                this.state.bg.hsv.s = message.payload.saturation;
+                                this.state.bg.hsv.v = message.payload.value;
                                 setHslStrings(this.state.bg);
                             } break;
                             case c.LINK_BTN: {
-                                this.state.li.hue = message.payload.hue;
-                                this.state.li.saturation = message.payload.saturation;
-                                this.state.li.value = message.payload.value;
+                                this.state.li.hsv.h = message.payload.hue;
+                                this.state.li.hsv.s = message.payload.saturation;
+                                this.state.li.hsv.v = message.payload.value;
                                 setHslStrings(this.state.li);
                             } break;
                             default: break;

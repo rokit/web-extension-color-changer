@@ -11,14 +11,17 @@ export interface State {
 }
 
 export interface Color {
-  hue: number,
-  saturation: number,
-  value: number,
-  hsl: string;
-  valueShift: string;
+  hsv: Hsv,
+  hslString: string;
+  lightnessShift: string;
   hueHovered: string;
   hueVisited: string;
-  alpha: string;
+}
+
+export type Hsv = {
+  h: number,
+  s: number,
+  v: number,
 }
 
 export interface Message {
