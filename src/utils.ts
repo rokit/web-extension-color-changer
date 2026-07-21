@@ -1,5 +1,6 @@
 import convert from "color-convert";
 import { type Color, type State } from "./types";
+import * as c from "./constants";
 
 const DEG_TO_RAD = Math.PI / 180;
 const RAD_TO_DEG = 180 / Math.PI;
@@ -64,7 +65,49 @@ export function roundToTenths(num: number) {
   return Math.round((num + Number.EPSILON) * 10) / 10;
 }
 
-/** Try to preserve colors and hosts from old versions */
-export function migrateVersion(oldState: any, newState: State) {
+/** Try to preserve colors and hosts from old versions. */
+export function migrateVersion(oldState: any) {
+  let newState: State = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
 
+  c.LOG && console.log('cc - migrateVersion - oldState:', oldState);
+
+  if (Object.hasOwn(oldState, "version") && oldState.version == newState.version) {
+    // We're using the current version's state.
+    return oldState;
+  }
+
+  // update to new state
+  if (Object.hasOwn(oldState, "hosts")) {
+    newState.hosts = oldState.hosts;
+  }
+
+  if (Object.hasOwn(oldState, "fg") && Object.hasOwn(oldState.fg, "swatch")) {
+    let hsl = oldState.fg.swatch;
+    let hsv = convert.hsl.hsv.raw(hsl.hue, hsl.saturation, hsl.lightness);
+    newState.text = createColor(hsv[0], hsv[1], hsv[2]);
+  }
+
+  if (Object.hasOwn(oldState, "bg") && Object.hasOwn(oldState.bg, "swatch")) {
+    let hsl = oldState.bg.swatch;
+    let hsv = convert.hsl.hsv.raw(hsl.hue, hsl.saturation, hsl.lightness);
+    newState.background = createColor(hsv[0], hsv[1], hsv[2]);
+  }
+
+  if (Object.hasOwn(oldState, "li") && Object.hasOwn(oldState.li, "swatch")) {
+    let hsl = oldState.li.swatch;
+    let hsv = convert.hsl.hsv.raw(hsl.hue, hsl.saturation, hsl.lightness);
+    newState.link = createColor(hsv[0], hsv[1], hsv[2]);
+
+    let hoveredHue = (hsl.hue + 40) % 360
+    let hoveredSat = hsl.saturation + 20;
+    let hoveredHsv = convert.hsl.hsv.raw(hoveredHue, hoveredSat, hsl.lightness);
+    newState.linkHovered = createColor(hoveredHsv[0], hoveredHsv[1], hoveredHsv[2]);
+
+    let visitedHue = (hsl.hue - 40) % 360;
+    let visitedSat = hsl.saturation + 20;
+    let visitedHsv = convert.hsl.hsv.raw(visitedHue, visitedSat, hsl.lightness);
+    newState.linkHovered = createColor(visitedHsv[0], visitedHsv[1], visitedHsv[2]);
+  }
+
+  return newState;
 }

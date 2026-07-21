@@ -110,6 +110,7 @@ label[for="linkHovered"] {
   margin-left: 20px;
 }
 
-button#reset {
+footer button {
   padding: 4px;
+  margin-right: 10px;
 }

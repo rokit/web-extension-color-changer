@@ -1,7 +1,7 @@
 
 import * as c from "./constants";
 import { type Color, type Message, type State, type TabActiveInfo } from "./types";
-import { setHslStrings, shouldChangeColors } from "./utils";
+import { migrateVersion, setHslStrings, shouldChangeColors } from "./utils";
 
 if (!globalThis.browser) {
   // @ts-ignore
@@ -30,6 +30,9 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     }; break;
     case c.RESET: {
       onReset();
+    }; break;
+    case c.CLEAR_STORAGE: {
+      clearStorage();
     }; break;
     default: break;
   }
@@ -224,6 +227,7 @@ function onInstalled(details: any) {
 
 // --------------------------------------------------------------------------------------------- storage
 function clearStorage() {
+  c.LOG && console.log('cc - storage cleared');
   browser.storage.sync.remove(c.STORAGE_ID);
 }
 
@@ -239,8 +243,10 @@ async function initServiceWorker() {
   createContextMenu();
 
   let storage = await browser.storage.sync.get([c.STORAGE_ID]);
-  if (storage[c.STORAGE_ID]) {
+
+  if (Object.hasOwn(storage, c.STORAGE_ID)) {
     state = storage[c.STORAGE_ID];
+    state = migrateVersion(state);
   } else {
     state = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
   }
@@ -259,7 +265,7 @@ async function initServiceWorker() {
     }
   }
 
-  c.LOG && console.log('state', state);
+  c.LOG && console.log('initialized state', state);
 
   updateContextMenu();
   browser.storage.sync.set({ [c.STORAGE_ID]: state });

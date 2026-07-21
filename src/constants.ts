@@ -11,6 +11,7 @@ export const CHANGE_COLORS = "CHANGE_COLORS";
 export const SET_ACTIVE_BUTTON = "SET_ACTIVE_BUTTON";
 export const UPDATE_COLOR = "UPDATE_COLOR";
 export const RESET = "RESET";
+export const CLEAR_STORAGE = "CLEAR_STORAGE";
 export const INVALID_TAB = -9999;
 
 export const TEXT_KEY = "text";

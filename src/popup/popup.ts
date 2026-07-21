@@ -235,6 +235,7 @@ let changeColorsCheckbox = document.getElementById("change-colors")! as HTMLInpu
 let changeColorsLabel = document.getElementById("change-colors-label")! as HTMLInputElement;
 let checkboxContainer = document.getElementById("checkbox-container")! as HTMLDivElement;
 let errorElement = document.getElementById("error")! as HTMLDivElement;
+let footerElement = document.getElementsByTagName("footer")[0]! as HTMLElement;
 
 let textBtn = document.getElementById(c.TEXT_KEY)! as HTMLButtonElement;
 let backgroundBtn = document.getElementById(c.BACKGROUND_KEY)! as HTMLButtonElement;
@@ -275,6 +276,18 @@ backgroundBtn.onclick = onClickBackground;
 linkBtn.onclick = onClickLink;
 linkHoveredBtn.onclick = onClickLinkHovered;
 linkVisitedBtn.onclick = onClickLinkVisited;
+
+function addClearStorageBtn() {
+  if (!c.LOG) return;
+
+  let button = document.createElement("button") as HTMLButtonElement;
+  button.textContent = "Clear storage";
+  button.onclick = function () {
+    browser.runtime.sendMessage({ message: c.CLEAR_STORAGE });
+  }
+
+  footerElement.appendChild(button);
+}
 
 async function setActiveColorButton(state: State) {
   textBtn.classList.remove("active-btn");
@@ -328,6 +341,7 @@ async function updateUi() {
   updateColorPickerFromState(state);
 }
 
+addClearStorageBtn();
 updateDocumentCpCenter();
 updateSquareReticleElement();
 updateHueReticleElement();
