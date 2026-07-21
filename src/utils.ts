@@ -74,7 +74,7 @@ export async function updateContextMenu() {
   }
 }
 
-//** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
+/** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 export async function sendTabMessage(message: Message) {
   let { activeTabId } = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY]);
 
