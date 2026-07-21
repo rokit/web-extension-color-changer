@@ -29,6 +29,7 @@ async function updateCss(state: ColorState) {
     border-color: ${state.background.lightnessShift} !important;
   }
 
+  .${c.COLOR_CHANGER_CLASS_NAME}${is},
   .${c.COLOR_CHANGER_CLASS_NAME}${is} body,
   .${c.COLOR_CHANGER_CLASS_NAME}${is} nav,
   .${c.COLOR_CHANGER_CLASS_NAME}${is} ul,
