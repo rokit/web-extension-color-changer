@@ -8,8 +8,9 @@ export class MockBrowser {
     runtime: object
 
     constructor() {
-        this.state = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
+        this.state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
         this.state.activeTabId = 1;
+
         this.storage = {
             onChanged: {
                 addListener: (listener: any) => {
@@ -17,6 +18,7 @@ export class MockBrowser {
                 }
             }
         }
+
         this.runtime = {
             sendMessage: (message: any) => {
                 switch (message.message) {

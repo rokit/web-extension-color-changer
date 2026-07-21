@@ -1,6 +1,6 @@
 
 import * as c from "./constants";
-import { type Color, type Message, type State, type TabActiveInfo } from "./types";
+import { type Message, type TabActiveInfo } from "./types";
 import { migrateVersion, setHslStrings, shouldChangeColors } from "./utils";
 
 if (!globalThis.browser) {
@@ -8,17 +8,9 @@ if (!globalThis.browser) {
   globalThis.browser = chrome;
 }
 
-let state: State = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
-
 // --------------------------------------------------------------------------------------------- actions
 function onMessage(message: Message, _sender: any, sendResponse: any) {
   switch (message.message) {
-    case c.GET_STATE: {
-      sendResponse(state)
-    }; break;
-    case c.SAVE_STATE: {
-      browser.storage.sync.set({ [c.STORAGE_ID]: state });
-    }; break;
     case c.CHANGE_COLORS: {
       onChangeColors(message.payload);
     }; break;
@@ -38,146 +30,158 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
   }
 }
 
-function onChangeColors(changeColors: boolean) {
-  c.LOG && console.log('state.activeTabHostname', state.activeTabHostname, 'state.activeTabId', state.activeTabId);
-  if (!state.activeTabHostname) {
-    c.LOG && console.log('onChangeColors - No hostname');
+async function onChangeColors(changeColors: boolean) {
+  let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
+
+  c.LOG && console.log('cc - onChangeColors - activeTabHostname', activeTabHostname, 'activeTabId', activeTabId);
+  if (!activeTabHostname) {
+    c.LOG && console.log('cc - onChangeColors - No hostname');
     return
   };
 
-  if (!state.activeTabId) {
-    c.LOG && console.log('onChangeColors - No tab ID.');
+  if (!activeTabId) {
+    c.LOG && console.log('cc - onChangeColors - No tab ID.');
     return;
   }
 
-  if (changeColors && !state.hosts.includes(state.activeTabHostname)) {
-    state.hosts.push(state.activeTabHostname);
+  if (changeColors && !hosts.includes(activeTabHostname)) {
+    hosts.push(activeTabHostname);
   } else {
-    state.hosts = [...state.hosts.filter((host) => host !== state.activeTabHostname)];
+    hosts = [...hosts.filter((host: string) => host !== activeTabHostname)];
   }
 
   updateContextMenu();
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
+  sendTabMessage({ message: c.UPDATE_CONTENT });
+  browser.storage.sync.set({ [c.HOSTS_KEY]: hosts });
 }
 
 function onSetActiveButton(button: string) {
-  state.activeBtn = button;
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
+  browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: button });
 }
 
-function onUpdateColor(hue: number, saturation: number, value: number) {
-  let color = state[state.activeBtn as keyof State] as Color;
+async function onUpdateColor(hue: number, saturation: number, value: number) {
+  let { activeBtn } = await browser.storage.sync.get([c.ACTIVE_BTN_KEY]);
+  c.LOG && console.log('cc - onUpdateColor - activeBtn:', activeBtn);
+
+  let btn = await browser.storage.sync.get([activeBtn]);
+  c.LOG && console.log('cc - onUpdateColor - btn:', btn);
+
+  let color = btn[activeBtn];
+
   color.hsv.h = hue;
   color.hsv.s = saturation;
   color.hsv.v = value;
   setHslStrings(color);
-
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
+  await browser.storage.sync.set({ [activeBtn]: color });
+  await sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
 /** Sets back to defaults. Does not reset:
  * - activeTabId
  * - activeTabHostname
 */
-function onReset() {
-  // Properties to preserve between resets.
-  let activeTabId = state.activeTabId;
-  let activeTabHostname = state.activeTabHostname;
+async function onReset() {
+  await browser.storage.sync.set({ [c.TEXT_KEY]: c.DEFAULT_TEXT_COLOR });
+  await browser.storage.sync.set({ [c.BACKGROUND_KEY]: c.DEFAULT_BACKGROUND_COLOR });
+  await browser.storage.sync.set({ [c.LINK_KEY]: c.DEFAULT_LINK_COLOR });
+  await browser.storage.sync.set({ [c.LINK_HOVERED_KEY]: c.DEFAULT_LINK_HOVERED_COLOR });
+  await browser.storage.sync.set({ [c.LINK_VISITED_KEY]: c.DEFAULT_LINK_VISITED_COLOR });
 
-  state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
-  state.activeTabId = activeTabId;
-  state.activeTabHostname = activeTabHostname;
+  await browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
+  await browser.storage.sync.set({ [c.HOSTS_KEY]: [] });
+  await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: false });
+  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: false });
 
   updateContextMenu();
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
+  sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
 // --------------------------------------------------------------------------------------------- tabs
 /** On tab activation, get the full tab data. */
 async function onTabActivated(tabInfo: TabActiveInfo) {
-  c.LOG && console.log('tab activated', tabInfo.tabId);
-  state.activeTabId = tabInfo.tabId;
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
+  c.LOG && console.log('cc - onTabActivated - tab activated', tabInfo.tabId);
+
+  await browser.storage.sync.set({ [c.ACTIVE_TAB_ID_KEY]: tabInfo.tabId });
   let tab = await browser.tabs.get(tabInfo.tabId);
   validateTab(tab);
 }
 
-function onTabUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab) {
-  c.LOG && console.log('tabUdpated', tab);
-  c.LOG && console.log('changeInfo', changeInfo);
-  if (state.activeTabId === c.INVALID_TAB) {
+async function onTabUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab) {
+  c.LOG && console.log('cc - onTabUpdated - tabUdpated', tab);
+  c.LOG && console.log('cc - onTabUpdated - changeInfo', changeInfo);
+
+  let { activeTabId } = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY]);
+
+  if (activeTabId === c.INVALID_TAB) {
     // Tab ID can be invalid if the browser was first loaded.
-    state.activeTabId = tabId;
+    await browser.storage.sync.set({ [c.ACTIVE_TAB_ID_KEY]: tabId });
     validateTab(tab);
-  } else if (state.activeTabId === tabId) {
+  } else if (activeTabId === tabId) {
     validateTab(tab);
   }
 }
 
 /** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
-function validateTab(tab: browser.tabs.Tab) {
-  c.LOG && console.log('validating tab', tab);
-  state.invalidUrl = false;
-  state.lostConnection = false;
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
+async function validateTab(tab: browser.tabs.Tab) {
+  c.LOG && console.log('cc - validateTab - validating tab', tab);
 
-  // c.SHOULD_CONSOLE_LOG && console.log('validate tab', tab);
+  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: false });
+  await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: false });
+
+  // c.SHOULD_CONSOLE_LOG && console.log('cc - validate tab', tab);
   if (!tab.url) {
     // This may be null until the tab is updated.
     return;
   };
 
   let url = new URL(tab.url);
-  c.LOG && console.log('url.hostname', url.hostname);
-  c.LOG && console.log('url.protocol', url.protocol);
+  c.LOG && console.log('cc - validateTab - url.hostname', url.hostname);
+  c.LOG && console.log('cc - validateTab - url.protocol', url.protocol);
 
   if (url.hostname == "") {
-    c.LOG && console.log('Empty hostname');
+    c.LOG && console.log('cc - validateTab - Empty hostname');
     setInvalidUrl();
     return;
   }
 
   if (c.DISALLOWED_PROTOCOLS.includes(url.protocol)) {
-    c.LOG && console.log('Disallowed protocol', url.protocol);
+    c.LOG && console.log('cc - validateTab - disallowed protocol', url.protocol);
     setInvalidUrl();
     return;
   }
 
   if (c.DISALLOWED_HOSTNAMES.includes(url.hostname)) {
-    c.LOG && console.log('Disallowed hostname', url.hostname);
+    c.LOG && console.log('cc - validateTab - disallowed hostname', url.hostname);
     setInvalidUrl();
     return;
   }
 
-  state.activeTabHostname = url.hostname;
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
+  await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: url.hostname });
 
   updateContextMenu();
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: state });
+  sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
-function setInvalidUrl() {
-  state.activeTabHostname = "";
-  state.invalidUrl = true;
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
+async function setInvalidUrl() {
+  await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: "" });
+  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: true });
 }
 
 //** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 async function sendTabMessage(message: Message) {
-  if (!state.activeTabId) {
-    c.LOG && console.log('No active tab ID.');
+  let { activeTabId } = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY]);
+
+  if (!activeTabId) {
+    c.LOG && console.log('cc - sendTabMessage - No active tab ID.');
     return
   };
 
   try {
-    c.LOG && console.log('cc background - sendTabMessage: ', message);
-    await browser.tabs.sendMessage(state.activeTabId, message);
+    c.LOG && console.log('cc - sendTabMessage: ', message);
+    await browser.tabs.sendMessage(activeTabId, message);
   } catch (err) {
-    c.LOG && console.error("cc background - sendTabMessage error: ", err);
-    state.lostConnection = true;
-    browser.storage.sync.set({ [c.STORAGE_ID]: state });
+    c.LOG && console.error("cc - sendTabMessage error: ", err);
+    await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: true });
   }
 }
 
@@ -204,20 +208,38 @@ function onContextMenuClicked(info: browser.contextMenus.OnClickData, _tab?: bro
 
 async function updateContextMenu() {
   try {
-    await browser.contextMenus.update(c.CHANGE_COLORS, { checked: shouldChangeColors(state) });
+    await browser.contextMenus.update(c.CHANGE_COLORS, { checked: await shouldChangeColors() });
   } catch (e) {
-    c.LOG && console.error('cc background - updateContextMenu: ', e);
+    c.LOG && console.error('cc - updateContextMenu: ', e);
   }
 }
 
+async function initState() {
+  await browser.storage.sync.set({ [c.VERSION_KEY]: c.VERSION });
+  await browser.storage.sync.set({ [c.ACTIVE_TAB_ID_KEY]: c.INVALID_TAB });
+  await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: "" });
+
+  await browser.storage.sync.set({ [c.TEXT_KEY]: c.DEFAULT_TEXT_COLOR });
+  await browser.storage.sync.set({ [c.BACKGROUND_KEY]: c.DEFAULT_BACKGROUND_COLOR });
+  await browser.storage.sync.set({ [c.LINK_KEY]: c.DEFAULT_LINK_COLOR });
+  await browser.storage.sync.set({ [c.LINK_HOVERED_KEY]: c.DEFAULT_LINK_HOVERED_COLOR });
+  await browser.storage.sync.set({ [c.LINK_VISITED_KEY]: c.DEFAULT_LINK_VISITED_COLOR });
+
+  await browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
+  await browser.storage.sync.set({ [c.HOSTS_KEY]: [] });
+  await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: false });
+  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: false });
+}
+
 // --------------------------------------------------------------------------------------------- installed
-function onInstalled(details: any) {
+async function onInstalled(details: any) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
   if (details.reason === 'update') {
     // only do this for major versions with breaking changes
     // clearStorage(initServiceWorker);
   } else if (details.reason === 'install') {
     // showAboutPage(details.reason);
+    initState();
   }
 }
 
@@ -227,8 +249,8 @@ function onInstalled(details: any) {
 
 // --------------------------------------------------------------------------------------------- storage
 function clearStorage() {
-  c.LOG && console.log('cc - storage cleared');
-  browser.storage.sync.remove(c.STORAGE_ID);
+  // c.LOG && console.log('cc - storage cleared');
+  // browser.storage.sync.remove(c.STORAGE_ID);
 }
 
 // --------------------------------------------------------------------------------------------- listeners
@@ -240,35 +262,25 @@ browser.runtime.onInstalled.addListener(onInstalled);
 // --------------------------------------------------------------------------------------------- init
 /** Get state from storage if it exists. If not, create default state. */
 async function initServiceWorker() {
+  c.LOG && console.log('cc - initServiceWorker');
+
   createContextMenu();
 
-  let storage = await browser.storage.sync.get([c.STORAGE_ID]);
-
-  if (Object.hasOwn(storage, c.STORAGE_ID)) {
-    state = storage[c.STORAGE_ID];
-    state = migrateVersion(state);
-  } else {
-    state = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
-  }
-
   // Initialize tabs.
-  state.activeTabId = c.INVALID_TAB;
-  state.activeTabHostname = "";
+  await browser.storage.sync.set({ [c.ACTIVE_TAB_ID_KEY]: c.INVALID_TAB });
+  await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: "" });
 
   let tabs = await browser.tabs.query({ currentWindow: true, active: true });
 
   if (tabs.length > 0) {
     let tab = tabs[0];
     if (tab.id) {
-      state.activeTabId = tab.id;
+      await browser.storage.sync.set({ [c.ACTIVE_TAB_ID_KEY]: tab.id });
       validateTab(tab);
     }
   }
 
-  c.LOG && console.log('initialized state', state);
-
   updateContextMenu();
-  browser.storage.sync.set({ [c.STORAGE_ID]: state });
 }
 
 initServiceWorker();

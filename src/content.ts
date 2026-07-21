@@ -1,5 +1,5 @@
 import * as c from "./constants";
-import { type Message, type State } from "./types";
+import { type Message } from "./types";
 import { shouldChangeColors } from "./utils";
 
 c.LOG && console.log('cc content - loaded content script');
@@ -17,8 +17,8 @@ let observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 let css = "";
 
-function updateCss(state: State) {
-  if (!state) return;
+async function updateCss() {
+  let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]);
 
   let is = ":not(#increase-specificity-yo)";
 
@@ -104,10 +104,10 @@ function removeClass() {
   observer.disconnect();
 }
 
-function updateContent(state: State) {
+async function updateContent() {
   // c.SHOULD_CONSOLE_LOG && console.log('update content state:', state);
-  if (shouldChangeColors(state)) {
-    updateCss(state);
+  if (await shouldChangeColors()) {
+    updateCss();
 
     ccStyle.textContent = css;
 
@@ -124,17 +124,17 @@ function updateContent(state: State) {
 function onMessage(message: Message, _sender: any, res: any) {
   switch (message.message) {
     case c.UPDATE_CONTENT: {
-      updateContent(message.payload);
+      updateContent();
     }; break;
     default: break;
   }
 }
 
 async function init() {
-  let state = await browser.runtime.sendMessage({ message: c.GET_STATE });
-  updateContent(state);
+  updateContent();
 }
 
-browser.runtime.onMessage.addListener(onMessage);
-
 init();
+
+browser.runtime.onMessage.addListener(onMessage);
+browser.storage.onChanged.addListener(updateContent);

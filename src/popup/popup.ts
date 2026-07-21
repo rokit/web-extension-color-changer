@@ -68,7 +68,7 @@ canvas.onmousedown = (e) => {
 document.onmouseup = () => {
   isHueMouseDown = false;
   isSquareMouseDown = false;
-  browser.runtime.sendMessage({ message: c.SAVE_STATE });
+  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
 };
 
 document.onmousemove = (e: MouseEvent) => {
@@ -101,7 +101,6 @@ hexInputElement.oninput = () => {
   updateReticlesFromHsv();
   drawColorPicker();
   browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
-  browser.runtime.sendMessage({ message: c.SAVE_STATE });
 }
 
 function updateReticlesFromHsv() {
@@ -145,7 +144,6 @@ function updateSquareReticle(e: MouseEvent) {
 
   updateHexInput();
   updateSquareReticleElement();
-  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
 }
 
 function updateHueReticle(e: MouseEvent) {
@@ -165,7 +163,6 @@ function updateHueReticle(e: MouseEvent) {
 
   updateHexInput();
   updateHueReticleElement();
-  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue, } });
   drawColorPicker();
 }
 
@@ -289,17 +286,16 @@ function addClearStorageBtn() {
   footerElement.appendChild(button);
 }
 
-async function setActiveColorButton(state: State) {
+async function setActiveColorButton(button: string) {
   textBtn.classList.remove("active-btn");
   backgroundBtn.classList.remove("active-btn");
   linkBtn.classList.remove("active-btn");
   linkHoveredBtn.classList.remove("active-btn");
   linkVisitedBtn.classList.remove("active-btn");
-  document.getElementById(state.activeBtn)!.classList.add("active-btn");
+  document.getElementById(button)!.classList.add("active-btn");
 }
 
-function updateColorPickerFromState(state: State) {
-  let color = state[state.activeBtn as keyof State] as Color;
+function updateColorPickerFromState(color: Color) {
   selectedHue = color.hsv.h;
   selectedSaturation = color.hsv.s;
   selectedValue = color.hsv.v;
@@ -310,7 +306,7 @@ function updateColorPickerFromState(state: State) {
 }
 
 async function updateUi() {
-  let state: State = await browser.runtime.sendMessage({ message: c.GET_STATE });
+  let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY, c.ACTIVE_TAB_ID_KEY, c.INVALID_URL_KEY, c.LOST_CONNECTION_KEY]);
 
   textBtn.style.background = state.text.hslString;
   backgroundBtn.style.background = state.background.hslString;
@@ -318,7 +314,7 @@ async function updateUi() {
   linkHoveredBtn.style.background = state.linkHovered.hslString;
   linkVisitedBtn.style.background = state.linkVisited.hslString;
 
-  changeColorsCheckbox.checked = shouldChangeColors(state);
+  changeColorsCheckbox.checked = await shouldChangeColors();
 
   errorElement.classList.add("show");
   if (state.activeTabId === c.INVALID_TAB) {
@@ -337,8 +333,8 @@ async function updateUi() {
   }
 
   updateDocumentCpCenter();
-  setActiveColorButton(state);
-  updateColorPickerFromState(state);
+  setActiveColorButton(state.activeBtn);
+  updateColorPickerFromState(state[state.activeBtn]);
 }
 
 addClearStorageBtn();

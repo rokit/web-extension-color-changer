@@ -50,11 +50,12 @@ export function setHslStrings(color: Color) {
   }
 }
 
-export function shouldChangeColors(state: State): boolean {
-  if (!state.activeTabHostname) return false;
-  if (!state.activeTabId) return false;
+export async function shouldChangeColors() {
+  let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
+  if (!activeTabHostname) return false;
+  if (!activeTabId) return false;
 
-  if (state.hosts.includes(state.activeTabHostname)) {
+  if (hosts.includes(activeTabHostname)) {
     return true;
   } else {
     return false;
@@ -67,7 +68,7 @@ export function roundToTenths(num: number) {
 
 /** Try to preserve colors and hosts from old versions. */
 export function migrateVersion(oldState: any) {
-  let newState: State = JSON.parse(JSON.stringify(c.DEFAULT_STATE));
+  let newState: any = {};
 
   c.LOG && console.log('cc - migrateVersion - oldState:', oldState);
 
