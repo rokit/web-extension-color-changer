@@ -390,6 +390,7 @@ async function handleErrors() {
 }
 
 async function initUi() {
+  handleErrors();
   uiState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as Ui;
   changeColorsCheckbox.checked = await shouldChangeColors();
 
