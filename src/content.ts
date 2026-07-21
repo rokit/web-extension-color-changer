@@ -102,8 +102,13 @@ function removeClass() {
   observer.disconnect();
 }
 
-async function updateContent(state: Ui) {
-  // c.SHOULD_CONSOLE_LOG && console.log('update content state:', state);
+async function updateContent(state: Ui | undefined) {
+  c.LOG && console.log('cc - updateContent - state:', state);
+
+  if (state == undefined) {
+    state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as Ui;
+  };
+
   if (await shouldChangeColors()) {
     updateCss(state);
 

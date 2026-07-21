@@ -50,6 +50,31 @@ export function setHslStrings(color: Color) {
   }
 }
 
+export async function onChangeColors(changeColors: boolean) {
+  let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
+
+  c.LOG && console.log('cc - onChangeColors - activeTabHostname', activeTabHostname, 'activeTabId', activeTabId);
+  if (!activeTabHostname) {
+    c.LOG && console.log('cc - onChangeColors - No hostname');
+    return;
+  };
+
+  if (!activeTabId) {
+    c.LOG && console.log('cc - onChangeColors - No tab ID.');
+    return;
+  }
+
+  if (changeColors && !hosts.includes(activeTabHostname)) {
+    hosts.push(activeTabHostname);
+  } else {
+    hosts = [...hosts.filter((host: string) => host !== activeTabHostname)];
+  }
+
+  await browser.storage.sync.set({ [c.HOSTS_KEY]: hosts });
+  await updateContextMenu();
+  await sendTabMessage({ message: c.UPDATE_CONTENT });
+}
+
 export async function shouldChangeColors() {
   let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
   if (!activeTabHostname) return false;

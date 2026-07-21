@@ -1,49 +1,11 @@
 
 import * as c from "./constants";
 import { type Message, type TabActiveInfo } from "./types";
-import { migrateVersion, sendTabMessage, setHslStrings, shouldChangeColors, updateContextMenu } from "./utils";
+import { migrateVersion, onChangeColors, sendTabMessage, setHslStrings, shouldChangeColors, updateContextMenu } from "./utils";
 
 if (!globalThis.browser) {
   // @ts-ignore
   globalThis.browser = chrome;
-}
-
-// --------------------------------------------------------------------------------------------- actions
-function onMessage(message: Message, _sender: any, sendResponse: any) {
-  switch (message.message) {
-    case c.CHANGE_COLORS: {
-      onChangeColors(message.payload);
-    }; break;
-    case c.CLEAR_STORAGE: {
-      clearStorage();
-    }; break;
-    default: break;
-  }
-}
-
-async function onChangeColors(changeColors: boolean) {
-  let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
-
-  c.LOG && console.log('cc - onChangeColors - activeTabHostname', activeTabHostname, 'activeTabId', activeTabId);
-  if (!activeTabHostname) {
-    c.LOG && console.log('cc - onChangeColors - No hostname');
-    return
-  };
-
-  if (!activeTabId) {
-    c.LOG && console.log('cc - onChangeColors - No tab ID.');
-    return;
-  }
-
-  if (changeColors && !hosts.includes(activeTabHostname)) {
-    hosts.push(activeTabHostname);
-  } else {
-    hosts = [...hosts.filter((host: string) => host !== activeTabHostname)];
-  }
-
-  updateContextMenu();
-  sendTabMessage({ message: c.UPDATE_CONTENT });
-  browser.storage.sync.set({ [c.HOSTS_KEY]: hosts });
 }
 
 // --------------------------------------------------------------------------------------------- tabs
@@ -171,16 +133,9 @@ async function onInstalled(details: any) {
 //   browser.tabs.create({ url: browser.runtime.getURL(`about/about.html?reason=${reason}`) });
 // }
 
-// --------------------------------------------------------------------------------------------- storage
-function clearStorage() {
-  // c.LOG && console.log('cc - storage cleared');
-  // browser.storage.sync.remove(c.STORAGE_ID);
-}
-
 // --------------------------------------------------------------------------------------------- listeners
 browser.tabs.onActivated.addListener(onTabActivated);
 browser.tabs.onUpdated.addListener(onTabUpdated);
-browser.runtime.onMessage.addListener(onMessage);
 browser.runtime.onInstalled.addListener(onInstalled);
 
 // --------------------------------------------------------------------------------------------- init

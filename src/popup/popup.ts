@@ -1,6 +1,6 @@
 import * as c from "../constants";
 import { type Point, type Color, type Ui } from "../types";
-import { shouldChangeColors, degToRad, radToDeg, mapRange, updateContextMenu, sendTabMessage, setHslStrings } from "../utils";
+import { shouldChangeColors, degToRad, radToDeg, mapRange, updateContextMenu, sendTabMessage, setHslStrings, onChangeColors } from "../utils";
 import convert from 'color-convert';
 import { MockBrowser } from "../mockBrowser";
 
@@ -70,7 +70,7 @@ canvas.onmousedown = (e) => {
 document.onmouseup = () => {
   if (isHueMouseDown || isSquareMouseDown) {
     updateColor();
-    saveStorage();
+    saveColor();
   }
 
   isHueMouseDown = false;
@@ -107,7 +107,7 @@ hexInputElement.oninput = () => {
   updateReticlesFromHsv();
   drawColorPicker();
   updateColor();
-  saveStorage();
+  saveColor();
 }
 
 function updateReticlesFromHsv() {
@@ -238,8 +238,6 @@ function updateHexInput() {
 ///////////////////////////////
 
 let changeColorsCheckbox = document.getElementById("change-colors")! as HTMLInputElement;
-let changeColorsLabel = document.getElementById("change-colors-label")! as HTMLInputElement;
-let checkboxContainer = document.getElementById("checkbox-container")! as HTMLDivElement;
 let errorElement = document.getElementById("error")! as HTMLDivElement;
 let footerElement = document.getElementsByTagName("footer")[0]! as HTMLElement;
 
@@ -251,8 +249,9 @@ let linkVisitedBtn = document.getElementById(c.LINK_VISITED_KEY)! as HTMLButtonE
 
 let resetBtn = document.getElementById("reset")! as HTMLButtonElement;
 
-changeColorsCheckbox.onclick = () => {
-  browser.runtime.sendMessage({ message: c.CHANGE_COLORS, payload: changeColorsCheckbox.checked });
+changeColorsCheckbox.onclick = async () => {
+  await saveState();
+  await onChangeColors(changeColorsCheckbox.checked);
 };
 
 /** Sets back to defaults. Does not reset:
@@ -267,6 +266,8 @@ resetBtn.onclick = async function () {
     ...uiState,
     [c.HOSTS_KEY]: []
   });
+
+  await initUi();
 
   await updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT });
@@ -329,9 +330,18 @@ async function setActiveColorButton(button: string) {
   document.getElementById(button)!.classList.add("active-btn");
 }
 
-async function saveStorage() {
+async function saveColor() {
   let color = uiState[uiState.activeBtn as keyof Ui] as Color;
   await browser.storage.sync.set({ [uiState.activeBtn]: color });
+}
+
+async function saveState() {
+  await browser.storage.sync.set(uiState);
+}
+
+function clearStorage() {
+  // c.LOG && console.log('cc - storage cleared');
+  // browser.storage.sync.remove(c.STORAGE_ID);
 }
 
 function updateColor() {
@@ -373,7 +383,6 @@ async function handleErrors() {
 async function initUi() {
   uiState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as Ui;
   changeColorsCheckbox.checked = await shouldChangeColors();
-  addClearStorageBtn();
 
   let color = uiState[uiState.activeBtn as keyof Ui] as Color;
   selectedHue = color.hsv.h;
@@ -395,4 +404,5 @@ async function initUi() {
 
 browser.storage.onChanged.addListener(handleErrors);
 
+addClearStorageBtn();
 window.onload = initUi;
