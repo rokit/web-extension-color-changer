@@ -152,6 +152,7 @@ function updateSquareReticle(e: MouseEvent) {
   updateHexInput();
   updateSquareReticleElement();
   updateColor();
+  saveColor();
 }
 
 function updateHueReticle(e: MouseEvent) {
