@@ -61,10 +61,7 @@ function onSetActiveButton(button: string) {
 
 async function onUpdateColor(hue: number, saturation: number, value: number) {
   let { activeBtn } = await browser.storage.sync.get([c.ACTIVE_BTN_KEY]);
-  c.LOG && console.log('cc - onUpdateColor - activeBtn:', activeBtn);
-
   let btn = await browser.storage.sync.get([activeBtn]);
-  c.LOG && console.log('cc - onUpdateColor - btn:', btn);
 
   let color = btn[activeBtn];
 
