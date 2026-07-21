@@ -1,6 +1,6 @@
 import * as c from "../constants";
 import { type State, type Point, type Color } from "../types";
-import { shouldChangeColors, degToRad, radToDeg, mapRange } from "../utils";
+import { shouldChangeColors, degToRad, radToDeg, mapRange, updateContextMenu, sendTabMessage } from "../utils";
 import convert from 'color-convert';
 import { MockBrowser } from "../mockBrowser";
 
@@ -66,9 +66,12 @@ canvas.onmousedown = (e) => {
 }
 
 document.onmouseup = () => {
+  if (isHueMouseDown || isSquareMouseDown) {
+    browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
+  }
+
   isHueMouseDown = false;
   isSquareMouseDown = false;
-  browser.runtime.sendMessage({ message: c.UPDATE_COLOR, payload: { hue: selectedHue, saturation: selectedSaturation, value: selectedValue } });
 };
 
 document.onmousemove = (e: MouseEvent) => {
@@ -246,26 +249,44 @@ changeColorsCheckbox.onclick = () => {
   browser.runtime.sendMessage({ message: c.CHANGE_COLORS, payload: changeColorsCheckbox.checked });
 };
 
-resetBtn.onclick = function () {
-  browser.runtime.sendMessage({ message: c.RESET });
+/** Sets back to defaults. Does not reset:
+ * - activeTabId
+ * - activeTabHostname
+*/
+resetBtn.onclick = async function () {
+  await browser.storage.sync.set({ [c.TEXT_KEY]: c.DEFAULT_TEXT_COLOR });
+  await browser.storage.sync.set({ [c.BACKGROUND_KEY]: c.DEFAULT_BACKGROUND_COLOR });
+  await browser.storage.sync.set({ [c.LINK_KEY]: c.DEFAULT_LINK_COLOR });
+  await browser.storage.sync.set({ [c.LINK_HOVERED_KEY]: c.DEFAULT_LINK_HOVERED_COLOR });
+  await browser.storage.sync.set({ [c.LINK_VISITED_KEY]: c.DEFAULT_LINK_VISITED_COLOR });
+
+  await browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
+  await browser.storage.sync.set({ [c.HOSTS_KEY]: [] });
+  await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: false });
+  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: false });
+
+  updateContextMenu();
+  sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
 function onClickForeground() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.TEXT_KEY });
+  browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
 }
+
 function onClickBackground() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.BACKGROUND_KEY });
+  browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.BACKGROUND_KEY });
 }
+
 function onClickLink() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_KEY });
+  browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_KEY });
 }
 
 function onClickLinkHovered() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_HOVERED_KEY });
+  browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_HOVERED_KEY });
 }
 
 function onClickLinkVisited() {
-  browser.runtime.sendMessage({ message: c.SET_ACTIVE_BUTTON, payload: c.LINK_VISITED_KEY });
+  browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_VISITED_KEY });
 }
 
 textBtn.onclick = onClickForeground;
@@ -305,7 +326,8 @@ function updateColorPickerFromState(color: Color) {
   drawColorPicker();
 }
 
-async function updateUi() {
+async function updateUi(changes: any) {
+  console.log('cc - updateUi - changes:', changes);
   let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY, c.ACTIVE_TAB_ID_KEY, c.INVALID_URL_KEY, c.LOST_CONNECTION_KEY]);
 
   textBtn.style.background = state.text.hslString;

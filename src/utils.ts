@@ -1,5 +1,5 @@
 import convert from "color-convert";
-import { type Color, type State } from "./types";
+import { type Color, type Message, type State } from "./types";
 import * as c from "./constants";
 
 const DEG_TO_RAD = Math.PI / 180;
@@ -64,6 +64,32 @@ export async function shouldChangeColors() {
 
 export function roundToTenths(num: number) {
   return Math.round((num + Number.EPSILON) * 10) / 10;
+}
+
+export async function updateContextMenu() {
+  try {
+    await browser.contextMenus.update(c.CHANGE_COLORS, { checked: await shouldChangeColors() });
+  } catch (e) {
+    c.LOG && console.error('cc - updateContextMenu: ', e);
+  }
+}
+
+//** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
+export async function sendTabMessage(message: Message) {
+  let { activeTabId } = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY]);
+
+  if (!activeTabId) {
+    c.LOG && console.log('cc - sendTabMessage - No active tab ID.');
+    return
+  };
+
+  try {
+    c.LOG && console.log('cc - sendTabMessage: ', message);
+    await browser.tabs.sendMessage(activeTabId, message);
+  } catch (err) {
+    c.LOG && console.error("cc - sendTabMessage error: ", err);
+    await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: true });
+  }
 }
 
 /** Try to preserve colors and hosts from old versions. */

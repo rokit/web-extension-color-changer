@@ -1,7 +1,7 @@
 
 import * as c from "./constants";
 import { type Message, type TabActiveInfo } from "./types";
-import { migrateVersion, setHslStrings, shouldChangeColors } from "./utils";
+import { migrateVersion, sendTabMessage, setHslStrings, shouldChangeColors, updateContextMenu } from "./utils";
 
 if (!globalThis.browser) {
   // @ts-ignore
@@ -14,14 +14,8 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     case c.CHANGE_COLORS: {
       onChangeColors(message.payload);
     }; break;
-    case c.SET_ACTIVE_BUTTON: {
-      onSetActiveButton(message.payload);
-    }; break;
     case c.UPDATE_COLOR: {
       onUpdateColor(message.payload.hue, message.payload.saturation, message.payload.value);
-    }; break;
-    case c.RESET: {
-      onReset();
     }; break;
     case c.CLEAR_STORAGE: {
       clearStorage();
@@ -55,10 +49,6 @@ async function onChangeColors(changeColors: boolean) {
   browser.storage.sync.set({ [c.HOSTS_KEY]: hosts });
 }
 
-function onSetActiveButton(button: string) {
-  browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: button });
-}
-
 async function onUpdateColor(hue: number, saturation: number, value: number) {
   let { activeBtn } = await browser.storage.sync.get([c.ACTIVE_BTN_KEY]);
   let btn = await browser.storage.sync.get([activeBtn]);
@@ -71,26 +61,6 @@ async function onUpdateColor(hue: number, saturation: number, value: number) {
   setHslStrings(color);
   await browser.storage.sync.set({ [activeBtn]: color });
   await sendTabMessage({ message: c.UPDATE_CONTENT });
-}
-
-/** Sets back to defaults. Does not reset:
- * - activeTabId
- * - activeTabHostname
-*/
-async function onReset() {
-  await browser.storage.sync.set({ [c.TEXT_KEY]: c.DEFAULT_TEXT_COLOR });
-  await browser.storage.sync.set({ [c.BACKGROUND_KEY]: c.DEFAULT_BACKGROUND_COLOR });
-  await browser.storage.sync.set({ [c.LINK_KEY]: c.DEFAULT_LINK_COLOR });
-  await browser.storage.sync.set({ [c.LINK_HOVERED_KEY]: c.DEFAULT_LINK_HOVERED_COLOR });
-  await browser.storage.sync.set({ [c.LINK_VISITED_KEY]: c.DEFAULT_LINK_VISITED_COLOR });
-
-  await browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
-  await browser.storage.sync.set({ [c.HOSTS_KEY]: [] });
-  await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: false });
-  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: false });
-
-  updateContextMenu();
-  sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
 // --------------------------------------------------------------------------------------------- tabs
@@ -164,24 +134,6 @@ async function setInvalidUrl() {
   await browser.storage.sync.set({ [c.INVALID_URL_KEY]: true });
 }
 
-//** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
-async function sendTabMessage(message: Message) {
-  let { activeTabId } = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY]);
-
-  if (!activeTabId) {
-    c.LOG && console.log('cc - sendTabMessage - No active tab ID.');
-    return
-  };
-
-  try {
-    c.LOG && console.log('cc - sendTabMessage: ', message);
-    await browser.tabs.sendMessage(activeTabId, message);
-  } catch (err) {
-    c.LOG && console.error("cc - sendTabMessage error: ", err);
-    await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: true });
-  }
-}
-
 // --------------------------------------------------------------------------------------------- context menu
 function createContextMenu() {
   let menu = {
@@ -200,14 +152,6 @@ function createContextMenu() {
 function onContextMenuClicked(info: browser.contextMenus.OnClickData, _tab?: browser.tabs.Tab) {
   if (info.menuItemId === c.CHANGE_COLORS) {
     onChangeColors(!!info.checked)
-  }
-}
-
-async function updateContextMenu() {
-  try {
-    await browser.contextMenus.update(c.CHANGE_COLORS, { checked: await shouldChangeColors() });
-  } catch (e) {
-    c.LOG && console.error('cc - updateContextMenu: ', e);
   }
 }
 
