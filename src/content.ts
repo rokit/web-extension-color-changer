@@ -30,10 +30,11 @@ async function updateCss(state: ColorState) {
   }
 
   .${c.COLOR_CHANGER_CLASS_NAME}${is} body,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} header,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} footer,
   .${c.COLOR_CHANGER_CLASS_NAME}${is} nav,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} ul
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} ul,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} header,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} table,
+  .${c.COLOR_CHANGER_CLASS_NAME}${is} footer
   {
     background-color: ${state.background.hslString} !important;
   }
