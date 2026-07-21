@@ -58,7 +58,7 @@ export const DEFAULT_LINK_HOVERED_COLOR = createColor(120, 33, 96);
 export const DEFAULT_LINK_VISITED_COLOR = createColor(240, 33, 96);
 
 export const DEFAULT_STATE: State = {
-  version: "5.0.0",
+  version: VERSION,
   activeTabId: INVALID_TAB,
   activeTabHostname: "",
 
