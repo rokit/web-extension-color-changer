@@ -1,4 +1,4 @@
-import { type State } from "./types";
+import { type State, type Ui } from "./types";
 import { createColor } from "./utils";
 
 export const LOG = true;
@@ -70,4 +70,14 @@ export const DEFAULT_STATE: State = {
   hosts: [],
   lostConnection: false,
   invalidUrl: false,
+}
+
+export const DEFAULT_UI: Ui = {
+  text: DEFAULT_TEXT_COLOR,
+  background: DEFAULT_BACKGROUND_COLOR,
+  link: DEFAULT_LINK_COLOR,
+  linkHovered: DEFAULT_LINK_HOVERED_COLOR,
+  linkVisited: DEFAULT_LINK_VISITED_COLOR,
+
+  activeBtn: TEXT_KEY,
 }

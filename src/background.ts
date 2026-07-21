@@ -14,9 +14,6 @@ function onMessage(message: Message, _sender: any, sendResponse: any) {
     case c.CHANGE_COLORS: {
       onChangeColors(message.payload);
     }; break;
-    case c.UPDATE_COLOR: {
-      onUpdateColor(message.payload.hue, message.payload.saturation, message.payload.value);
-    }; break;
     case c.CLEAR_STORAGE: {
       clearStorage();
     }; break;
@@ -47,20 +44,6 @@ async function onChangeColors(changeColors: boolean) {
   updateContextMenu();
   sendTabMessage({ message: c.UPDATE_CONTENT });
   browser.storage.sync.set({ [c.HOSTS_KEY]: hosts });
-}
-
-async function onUpdateColor(hue: number, saturation: number, value: number) {
-  let { activeBtn } = await browser.storage.sync.get([c.ACTIVE_BTN_KEY]);
-  let btn = await browser.storage.sync.get([activeBtn]);
-
-  let color = btn[activeBtn];
-
-  color.hsv.h = hue;
-  color.hsv.s = saturation;
-  color.hsv.v = value;
-  setHslStrings(color);
-  await browser.storage.sync.set({ [activeBtn]: color });
-  await sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
 // --------------------------------------------------------------------------------------------- tabs

@@ -1,5 +1,5 @@
 import * as c from "./constants";
-import { type Message } from "./types";
+import { type Message, type Ui } from "./types";
 import { shouldChangeColors } from "./utils";
 
 c.LOG && console.log('cc content - loaded content script');
@@ -17,9 +17,7 @@ let observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 let css = "";
 
-async function updateCss() {
-  let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]);
-
+async function updateCss(state: Ui) {
   let is = ":not(#increase-specificity-yo)";
 
   css = `
@@ -104,10 +102,10 @@ function removeClass() {
   observer.disconnect();
 }
 
-async function updateContent() {
+async function updateContent(state: Ui) {
   // c.SHOULD_CONSOLE_LOG && console.log('update content state:', state);
   if (await shouldChangeColors()) {
-    updateCss();
+    updateCss(state);
 
     ccStyle.textContent = css;
 
@@ -124,17 +122,17 @@ async function updateContent() {
 function onMessage(message: Message, _sender: any, res: any) {
   switch (message.message) {
     case c.UPDATE_CONTENT: {
-      updateContent();
+      updateContent(message.payload);
     }; break;
     default: break;
   }
 }
 
 async function init() {
-  updateContent();
+  let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as Ui;
+  updateContent(state);
 }
 
 init();
 
 browser.runtime.onMessage.addListener(onMessage);
-browser.storage.onChanged.addListener(updateContent);

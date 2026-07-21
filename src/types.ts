@@ -15,6 +15,15 @@ export type State = {
   invalidUrl: boolean;
 }
 
+export type Ui = {
+  text: Color;
+  background: Color;
+  link: Color;
+  linkHovered: Color;
+  linkVisited: Color;
+  activeBtn: string;
+}
+
 export type Color = {
   hsv: Hsv,
   hslString: string;
