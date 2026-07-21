@@ -1,5 +1,5 @@
 import * as c from "../constants";
-import { type Point, type Color, type Ui } from "../types";
+import { type Point, type Color, type ColorState } from "../types";
 import { shouldChangeColors, degToRad, radToDeg, mapRange, updateContextMenu, sendTabMessage, setHslStrings, onChangeColors } from "../utils";
 import convert from 'color-convert';
 import { MockBrowser } from "../mockBrowser";
@@ -15,7 +15,7 @@ if (!globalThis.browser) {
   }
 }
 
-let uiState = JSON.parse(JSON.stringify(c.DEFAULT_UI)) as Ui;
+let colorState = JSON.parse(JSON.stringify(c.DEFAULT_COLOR_STATE)) as ColorState;
 
 let selectedHue = 0;
 let selectedSaturation = 100;
@@ -261,9 +261,9 @@ changeColorsCheckbox.onclick = async () => {
  * - invalidUrl
 */
 resetBtn.onclick = async function () {
-  uiState = JSON.parse(JSON.stringify(c.DEFAULT_UI)) as Ui;
+  colorState = JSON.parse(JSON.stringify(c.DEFAULT_COLOR_STATE)) as ColorState;
   await browser.storage.sync.set({
-    ...uiState,
+    ...colorState,
     [c.HOSTS_KEY]: []
   });
 
@@ -275,31 +275,31 @@ resetBtn.onclick = async function () {
 
 function onClickForeground() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
-  uiState.activeBtn = c.TEXT_KEY;
+  colorState.activeBtn = c.TEXT_KEY;
   setActiveColorButton(c.TEXT_KEY);
 }
 
 function onClickBackground() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.BACKGROUND_KEY });
-  uiState.activeBtn = c.BACKGROUND_KEY;
+  colorState.activeBtn = c.BACKGROUND_KEY;
   setActiveColorButton(c.BACKGROUND_KEY);
 }
 
 function onClickLink() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_KEY });
-  uiState.activeBtn = c.LINK_KEY;
+  colorState.activeBtn = c.LINK_KEY;
   setActiveColorButton(c.LINK_KEY);
 }
 
 function onClickLinkHovered() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_HOVERED_KEY });
-  uiState.activeBtn = c.LINK_HOVERED_KEY;
+  colorState.activeBtn = c.LINK_HOVERED_KEY;
   setActiveColorButton(c.LINK_HOVERED_KEY);
 }
 
 function onClickLinkVisited() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_VISITED_KEY });
-  uiState.activeBtn = c.LINK_VISITED_KEY;
+  colorState.activeBtn = c.LINK_VISITED_KEY;
   setActiveColorButton(c.LINK_VISITED_KEY);
 }
 
@@ -329,7 +329,7 @@ async function setActiveColorButton(button: string) {
   linkVisitedBtn.classList.remove("active-btn");
   document.getElementById(button)!.classList.add("active-btn");
 
-  let color = uiState[uiState.activeBtn as keyof Ui] as Color;
+  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
   selectedHue = color.hsv.h;
   selectedSaturation = color.hsv.s;
   selectedValue = color.hsv.v;
@@ -340,12 +340,12 @@ async function setActiveColorButton(button: string) {
 }
 
 async function saveColor() {
-  let color = uiState[uiState.activeBtn as keyof Ui] as Color;
-  await browser.storage.sync.set({ [uiState.activeBtn]: color });
+  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
+  await browser.storage.sync.set({ [colorState.activeBtn]: color });
 }
 
 async function saveState() {
-  await browser.storage.sync.set(uiState);
+  await browser.storage.sync.set(colorState);
 }
 
 function clearStorage() {
@@ -354,19 +354,19 @@ function clearStorage() {
 }
 
 function updateColor() {
-  let color = uiState[uiState.activeBtn as keyof Ui] as Color;
+  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
   color.hsv.h = selectedHue;
   color.hsv.s = selectedSaturation;
   color.hsv.v = selectedValue;
   setHslStrings(color);
 
-  textBtn.style.background = uiState.text.hslString;
-  backgroundBtn.style.background = uiState.background.hslString;
-  linkBtn.style.background = uiState.link.hslString;
-  linkHoveredBtn.style.background = uiState.linkHovered.hslString;
-  linkVisitedBtn.style.background = uiState.linkVisited.hslString;
+  textBtn.style.background = colorState.text.hslString;
+  backgroundBtn.style.background = colorState.background.hslString;
+  linkBtn.style.background = colorState.link.hslString;
+  linkHoveredBtn.style.background = colorState.linkHovered.hslString;
+  linkVisitedBtn.style.background = colorState.linkVisited.hslString;
 
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: uiState });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: colorState });
 }
 
 async function handleErrors() {
@@ -391,20 +391,20 @@ async function handleErrors() {
 
 async function initUi() {
   handleErrors();
-  uiState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as Ui;
+  colorState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as ColorState;
   changeColorsCheckbox.checked = await shouldChangeColors();
 
-  let color = uiState[uiState.activeBtn as keyof Ui] as Color;
+  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
   selectedHue = color.hsv.h;
   selectedSaturation = color.hsv.s;
   selectedValue = color.hsv.v;
 
-  textBtn.style.background = uiState.text.hslString;
-  backgroundBtn.style.background = uiState.background.hslString;
-  linkBtn.style.background = uiState.link.hslString;
-  linkHoveredBtn.style.background = uiState.linkHovered.hslString;
-  linkVisitedBtn.style.background = uiState.linkVisited.hslString;
-  setActiveColorButton(uiState.activeBtn);
+  textBtn.style.background = colorState.text.hslString;
+  backgroundBtn.style.background = colorState.background.hslString;
+  linkBtn.style.background = colorState.link.hslString;
+  linkHoveredBtn.style.background = colorState.linkHovered.hslString;
+  linkVisitedBtn.style.background = colorState.linkVisited.hslString;
+  setActiveColorButton(colorState.activeBtn);
 
   updateHexInput();
   updateDocumentCpCenter();

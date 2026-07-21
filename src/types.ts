@@ -15,7 +15,7 @@ export type State = {
   invalidUrl: boolean;
 }
 
-export type Ui = {
+export type ColorState = {
   text: Color;
   background: Color;
   link: Color;

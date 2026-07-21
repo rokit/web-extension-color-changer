@@ -1,4 +1,4 @@
-import { type State, type Ui } from "./types";
+import { type State, type ColorState } from "./types";
 import { createColor } from "./utils";
 
 export const LOG = true;
@@ -50,6 +50,7 @@ export const DEFAULT_LINK_COLOR = createColor(180, 33, 96);
 export const DEFAULT_LINK_HOVERED_COLOR = createColor(120, 33, 96);
 export const DEFAULT_LINK_VISITED_COLOR = createColor(240, 33, 96);
 
+/** State used by the extension. */
 export const DEFAULT_STATE: State = {
   [VERSION_KEY]: VERSION,
   [ACTIVE_TAB_ID_KEY]: INVALID_TAB,
@@ -67,12 +68,13 @@ export const DEFAULT_STATE: State = {
   [INVALID_URL_KEY]: false,
 }
 
-export const DEFAULT_UI: Ui = {
-  text: DEFAULT_TEXT_COLOR,
-  background: DEFAULT_BACKGROUND_COLOR,
-  link: DEFAULT_LINK_COLOR,
-  linkHovered: DEFAULT_LINK_HOVERED_COLOR,
-  linkVisited: DEFAULT_LINK_VISITED_COLOR,
+/** Subset of state above used for the ui. */
+export const DEFAULT_COLOR_STATE: ColorState = {
+  [TEXT_KEY]: DEFAULT_TEXT_COLOR,
+  [BACKGROUND_KEY]: DEFAULT_BACKGROUND_COLOR,
+  [LINK_KEY]: DEFAULT_LINK_COLOR,
+  [LINK_HOVERED_KEY]: DEFAULT_LINK_HOVERED_COLOR,
+  [LINK_VISITED_KEY]: DEFAULT_LINK_VISITED_COLOR,
 
-  activeBtn: TEXT_KEY,
+  [ACTIVE_BTN_KEY]: TEXT_KEY,
 }

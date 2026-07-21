@@ -1,5 +1,5 @@
 import * as c from "./constants";
-import { type Message, type Ui } from "./types";
+import { type Message, type ColorState } from "./types";
 import { shouldChangeColors } from "./utils";
 
 c.LOG && console.log('cc content - loaded content script');
@@ -17,7 +17,7 @@ let observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 let css = "";
 
-async function updateCss(state: Ui) {
+async function updateCss(state: ColorState) {
   let is = ":not(#increase-specificity-yo)";
 
   css = `
@@ -102,11 +102,11 @@ function removeClass() {
   observer.disconnect();
 }
 
-async function updateContent(state: Ui | undefined) {
+async function updateContent(state: ColorState | undefined) {
   c.LOG && console.log('cc - updateContent - state:', state);
 
   if (state == undefined) {
-    state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as Ui;
+    state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as ColorState;
   };
 
   if (await shouldChangeColors()) {
@@ -134,7 +134,7 @@ function onMessage(message: Message, _sender: any, res: any) {
 }
 
 async function init() {
-  let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as Ui;
+  let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as ColorState;
   updateContent(state);
 }
 
