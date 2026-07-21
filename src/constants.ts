@@ -1,5 +1,5 @@
 import { type State, type ColorState } from "./types";
-import { createColor } from "./utils";
+import { createColor, createColorV4 } from "./utils";
 
 export const LOG = true;
 
@@ -26,10 +26,7 @@ export const DISALLOWED_HOSTNAMES = [
   "chromewebstore.google.com",
 ];
 
-export const VERSION = "5.0.0";
-
 // state keys
-export const VERSION_KEY = "version";
 export const ACTIVE_TAB_ID_KEY = "activeTabId";
 export const ACTIVE_TAB_HOSTNAME_KEY = "activeTabHostname";
 
@@ -52,7 +49,6 @@ export const DEFAULT_LINK_VISITED_COLOR = createColor(240, 33, 96);
 
 /** State used by the extension. */
 export const DEFAULT_STATE: State = {
-  [VERSION_KEY]: VERSION,
   [ACTIVE_TAB_ID_KEY]: INVALID_TAB,
   [ACTIVE_TAB_HOSTNAME_KEY]: "",
 
@@ -77,4 +73,17 @@ export const DEFAULT_COLOR_STATE: ColorState = {
   [LINK_VISITED_KEY]: DEFAULT_LINK_VISITED_COLOR,
 
   [ACTIVE_BTN_KEY]: TEXT_KEY,
+}
+
+export const STATE_V4 = {
+  activeTabId: INVALID_TAB,
+  activeTabHostname: "",
+  fg: createColorV4(0, 0, 20),
+  bg: createColorV4(0, 0, 10),
+  li: createColorV4(32, 40, 40),
+  activeBtn: "fore",
+  lightness: 80,
+  hosts: ["asdf.yo.com", "test.one.two"],
+  lostConnection: false,
+  invalidUrl: false,
 }

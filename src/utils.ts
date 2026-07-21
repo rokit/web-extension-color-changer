@@ -115,17 +115,20 @@ export async function sendTabMessage(message: Message) {
 
 /** Try to preserve colors and hosts from old versions. */
 export function migrateVersion(oldState: any) {
-  let newState: any = {};
+  let newState: any = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
 
   c.LOG && console.log('cc - migrateVersion - oldState:', oldState);
+  c.LOG && console.log('cc - migrateVersion - newState:', newState);
 
   if (Object.hasOwn(oldState, "version") && oldState.version == newState.version) {
     // We're using the current version's state.
+    c.LOG && console.log('cc - migrateVersion - return old state.');
     return oldState;
   }
 
   // update to new state
   if (Object.hasOwn(oldState, "hosts")) {
+    c.LOG && console.log('cc - migrateVersion - migrate hosts.');
     newState.hosts = oldState.hosts;
   }
 
@@ -133,12 +136,14 @@ export function migrateVersion(oldState: any) {
     let hsl = oldState.fg.swatch;
     let hsv = convert.hsl.hsv.raw(hsl.hue, hsl.saturation, hsl.lightness);
     newState.text = createColor(hsv[0], hsv[1], hsv[2]);
+    c.LOG && console.log('cc - migrateVersion - migrate text.');
   }
 
   if (Object.hasOwn(oldState, "bg") && Object.hasOwn(oldState.bg, "swatch")) {
     let hsl = oldState.bg.swatch;
     let hsv = convert.hsl.hsv.raw(hsl.hue, hsl.saturation, hsl.lightness);
     newState.background = createColor(hsv[0], hsv[1], hsv[2]);
+    c.LOG && console.log('cc - migrateVersion - migrate background.');
   }
 
   if (Object.hasOwn(oldState, "li") && Object.hasOwn(oldState.li, "swatch")) {
@@ -155,7 +160,20 @@ export function migrateVersion(oldState: any) {
     let visitedSat = hsl.saturation + 20;
     let visitedHsv = convert.hsl.hsv.raw(visitedHue, visitedSat, hsl.lightness);
     newState.linkHovered = createColor(visitedHsv[0], visitedHsv[1], visitedHsv[2]);
+    c.LOG && console.log('cc - migrateVersion - migrate links.');
   }
 
-  return newState;
+  c.LOG && console.log('cc - migrateVersion - final state:', newState);
+  browser.storage.sync.set(newState);
+}
+
+export function createColorV4(hue: number, saturation: number, lightness: number) {
+  let color: any = {
+    swatch: {
+      hue,
+      saturation,
+      lightness,
+    },
+  }
+  return color;
 }

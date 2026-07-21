@@ -1,5 +1,4 @@
 export type State = {
-  version: string,
   activeTabId: number;
   activeTabHostname: string;
 

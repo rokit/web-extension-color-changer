@@ -102,11 +102,15 @@ function onContextMenuClicked(info: browser.contextMenus.OnClickData, _tab?: bro
 
 // --------------------------------------------------------------------------------------------- installed
 async function onInstalled(details: any) {
+  c.LOG && console.log("cc - onInstalled", details);
+
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
-  if (details.reason === 'update') {
-    // only do this for major versions with breaking changes
-    // clearStorage(initServiceWorker);
-  } else if (details.reason === 'install') {
+  if (details.reason == "update") {
+    c.LOG && console.log("cc - onInstalled - updating");
+    await browser.storage.sync.set({ "colorChangerState": c.STATE_V4 });
+    let oldState = await browser.storage.sync.get(["colorChangerState"]);
+    migrateVersion(oldState["colorChangerState"]);
+  } else if (details.reason == "install") {
     let state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
     await browser.storage.sync.set(state);
     // showAboutPage(details.reason);
