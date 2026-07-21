@@ -87,10 +87,6 @@ export async function shouldChangeColors() {
   }
 }
 
-export function roundToTenths(num: number) {
-  return Math.round((num + Number.EPSILON) * 10) / 10;
-}
-
 export async function updateContextMenu() {
   try {
     await browser.contextMenus.update(c.CONTEXT_MENU_ID, { checked: await shouldChangeColors() });
