@@ -315,7 +315,7 @@ function addClearStorageBtn() {
   let button = document.createElement("button") as HTMLButtonElement;
   button.textContent = "Clear storage";
   button.onclick = function () {
-    browser.runtime.sendMessage({ message: c.CLEAR_STORAGE });
+    clearStorage();
   }
 
   footerElement.appendChild(button);

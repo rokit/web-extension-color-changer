@@ -3,13 +3,8 @@ import { createColor } from "./utils";
 
 export const LOG = true;
 
-export const STORAGE_ID = "colorChangerState";
-export const GET_STATE = "GET_STATE";
-export const SAVE_STATE = "SAVE_STATE";
 export const UPDATE_CONTENT = "UPDATE_CONTENT";
-export const CHANGE_COLORS = "CHANGE_COLORS";
-export const UPDATE_COLOR = "UPDATE_COLOR";
-export const CLEAR_STORAGE = "CLEAR_STORAGE";
+export const CONTEXT_MENU_ID = "CHANGE_COLORS";
 export const INVALID_TAB = -9999;
 
 export const COLOR_CHANGER_STYLE_ID = "color-changer-style";
@@ -56,20 +51,20 @@ export const DEFAULT_LINK_HOVERED_COLOR = createColor(120, 33, 96);
 export const DEFAULT_LINK_VISITED_COLOR = createColor(240, 33, 96);
 
 export const DEFAULT_STATE: State = {
-  version: VERSION,
-  activeTabId: INVALID_TAB,
-  activeTabHostname: "",
+  [VERSION_KEY]: VERSION,
+  [ACTIVE_TAB_ID_KEY]: INVALID_TAB,
+  [ACTIVE_TAB_HOSTNAME_KEY]: "",
 
-  text: DEFAULT_TEXT_COLOR,
-  background: DEFAULT_BACKGROUND_COLOR,
-  link: DEFAULT_LINK_COLOR,
-  linkHovered: DEFAULT_LINK_HOVERED_COLOR,
-  linkVisited: DEFAULT_LINK_VISITED_COLOR,
+  [TEXT_KEY]: DEFAULT_TEXT_COLOR,
+  [BACKGROUND_KEY]: DEFAULT_BACKGROUND_COLOR,
+  [LINK_KEY]: DEFAULT_LINK_COLOR,
+  [LINK_HOVERED_KEY]: DEFAULT_LINK_HOVERED_COLOR,
+  [LINK_VISITED_KEY]: DEFAULT_LINK_VISITED_COLOR,
 
-  activeBtn: TEXT_KEY,
-  hosts: [],
-  lostConnection: false,
-  invalidUrl: false,
+  [ACTIVE_BTN_KEY]: TEXT_KEY,
+  [HOSTS_KEY]: [],
+  [LOST_CONNECTION_KEY]: false,
+  [INVALID_URL_KEY]: false,
 }
 
 export const DEFAULT_UI: Ui = {

@@ -82,7 +82,7 @@ async function setInvalidUrl() {
 // --------------------------------------------------------------------------------------------- context menu
 function createContextMenu() {
   let menu = {
-    id: c.CHANGE_COLORS,
+    id: c.CONTEXT_MENU_ID,
     title: "Change Colors",
     type: "checkbox",
     checked: false,
@@ -95,7 +95,7 @@ function createContextMenu() {
 }
 
 function onContextMenuClicked(info: browser.contextMenus.OnClickData, _tab?: browser.tabs.Tab) {
-  if (info.menuItemId === c.CHANGE_COLORS) {
+  if (info.menuItemId === c.CONTEXT_MENU_ID) {
     onChangeColors(!!info.checked)
   }
 }

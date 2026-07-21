@@ -93,7 +93,7 @@ export function roundToTenths(num: number) {
 
 export async function updateContextMenu() {
   try {
-    await browser.contextMenus.update(c.CHANGE_COLORS, { checked: await shouldChangeColors() });
+    await browser.contextMenus.update(c.CONTEXT_MENU_ID, { checked: await shouldChangeColors() });
   } catch (e) {
     c.LOG && console.error('cc - updateContextMenu: ', e);
   }

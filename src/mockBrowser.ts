@@ -21,21 +21,6 @@ export class MockBrowser {
 
         this.runtime = {
             sendMessage: (message: any) => {
-                switch (message.message) {
-                    case c.GET_STATE: {
-                        return Promise.resolve(this.state)
-                    }
-                    case c.SAVE_STATE: break;
-                    case c.CHANGE_COLORS: break;
-                    case c.UPDATE_COLOR: {
-                        let color = this.state[this.state.activeBtn as keyof State] as Color;
-                        color.hsv.h = message.payload.hue;
-                        color.hsv.s = message.payload.saturation;
-                        color.hsv.v = message.payload.value;
-                        setHslStrings(color);
-                    }; break;
-                    default: break;
-                }
             }
         }
     }
