@@ -1,7 +1,7 @@
 
 import * as c from "./constants";
-import { type Message, type State, type TabActiveInfo } from "./types";
-import { migrateVersion, onChangeColors, sendTabMessage, setHslStrings, shouldChangeColors, updateContextMenu } from "./utils";
+import { type State, type TabActiveInfo } from "./types";
+import { migrateVersion, onChangeColors, sendTabMessage, updateContextMenu } from "./utils";
 
 if (!globalThis.browser) {
   // @ts-ignore
