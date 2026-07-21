@@ -1,6 +1,6 @@
 
 import * as c from "./constants";
-import { type Message, type TabActiveInfo } from "./types";
+import { type Message, type State, type TabActiveInfo } from "./types";
 import { migrateVersion, onChangeColors, sendTabMessage, setHslStrings, shouldChangeColors, updateContextMenu } from "./utils";
 
 if (!globalThis.browser) {
@@ -100,23 +100,6 @@ function onContextMenuClicked(info: browser.contextMenus.OnClickData, _tab?: bro
   }
 }
 
-async function initState() {
-  await browser.storage.sync.set({ [c.VERSION_KEY]: c.VERSION });
-  await browser.storage.sync.set({ [c.ACTIVE_TAB_ID_KEY]: c.INVALID_TAB });
-  await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: "" });
-
-  await browser.storage.sync.set({ [c.TEXT_KEY]: c.DEFAULT_TEXT_COLOR });
-  await browser.storage.sync.set({ [c.BACKGROUND_KEY]: c.DEFAULT_BACKGROUND_COLOR });
-  await browser.storage.sync.set({ [c.LINK_KEY]: c.DEFAULT_LINK_COLOR });
-  await browser.storage.sync.set({ [c.LINK_HOVERED_KEY]: c.DEFAULT_LINK_HOVERED_COLOR });
-  await browser.storage.sync.set({ [c.LINK_VISITED_KEY]: c.DEFAULT_LINK_VISITED_COLOR });
-
-  await browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
-  await browser.storage.sync.set({ [c.HOSTS_KEY]: [] });
-  await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: false });
-  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: false });
-}
-
 // --------------------------------------------------------------------------------------------- installed
 async function onInstalled(details: any) {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/OnInstalledReason
@@ -124,8 +107,9 @@ async function onInstalled(details: any) {
     // only do this for major versions with breaking changes
     // clearStorage(initServiceWorker);
   } else if (details.reason === 'install') {
+    let state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
+    await browser.storage.sync.set(state);
     // showAboutPage(details.reason);
-    initState();
   }
 }
 
