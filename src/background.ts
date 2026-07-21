@@ -62,11 +62,11 @@ async function validateTab(tab: browser.tabs.Tab) {
     return;
   }
 
-  if (c.DISALLOWED_HOSTNAMES.includes(url.hostname)) {
-    c.LOG && console.log('cc - validateTab - disallowed hostname', url.hostname);
-    setInvalidUrl();
-    return;
-  }
+  // if (c.DISALLOWED_HOSTNAMES.includes(url.hostname)) {
+  //   c.LOG && console.log('cc - validateTab - disallowed hostname', url.hostname);
+  //   setInvalidUrl();
+  //   return;
+  // }
 
   await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: url.hostname });
 

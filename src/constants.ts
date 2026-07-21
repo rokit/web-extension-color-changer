@@ -21,10 +21,10 @@ export const DISALLOWED_PROTOCOLS = [
   "data:",
 ];
 
-export const DISALLOWED_HOSTNAMES = [
-  "addons.mozilla.org",
-  "chromewebstore.google.com",
-];
+// export const DISALLOWED_HOSTNAMES = [
+//   "addons.mozilla.org",
+//   "chromewebstore.google.com",
+// ];
 
 // state keys
 export const ACTIVE_TAB_ID_KEY = "activeTabId";
