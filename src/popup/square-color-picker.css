@@ -99,6 +99,10 @@ input {
   margin-top: 0.4rem;
 }
 
+input.hexError {
+  outline: 2px solid red;
+}
+
 #stats {
   position: absolute;
   display: flex;
@@ -114,8 +118,4 @@ input {
   margin: 0;
   padding: 0.05rem;
   width: 2.5rem;
-}
-
-#stats .hexError {
-  outline: 2px solid red;
 }
