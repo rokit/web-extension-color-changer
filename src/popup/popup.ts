@@ -328,6 +328,15 @@ async function setActiveColorButton(button: string) {
   linkHoveredBtn.classList.remove("active-btn");
   linkVisitedBtn.classList.remove("active-btn");
   document.getElementById(button)!.classList.add("active-btn");
+
+  let color = uiState[uiState.activeBtn as keyof Ui] as Color;
+  selectedHue = color.hsv.h;
+  selectedSaturation = color.hsv.s;
+  selectedValue = color.hsv.v;
+
+  updateHexInput();
+  updateReticlesFromHsv();
+  drawColorPicker();
 }
 
 async function saveColor() {
