@@ -271,7 +271,7 @@ resetBtn.onclick = async function () {
   await initUi();
 
   await updateContextMenu();
-  sendTabMessage({ message: c.UPDATE_CONTENT });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: colorState });
 }
 
 textBtn.onclick = function onClickForeground() {
