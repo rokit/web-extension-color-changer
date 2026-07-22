@@ -37,8 +37,10 @@ async function onTabUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Ta
 async function validateTab(tab: browser.tabs.Tab) {
   c.LOG && console.log('cc - validateTab - validating tab', tab);
 
-  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: false });
-  await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: false });
+  await browser.storage.sync.set({
+    [c.INVALID_URL_KEY]: false,
+    [c.LOST_CONNECTION_KEY]: false
+  });
 
   // c.SHOULD_CONSOLE_LOG && console.log('cc - validate tab', tab);
   if (!tab.url) {
@@ -75,8 +77,10 @@ async function validateTab(tab: browser.tabs.Tab) {
 }
 
 async function setInvalidUrl() {
-  await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: "" });
-  await browser.storage.sync.set({ [c.INVALID_URL_KEY]: true });
+  await browser.storage.sync.set({
+    [c.ACTIVE_TAB_HOSTNAME_KEY]: "",
+    [c.INVALID_URL_KEY]: true
+  });
 }
 
 // --------------------------------------------------------------------------------------------- context menu
@@ -138,8 +142,10 @@ async function initServiceWorker() {
   createContextMenu();
 
   // Initialize tabs.
-  await browser.storage.sync.set({ [c.ACTIVE_TAB_ID_KEY]: c.INVALID_TAB });
-  await browser.storage.sync.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: "" });
+  await browser.storage.sync.set({
+    [c.ACTIVE_TAB_ID_KEY]: c.INVALID_TAB,
+    [c.ACTIVE_TAB_HOSTNAME_KEY]: ""
+  });
 
   let tabs = await browser.tabs.query({ currentWindow: true, active: true });
 
