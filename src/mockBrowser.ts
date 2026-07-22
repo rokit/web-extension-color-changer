@@ -23,6 +23,14 @@ export class MockBrowser {
                     this.syncState = { ...this.syncState, ...items }
                 }
             },
+            local: {
+                get: (keys: string[]) => {
+                    return Object.fromEntries(keys.map(key => [key, this.localState[key as keyof LocalState]]));;
+                },
+                set: (items: { [key: string]: any; }) => {
+                    this.localState = { ...this.localState, ...items }
+                }
+            },
             onChanged: {
                 addListener: (listener: any) => {
                     setInterval(() => listener(), 1000 / 60)
