@@ -51,24 +51,13 @@ export function setHslStrings(color: Color) {
 }
 
 export async function onChangeColors(changeColors: boolean) {
-  let { activeTabHostname, activeTabId } = await browser.storage.local.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY]);
+  let { activeTabHostname } = await browser.storage.local.get([c.ACTIVE_TAB_HOSTNAME_KEY]);
   let { hosts } = await browser.storage.sync.get([c.HOSTS_KEY]);
 
-  c.LOG && console.log('cc - onChangeColors - activeTabHostname', activeTabHostname, 'activeTabId', activeTabId);
-  if (!activeTabHostname) {
-    c.LOG && console.log('cc - onChangeColors - No hostname');
-    return;
-  };
-
-  if (!activeTabId) {
-    c.LOG && console.log('cc - onChangeColors - No tab ID.');
-    return;
-  }
-
-  if (changeColors && !hosts.includes(activeTabHostname)) {
+  if (changeColors) {
     hosts.push(activeTabHostname);
   } else {
-    hosts = [...hosts.filter((host: string) => host !== activeTabHostname)];
+    hosts = [...hosts.filter((host: string) => host != activeTabHostname)];
   }
 
   await browser.storage.sync.set({ [c.HOSTS_KEY]: hosts });
