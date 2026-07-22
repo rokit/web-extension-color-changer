@@ -71,7 +71,7 @@ button.active-btn {
 }
 
 #checkbox-container input[type="checkbox"] {
-  margin: 14px;
+  margin: 14px 14px 14px 0;
   width: 2rem;
   height: 2rem;
 }
