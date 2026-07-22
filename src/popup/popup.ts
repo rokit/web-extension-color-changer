@@ -370,7 +370,7 @@ function updateColor() {
 }
 
 async function handleErrors(changes: { [key: string]: browser.storage.StorageChange; }, areaName: string) {
-  let state = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY, c.INVALID_URL_KEY, c.LOST_CONNECTION_KEY]);
+  let state = await browser.storage.local.get([c.ACTIVE_TAB_ID_KEY, c.INVALID_URL_KEY, c.LOST_CONNECTION_KEY]);
 
   // c.LOG && console.log('areaName:', areaName, "changes", changes);
 

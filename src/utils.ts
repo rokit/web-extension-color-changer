@@ -51,7 +51,8 @@ export function setHslStrings(color: Color) {
 }
 
 export async function onChangeColors(changeColors: boolean) {
-  let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
+  let { activeTabHostname, activeTabId } = await browser.storage.local.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY]);
+  let { hosts } = await browser.storage.sync.get([c.HOSTS_KEY]);
 
   c.LOG && console.log('cc - onChangeColors - activeTabHostname', activeTabHostname, 'activeTabId', activeTabId);
   if (!activeTabHostname) {
@@ -76,7 +77,9 @@ export async function onChangeColors(changeColors: boolean) {
 }
 
 export async function shouldChangeColors() {
-  let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
+  let { activeTabHostname, activeTabId } = await browser.storage.local.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY]);
+  let { hosts } = await browser.storage.sync.get([c.HOSTS_KEY]);
+
   c.LOG && console.log('cc - shouldChangeColors: activeTabId', activeTabId, 'activeTabHostname', activeTabHostname);
 
   if (!activeTabHostname) return false;
@@ -99,7 +102,7 @@ export async function updateContextMenu() {
 
 /** Send message to a tab. If the extension was reloaded, the tab will not be able to receive any messages until reloaded, hence the catch block. */
 export async function sendTabMessage(message: Message) {
-  let { activeTabId } = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY]);
+  let { activeTabId } = await browser.storage.local.get([c.ACTIVE_TAB_ID_KEY]);
 
   if (!activeTabId) {
     c.LOG && console.log('cc - sendTabMessage - No active tab ID.');
@@ -111,7 +114,7 @@ export async function sendTabMessage(message: Message) {
     await browser.tabs.sendMessage(activeTabId, message);
   } catch (err) {
     c.LOG && console.log("cc - sendTabMessage - lost connection: ", err);
-    await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: true });
+    await browser.storage.local.set({ [c.LOST_CONNECTION_KEY]: true });
   }
 }
 
