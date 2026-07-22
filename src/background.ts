@@ -9,48 +9,51 @@ if (!globalThis.browser) {
 }
 
 // --------------------------------------------------------------------------------------------- tabs
-/** On tab activation, get the full tab data. */
+/** Triggers when user clicks a tab, makes a new one, or deletes one.
+ * The tab could be blank or already populated with a page.
+ */
 async function onTabActivated(tabInfo: TabActiveInfo) {
-  c.LOG && console.log('cc - onTabActivated - tab activated', tabInfo.tabId);
+  c.LOG && console.log('cc - onTabActivated - tabInfo', tabInfo);
 
   await browser.storage.local.set({ [c.ACTIVE_TAB_ID_KEY]: tabInfo.tabId });
   let tab = await browser.tabs.get(tabInfo.tabId);
   validateTab(tab);
 }
 
-async function onTabUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab) {
+async function onTabUpdated(tabId: number, changeInfo: browser.tabs._OnUpdatedChangeInfo, tab: browser.tabs.Tab) {
+  // Ignore anything that's not a url update.
+  if (!changeInfo.url) return;
+
+  c.LOG && console.log('------------------------------');
+  c.LOG && console.log('cc - onTabUpdated - changeInfo.url', changeInfo.url);
   c.LOG && console.log('cc - onTabUpdated - tabUdpated', tab);
-  c.LOG && console.log('cc - onTabUpdated - changeInfo', changeInfo);
 
   let { activeTabId } = await browser.storage.local.get([c.ACTIVE_TAB_ID_KEY]);
 
-  if (activeTabId === c.INVALID_TAB) {
-    // Tab ID can be invalid if the browser was first loaded.
-    await browser.storage.local.set({ [c.ACTIVE_TAB_ID_KEY]: tabId });
-    validateTab(tab);
-  } else if (activeTabId === tabId) {
+  // If multiple tabs are loading, we only care about the one we're currently on.
+  if (activeTabId === tabId) {
     validateTab(tab);
   }
 }
 
-/** Check if the current tab is valid to change colors. If it is, save storage with the active tab. */
+/** Check if the current tab is valid to change colors. If it is, save the hostname to storage. */
 async function validateTab(tab: browser.tabs.Tab) {
-  c.LOG && console.log('cc - validateTab - validating tab', tab);
+  c.LOG && console.log('cc - validateTab - tab', tab);
 
   await browser.storage.local.set({
     [c.INVALID_URL_KEY]: false,
     [c.LOST_CONNECTION_KEY]: false
   });
 
-  // c.SHOULD_CONSOLE_LOG && console.log('cc - validate tab', tab);
-  if (!tab.url) {
-    // This may be null until the tab is updated.
+  // Url always seems to be defined, even on internal browser pages, so not sure when this happens.
+  if (tab.url == undefined) {
+    c.LOG && console.log('cc - validateTab - tab.url was undefined');
+    setInvalidUrl();
     return;
   };
 
   let url = new URL(tab.url);
-  c.LOG && console.log('cc - validateTab - url.hostname', url.hostname);
-  c.LOG && console.log('cc - validateTab - url.protocol', url.protocol);
+  c.LOG && console.log('cc - validateTab - url.hostname', url.hostname, 'url.protocol', url.protocol);
 
   if (url.hostname == "") {
     c.LOG && console.log('cc - validateTab - Empty hostname');
@@ -64,12 +67,7 @@ async function validateTab(tab: browser.tabs.Tab) {
     return;
   }
 
-  // if (c.DISALLOWED_HOSTNAMES.includes(url.hostname)) {
-  //   c.LOG && console.log('cc - validateTab - disallowed hostname', url.hostname);
-  //   setInvalidUrl();
-  //   return;
-  // }
-
+  c.LOG && console.log('cc - validateTab - tab is valid, setting hostname: ', url.hostname);
   await browser.storage.local.set({ [c.ACTIVE_TAB_HOSTNAME_KEY]: url.hostname });
 
   updateContextMenu();
