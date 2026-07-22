@@ -45,14 +45,18 @@ async function validateTab(tab: browser.tabs.Tab) {
     [c.LOST_CONNECTION_KEY]: false
   });
 
-  // Url always seems to be defined, even on internal browser pages, so not sure when this happens.
-  if (tab.url == undefined) {
-    c.LOG && console.log('cc - validateTab - tab.url was undefined');
+  // The spec says url can be undefined though I've never seen it.
+  // I have seen an empty url in chrome for new tabs.
+  // If we can't make a url for any reason, just return.
+  let url;
+  try {
+    url = new URL(tab.url || "");
+  } catch (e) {
+    c.LOG && console.log('cc - validateTab - url could not be made', tab);
     setInvalidUrl();
     return;
-  };
+  }
 
-  let url = new URL(tab.url);
   c.LOG && console.log('cc - validateTab - url.hostname', url.hostname, 'url.protocol', url.protocol);
 
   if (url.hostname == "") {
