@@ -369,8 +369,10 @@ function updateColor() {
   sendTabMessage({ message: c.UPDATE_CONTENT, payload: colorState });
 }
 
-async function handleErrors() {
+async function handleErrors(changes: { [key: string]: browser.storage.StorageChange; }, areaName: string) {
   let state = await browser.storage.sync.get([c.ACTIVE_TAB_ID_KEY, c.INVALID_URL_KEY, c.LOST_CONNECTION_KEY]);
+
+  // c.LOG && console.log('areaName:', areaName, "changes", changes);
 
   errorElement.classList.add("show");
   if (state.activeTabId === c.INVALID_TAB) {
@@ -390,7 +392,7 @@ async function handleErrors() {
 }
 
 async function initUi() {
-  handleErrors();
+  handleErrors({}, "init");
   colorState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as ColorState;
   changeColorsCheckbox.checked = await shouldChangeColors();
 
