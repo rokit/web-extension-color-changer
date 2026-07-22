@@ -251,7 +251,7 @@ let linkVisitedBtn = document.getElementById(c.LINK_VISITED_KEY)! as HTMLButtonE
 let resetBtn = document.getElementById("reset")! as HTMLButtonElement;
 
 changeColorsCheckbox.onclick = async () => {
-  await saveState();
+  // await saveState();
   await onChangeColors(changeColorsCheckbox.checked);
 };
 
@@ -274,41 +274,35 @@ resetBtn.onclick = async function () {
   sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
-function onClickForeground() {
+textBtn.onclick = function onClickForeground() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
   colorState.activeBtn = c.TEXT_KEY;
   setActiveColorButton(c.TEXT_KEY);
 }
 
-function onClickBackground() {
+backgroundBtn.onclick = function onClickBackground() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.BACKGROUND_KEY });
   colorState.activeBtn = c.BACKGROUND_KEY;
   setActiveColorButton(c.BACKGROUND_KEY);
 }
 
-function onClickLink() {
+linkBtn.onclick = function onClickLink() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_KEY });
   colorState.activeBtn = c.LINK_KEY;
   setActiveColorButton(c.LINK_KEY);
 }
 
-function onClickLinkHovered() {
+linkHoveredBtn.onclick = function onClickLinkHovered() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_HOVERED_KEY });
   colorState.activeBtn = c.LINK_HOVERED_KEY;
   setActiveColorButton(c.LINK_HOVERED_KEY);
 }
 
-function onClickLinkVisited() {
+linkVisitedBtn.onclick = function onClickLinkVisited() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_VISITED_KEY });
   colorState.activeBtn = c.LINK_VISITED_KEY;
   setActiveColorButton(c.LINK_VISITED_KEY);
 }
-
-textBtn.onclick = onClickForeground;
-backgroundBtn.onclick = onClickBackground;
-linkBtn.onclick = onClickLink;
-linkHoveredBtn.onclick = onClickLinkHovered;
-linkVisitedBtn.onclick = onClickLinkVisited;
 
 function addClearStorageBtn() {
   if (!c.LOG) return;
@@ -343,10 +337,6 @@ async function setActiveColorButton(button: string) {
 async function saveColor() {
   let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
   await browser.storage.sync.set({ [colorState.activeBtn]: color });
-}
-
-async function saveState() {
-  await browser.storage.sync.set(colorState);
 }
 
 function clearStorage() {
