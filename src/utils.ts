@@ -76,25 +76,22 @@ export async function onChangeColors(changeColors: boolean) {
   await sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
-export async function shouldChangeColors() {
-  let { activeTabHostname, activeTabId } = await browser.storage.local.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY]);
+export async function isSavedHost() {
+  let { activeTabHostname } = await browser.storage.local.get([c.ACTIVE_TAB_HOSTNAME_KEY]);
   let { hosts } = await browser.storage.sync.get([c.HOSTS_KEY]);
 
-  c.LOG && console.log('cc - shouldChangeColors: activeTabId', activeTabId, 'activeTabHostname', activeTabHostname);
-
-  if (!activeTabHostname) return false;
-  if (!activeTabId) return false;
-
   if (hosts.includes(activeTabHostname)) {
+    c.LOG && console.log('cc - isSavedHost - true');
     return true;
   } else {
+    c.LOG && console.log('cc - isSavedHost - false');
     return false;
   }
 }
 
 export async function updateContextMenu() {
   try {
-    await browser.contextMenus.update(c.CONTEXT_MENU_ID, { checked: await shouldChangeColors() });
+    await browser.contextMenus.update(c.CONTEXT_MENU_ID, { checked: await isSavedHost() });
   } catch (e) {
     c.LOG && console.log('cc - updateContextMenu - failed: ', e);
   }

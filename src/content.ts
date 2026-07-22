@@ -1,6 +1,6 @@
 import * as c from "./constants";
 import { type Message, type SyncState } from "./types";
-import { shouldChangeColors } from "./utils";
+import { isSavedHost } from "./utils";
 
 c.LOG && console.log('cc content - loaded content script');
 
@@ -111,7 +111,7 @@ async function updateContent(state: SyncState | undefined) {
     state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as SyncState;
   };
 
-  if (await shouldChangeColors()) {
+  if (await isSavedHost()) {
     updateCss(state);
 
     ccStyle.textContent = css;

@@ -1,6 +1,6 @@
 import * as c from "../constants";
 import { type Point, type Color, type SyncState } from "../types";
-import { shouldChangeColors, degToRad, radToDeg, mapRange, updateContextMenu, sendTabMessage, setHslStrings, onChangeColors } from "../utils";
+import { isSavedHost, degToRad, radToDeg, mapRange, updateContextMenu, sendTabMessage, setHslStrings, onChangeColors } from "../utils";
 import convert from 'color-convert';
 import { MockBrowser } from "../mockBrowser";
 
@@ -385,7 +385,7 @@ async function handleErrors(changes: { [key: string]: browser.storage.StorageCha
 async function initUi() {
   handleErrors({}, "init");
   colorState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as SyncState;
-  changeColorsCheckbox.checked = await shouldChangeColors();
+  changeColorsCheckbox.checked = await isSavedHost();
 
   let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
   selectedHue = color.hsv.h;
