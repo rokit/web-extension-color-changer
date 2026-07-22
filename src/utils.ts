@@ -77,6 +77,8 @@ export async function onChangeColors(changeColors: boolean) {
 
 export async function shouldChangeColors() {
   let { activeTabHostname, activeTabId, hosts } = await browser.storage.sync.get([c.ACTIVE_TAB_HOSTNAME_KEY, c.ACTIVE_TAB_ID_KEY, c.HOSTS_KEY]);
+  c.LOG && console.log('cc - shouldChangeColors: activeTabId', activeTabId, 'activeTabHostname', activeTabHostname);
+
   if (!activeTabHostname) return false;
   if (!activeTabId) return false;
 
@@ -91,7 +93,7 @@ export async function updateContextMenu() {
   try {
     await browser.contextMenus.update(c.CONTEXT_MENU_ID, { checked: await shouldChangeColors() });
   } catch (e) {
-    c.LOG && console.error('cc - updateContextMenu: ', e);
+    c.LOG && console.log('cc - updateContextMenu - failed: ', e);
   }
 }
 
@@ -108,7 +110,7 @@ export async function sendTabMessage(message: Message) {
     c.LOG && console.log('cc - sendTabMessage: ', message);
     await browser.tabs.sendMessage(activeTabId, message);
   } catch (err) {
-    c.LOG && console.error("cc - sendTabMessage error: ", err);
+    c.LOG && console.log("cc - sendTabMessage - lost connection: ", err);
     await browser.storage.sync.set({ [c.LOST_CONNECTION_KEY]: true });
   }
 }
