@@ -20,13 +20,15 @@ async function onTabActivated(tabInfo: TabActiveInfo) {
   validateTab(tab);
 }
 
+/** Firefox seems to always send a changeInfo.url update on reloaded tabs, but chrome doesn't.
+ *  We could listen for status == "complete", but that is not guaranteed to happen.
+ *  Since there doesn't seem to be a good way to get the final url of the tab,
+ *  we validate on every update.
+ */
 async function onTabUpdated(tabId: number, changeInfo: browser.tabs._OnUpdatedChangeInfo, tab: browser.tabs.Tab) {
-  // Ignore anything that's not a url update.
-  if (!changeInfo.url) return;
-
-  c.LOG && console.log('------------------------------');
-  c.LOG && console.log('cc - onTabUpdated - changeInfo.url', changeInfo.url);
-  c.LOG && console.log('cc - onTabUpdated - tabUdpated', tab);
+  // c.LOG && console.log('------------------------------');
+  // c.LOG && console.log('cc - onTabUpdated - changeInfo', changeInfo);
+  // c.LOG && console.log('cc - onTabUpdated - tabUdpated', tab);
 
   let { activeTabId } = await browser.storage.local.get([c.ACTIVE_TAB_ID_KEY]);
 
