@@ -1,4 +1,4 @@
-import { type State, type ColorState } from "./types";
+import { type LocalState, type SyncState } from "./types";
 import { createColor, createColorV4 } from "./utils";
 
 export const LOG = true;
@@ -47,11 +47,16 @@ export const DEFAULT_LINK_COLOR = createColor(180, 33, 96);
 export const DEFAULT_LINK_HOVERED_COLOR = createColor(120, 33, 96);
 export const DEFAULT_LINK_VISITED_COLOR = createColor(240, 33, 96);
 
-/** State used by the extension. */
-export const DEFAULT_STATE: State = {
+/** State used for the active tab. */
+export const DEFAULT_LOCAL_STATE: LocalState = {
   [ACTIVE_TAB_ID_KEY]: INVALID_TAB,
   [ACTIVE_TAB_HOSTNAME_KEY]: "",
+  [LOST_CONNECTION_KEY]: false,
+  [INVALID_URL_KEY]: false,
+}
 
+/** State for user settings that are saved across devices. */
+export const DEFAULT_SYNC_STATE: SyncState = {
   [TEXT_KEY]: DEFAULT_TEXT_COLOR,
   [BACKGROUND_KEY]: DEFAULT_BACKGROUND_COLOR,
   [LINK_KEY]: DEFAULT_LINK_COLOR,
@@ -60,19 +65,6 @@ export const DEFAULT_STATE: State = {
 
   [ACTIVE_BTN_KEY]: TEXT_KEY,
   [HOSTS_KEY]: [],
-  [LOST_CONNECTION_KEY]: false,
-  [INVALID_URL_KEY]: false,
-}
-
-/** Subset of state above used for the ui. */
-export const DEFAULT_COLOR_STATE: ColorState = {
-  [TEXT_KEY]: DEFAULT_TEXT_COLOR,
-  [BACKGROUND_KEY]: DEFAULT_BACKGROUND_COLOR,
-  [LINK_KEY]: DEFAULT_LINK_COLOR,
-  [LINK_HOVERED_KEY]: DEFAULT_LINK_HOVERED_COLOR,
-  [LINK_VISITED_KEY]: DEFAULT_LINK_VISITED_COLOR,
-
-  [ACTIVE_BTN_KEY]: TEXT_KEY,
 }
 
 export const STATE_V4 = {

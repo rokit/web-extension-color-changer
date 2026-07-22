@@ -1,5 +1,5 @@
 import * as c from "../constants";
-import { type Point, type Color, type ColorState } from "../types";
+import { type Point, type Color, type SyncState } from "../types";
 import { shouldChangeColors, degToRad, radToDeg, mapRange, updateContextMenu, sendTabMessage, setHslStrings, onChangeColors } from "../utils";
 import convert from 'color-convert';
 import { MockBrowser } from "../mockBrowser";
@@ -15,7 +15,7 @@ if (!globalThis.browser) {
   }
 }
 
-let colorState = JSON.parse(JSON.stringify(c.DEFAULT_COLOR_STATE)) as ColorState;
+let colorState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
 
 let selectedHue = 0;
 let selectedSaturation = 100;
@@ -261,7 +261,7 @@ changeColorsCheckbox.onclick = async () => {
  * - invalidUrl
 */
 resetBtn.onclick = async function () {
-  colorState = JSON.parse(JSON.stringify(c.DEFAULT_COLOR_STATE)) as ColorState;
+  colorState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
   await browser.storage.sync.set({
     ...colorState,
     [c.HOSTS_KEY]: []
@@ -329,7 +329,7 @@ async function setActiveColorButton(button: string) {
   linkVisitedBtn.classList.remove("active-btn");
   document.getElementById(button)!.classList.add("active-btn");
 
-  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
+  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
   selectedHue = color.hsv.h;
   selectedSaturation = color.hsv.s;
   selectedValue = color.hsv.v;
@@ -340,7 +340,7 @@ async function setActiveColorButton(button: string) {
 }
 
 async function saveColor() {
-  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
+  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
   await browser.storage.sync.set({ [colorState.activeBtn]: color });
 }
 
@@ -354,7 +354,7 @@ function clearStorage() {
 }
 
 function updateColor() {
-  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
+  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
   color.hsv.h = selectedHue;
   color.hsv.s = selectedSaturation;
   color.hsv.v = selectedValue;
@@ -393,10 +393,10 @@ async function handleErrors(changes: { [key: string]: browser.storage.StorageCha
 
 async function initUi() {
   handleErrors({}, "init");
-  colorState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as ColorState;
+  colorState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as SyncState;
   changeColorsCheckbox.checked = await shouldChangeColors();
 
-  let color = colorState[colorState.activeBtn as keyof ColorState] as Color;
+  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
   selectedHue = color.hsv.h;
   selectedSaturation = color.hsv.s;
   selectedValue = color.hsv.v;

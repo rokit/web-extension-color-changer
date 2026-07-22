@@ -1,5 +1,5 @@
 import convert from "color-convert";
-import { type Color, type Message, type State } from "./types";
+import { type Color, type Message, type LocalState, type SyncState } from "./types";
 import * as c from "./constants";
 
 const DEG_TO_RAD = Math.PI / 180;
@@ -120,7 +120,7 @@ export async function sendTabMessage(message: Message) {
 
 /** Try to preserve colors and hosts from old versions. */
 export function migrateVersion(oldState: any) {
-  let newState: any = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
+  let newState: any = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
 
   c.LOG && console.log('cc - migrateVersion - oldState:', oldState);
   c.LOG && console.log('cc - migrateVersion - newState:', newState);

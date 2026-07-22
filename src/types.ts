@@ -1,26 +1,18 @@
-export type State = {
+export type LocalState = {
   activeTabId: number;
   activeTabHostname: string;
-
-  text: Color;
-  background: Color;
-  link: Color;
-  linkHovered: Color;
-  linkVisited: Color;
-
-  activeBtn: string;
-  hosts: string[];
   lostConnection: boolean;
   invalidUrl: boolean;
 }
 
-export type ColorState = {
+export type SyncState = {
   text: Color;
   background: Color;
   link: Color;
   linkHovered: Color;
   linkVisited: Color;
   activeBtn: string;
+  hosts: string[];
 }
 
 export type Color = {

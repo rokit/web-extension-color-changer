@@ -1,6 +1,6 @@
 
 import * as c from "./constants";
-import { type State, type TabActiveInfo } from "./types";
+import { type SyncState, type TabActiveInfo } from "./types";
 import { migrateVersion, onChangeColors, sendTabMessage, updateContextMenu } from "./utils";
 
 if (!globalThis.browser) {
@@ -119,7 +119,7 @@ async function onInstalled(details: browser.runtime._OnInstalledDetails) {
       }
     }
   } else if (details.reason == "install") {
-    let state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
+    let state = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
     await browser.storage.sync.set(state);
     // showAboutPage(details.reason);
   }

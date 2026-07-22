@@ -1,24 +1,26 @@
 import * as c from "./constants";
-import type { Message, State } from "./types";
+import type { Message, LocalState, SyncState } from "./types";
 
 export class MockBrowser {
-    state: State
+    syncState: SyncState
+    localState: LocalState
     storage: object
     runtime: object
     tabs: object
     contextMenus: object
 
     constructor() {
-        this.state = JSON.parse(JSON.stringify(c.DEFAULT_STATE)) as State;
-        this.state.activeTabId = 1;
+        this.syncState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
+        this.localState = JSON.parse(JSON.stringify(c.DEFAULT_LOCAL_STATE)) as LocalState;
+        this.localState.activeTabId = 1;
 
         this.storage = {
             sync: {
                 get: (keys: string[]) => {
-                    return Object.fromEntries(keys.map(key => [key, this.state[key as keyof State]]));;
+                    return Object.fromEntries(keys.map(key => [key, this.syncState[key as keyof SyncState]]));;
                 },
                 set: (items: { [key: string]: any; }) => {
-                    this.state = { ...this.state, ...items }
+                    this.syncState = { ...this.syncState, ...items }
                 }
             },
             onChanged: {
