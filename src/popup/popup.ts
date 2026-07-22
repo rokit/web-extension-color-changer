@@ -94,6 +94,7 @@ hexInputElement.oninput = () => {
   let regex = /^(?:[0-9a-fA-F]{6})$/;
   if (regex.test(hexInputValue)) {
     hexInputElement.classList.remove("hexError");
+    hexInputElement.value = hexInputElement.value.toUpperCase();
   } else {
     hexInputElement.classList.add("hexError");
     return;
