@@ -76,6 +76,9 @@ export async function onChangeColors(changeColors: boolean) {
   await sendTabMessage({ message: c.UPDATE_CONTENT });
 }
 
+/** Drives the initialization of the main color changer checkbox.
+ *  If the url host is in the list of saved hosts, the colors should be changed, otherwise the host would have been removed.
+ * */
 export async function isSavedHost() {
   let { activeTabHostname } = await browser.storage.local.get([c.ACTIVE_TAB_HOSTNAME_KEY]);
   let { hosts } = await browser.storage.sync.get([c.HOSTS_KEY]);
