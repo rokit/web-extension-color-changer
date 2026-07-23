@@ -11,8 +11,7 @@
     "preview": "vite preview",
     "copy-ff-manifest": "node ./scripts/copy-manifest.js src/manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js src/manifest.chrome.json",
-    "zip:ff": "node ./scripts/zip.js firefox",
-    "zip:chrome": "node ./scripts/zip.js chrome",
+    "zip": "powershell -NoProfile -File ./scripts/zip.ps1",
     "test": "vitest"
   },
   "repository": {
