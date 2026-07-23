@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "copy-ff-manifest": "node ./scripts/copy-manifest.js src/manifest.ff.json",
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js src/manifest.chrome.json",
-    "zip": "powershell -NoProfile -File ./scripts/zip.ps1",
+    "zip:ff": "npm run build:ff && powershell -NoProfile -File ./scripts/zip.ps1",
+    "zip:chrome": "npm run build:chrome && powershell -NoProfile -File ./scripts/zip.ps1",
     "test": "vitest"
   },
   "repository": {
