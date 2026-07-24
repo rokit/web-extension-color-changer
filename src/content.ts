@@ -109,7 +109,7 @@ async function updateContent(state: SyncState | undefined) {
   c.LOG && console.log('cc - updateContent - state:', state);
 
   if (state == undefined) {
-    state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as SyncState;
+    state = await browser.storage.sync.get(null) as SyncState;
   };
 
   if (await isSavedHost()) {
@@ -137,7 +137,7 @@ function onMessage(message: Message, _sender: any, res: any) {
 }
 
 async function init() {
-  let state = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY]) as SyncState;
+  let state = await browser.storage.sync.get(null) as SyncState;
   updateContent(state);
 }
 

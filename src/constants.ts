@@ -63,7 +63,7 @@ export const DEFAULT_SYNC_STATE: SyncState = {
   [LINK_VISITED_KEY]: DEFAULT_LINK_VISITED_COLOR,
   [ACTIVE_BTN_KEY]: BACKGROUND_KEY,
   [HOSTS_KEY]: [],
-  [SHOULD_APPLY_TO_DIV]: false,
+  [SHOULD_APPLY_TO_DIV]: true,
 }
 
 export const STATE_V4 = {

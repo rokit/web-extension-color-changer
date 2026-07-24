@@ -15,7 +15,7 @@ if (!globalThis.browser) {
   }
 }
 
-let colorState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
+let syncState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
 
 let selectedHue = 0;
 let selectedSaturation = 100;
@@ -258,8 +258,8 @@ changeColorsCheckbox.onclick = async () => {
 
 applyToDivCheckbox.onclick = async () => {
   await browser.storage.sync.set({ [c.SHOULD_APPLY_TO_DIV]: applyToDivCheckbox.checked });
-  colorState.shouldApplyToDiv = applyToDivCheckbox.checked;
-  await sendTabMessage({ message: c.UPDATE_CONTENT, payload: colorState });
+  syncState.shouldApplyToDiv = applyToDivCheckbox.checked;
+  await sendTabMessage({ message: c.UPDATE_CONTENT, payload: syncState });
 }
 
 /** Sets back to defaults. Does not reset:
@@ -269,42 +269,41 @@ applyToDivCheckbox.onclick = async () => {
  * - invalidUrl
 */
 resetBtn.onclick = async function () {
-  colorState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
-  await browser.storage.sync.set(colorState);
-
+  syncState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
+  await browser.storage.sync.set(syncState);
   await initUi();
 
   await updateContextMenu();
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: colorState });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: syncState });
 }
 
 textBtn.onclick = function onClickForeground() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.TEXT_KEY });
-  colorState.activeBtn = c.TEXT_KEY;
+  syncState.activeBtn = c.TEXT_KEY;
   setActiveColorButton(c.TEXT_KEY);
 }
 
 backgroundBtn.onclick = function onClickBackground() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.BACKGROUND_KEY });
-  colorState.activeBtn = c.BACKGROUND_KEY;
+  syncState.activeBtn = c.BACKGROUND_KEY;
   setActiveColorButton(c.BACKGROUND_KEY);
 }
 
 linkBtn.onclick = function onClickLink() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_KEY });
-  colorState.activeBtn = c.LINK_KEY;
+  syncState.activeBtn = c.LINK_KEY;
   setActiveColorButton(c.LINK_KEY);
 }
 
 linkHoveredBtn.onclick = function onClickLinkHovered() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_HOVERED_KEY });
-  colorState.activeBtn = c.LINK_HOVERED_KEY;
+  syncState.activeBtn = c.LINK_HOVERED_KEY;
   setActiveColorButton(c.LINK_HOVERED_KEY);
 }
 
 linkVisitedBtn.onclick = function onClickLinkVisited() {
   browser.storage.sync.set({ [c.ACTIVE_BTN_KEY]: c.LINK_VISITED_KEY });
-  colorState.activeBtn = c.LINK_VISITED_KEY;
+  syncState.activeBtn = c.LINK_VISITED_KEY;
   setActiveColorButton(c.LINK_VISITED_KEY);
 }
 
@@ -328,7 +327,7 @@ async function setActiveColorButton(button: string) {
   linkVisitedBtn.classList.remove("active-btn");
   document.getElementById(button)!.classList.add("active-btn");
 
-  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
+  let color = syncState[syncState.activeBtn as keyof SyncState] as Color;
   selectedHue = color.hsv.h;
   selectedSaturation = color.hsv.s;
   selectedValue = color.hsv.v;
@@ -339,8 +338,8 @@ async function setActiveColorButton(button: string) {
 }
 
 async function saveColor() {
-  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
-  await browser.storage.sync.set({ [colorState.activeBtn]: color });
+  let color = syncState[syncState.activeBtn as keyof SyncState] as Color;
+  await browser.storage.sync.set({ [syncState.activeBtn]: color });
 }
 
 function clearStorage() {
@@ -349,19 +348,19 @@ function clearStorage() {
 }
 
 function updateColor() {
-  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
+  let color = syncState[syncState.activeBtn as keyof SyncState] as Color;
   color.hsv.h = selectedHue;
   color.hsv.s = selectedSaturation;
   color.hsv.v = selectedValue;
   setHslStrings(color);
 
-  textBtn.style.background = colorState.text.hslString;
-  backgroundBtn.style.background = colorState.background.hslString;
-  linkBtn.style.background = colorState.link.hslString;
-  linkHoveredBtn.style.background = colorState.linkHovered.hslString;
-  linkVisitedBtn.style.background = colorState.linkVisited.hslString;
+  textBtn.style.background = syncState.text.hslString;
+  backgroundBtn.style.background = syncState.background.hslString;
+  linkBtn.style.background = syncState.link.hslString;
+  linkHoveredBtn.style.background = syncState.linkHovered.hslString;
+  linkVisitedBtn.style.background = syncState.linkVisited.hslString;
 
-  sendTabMessage({ message: c.UPDATE_CONTENT, payload: colorState });
+  sendTabMessage({ message: c.UPDATE_CONTENT, payload: syncState });
 }
 
 async function handleErrors(changes: { [key: string]: browser.storage.StorageChange; }, areaName: string) {
@@ -388,21 +387,21 @@ async function handleErrors(changes: { [key: string]: browser.storage.StorageCha
 
 async function initUi() {
   handleErrors({}, "init");
-  colorState = await browser.storage.sync.get(null) as SyncState;
+  syncState = await browser.storage.sync.get(null) as SyncState;
   changeColorsCheckbox.checked = await isSavedHost();
-  applyToDivCheckbox.checked = colorState.shouldApplyToDiv;
+  applyToDivCheckbox.checked = syncState.shouldApplyToDiv;
 
-  let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
+  let color = syncState[syncState.activeBtn as keyof SyncState] as Color;
   selectedHue = color.hsv.h;
   selectedSaturation = color.hsv.s;
   selectedValue = color.hsv.v;
 
-  textBtn.style.background = colorState.text.hslString;
-  backgroundBtn.style.background = colorState.background.hslString;
-  linkBtn.style.background = colorState.link.hslString;
-  linkHoveredBtn.style.background = colorState.linkHovered.hslString;
-  linkVisitedBtn.style.background = colorState.linkVisited.hslString;
-  setActiveColorButton(colorState.activeBtn);
+  textBtn.style.background = syncState.text.hslString;
+  backgroundBtn.style.background = syncState.background.hslString;
+  linkBtn.style.background = syncState.link.hslString;
+  linkHoveredBtn.style.background = syncState.linkHovered.hslString;
+  linkVisitedBtn.style.background = syncState.linkVisited.hslString;
+  setActiveColorButton(syncState.activeBtn);
 
   updateHexInput();
   updateDocumentCpCenter();
