@@ -31,23 +31,47 @@ function updateCss(state: SyncState) {
 
   ${div}
   .${c.COLOR_CHANGER_CLASS_NAME} body,
-  .${c.COLOR_CHANGER_CLASS_NAME} nav,
-  .${c.COLOR_CHANGER_CLASS_NAME} ul,
+  .${c.COLOR_CHANGER_CLASS_NAME} article,
+  .${c.COLOR_CHANGER_CLASS_NAME} aside,
+  .${c.COLOR_CHANGER_CLASS_NAME} fieldset,
+  .${c.COLOR_CHANGER_CLASS_NAME} figure,
+  .${c.COLOR_CHANGER_CLASS_NAME} footer,
+  .${c.COLOR_CHANGER_CLASS_NAME} form,
   .${c.COLOR_CHANGER_CLASS_NAME} header,
+  .${c.COLOR_CHANGER_CLASS_NAME} h1,
+  .${c.COLOR_CHANGER_CLASS_NAME} h2,
+  .${c.COLOR_CHANGER_CLASS_NAME} h3,
+  .${c.COLOR_CHANGER_CLASS_NAME} h4,
+  .${c.COLOR_CHANGER_CLASS_NAME} h5,
+  .${c.COLOR_CHANGER_CLASS_NAME} h6,
+  .${c.COLOR_CHANGER_CLASS_NAME} li,
+  .${c.COLOR_CHANGER_CLASS_NAME} main,
+  .${c.COLOR_CHANGER_CLASS_NAME} nav,
+  .${c.COLOR_CHANGER_CLASS_NAME} ol,
+  .${c.COLOR_CHANGER_CLASS_NAME} p,
+  .${c.COLOR_CHANGER_CLASS_NAME} section,
   .${c.COLOR_CHANGER_CLASS_NAME} table,
-  .${c.COLOR_CHANGER_CLASS_NAME} footer
+  .${c.COLOR_CHANGER_CLASS_NAME} tfoot,
+  .${c.COLOR_CHANGER_CLASS_NAME} ul
   {
     background-color: ${state.background.hslString} !important;
   }
 
+  .${c.COLOR_CHANGER_CLASS_NAME} blockquote,
+  .${c.COLOR_CHANGER_CLASS_NAME} blockquote *,
+  .${c.COLOR_CHANGER_CLASS_NAME} code,
+  .${c.COLOR_CHANGER_CLASS_NAME} code *,
+  .${c.COLOR_CHANGER_CLASS_NAME} figcaption,
+  .${c.COLOR_CHANGER_CLASS_NAME} figcaption *,
+  .${c.COLOR_CHANGER_CLASS_NAME} hr,
   .${c.COLOR_CHANGER_CLASS_NAME} input,
   .${c.COLOR_CHANGER_CLASS_NAME} input *,
-  .${c.COLOR_CHANGER_CLASS_NAME} textarea,
-  .${c.COLOR_CHANGER_CLASS_NAME} textarea *,
   .${c.COLOR_CHANGER_CLASS_NAME} pre,
   .${c.COLOR_CHANGER_CLASS_NAME} pre *,
-  .${c.COLOR_CHANGER_CLASS_NAME} code,
-  .${c.COLOR_CHANGER_CLASS_NAME} code *
+  .${c.COLOR_CHANGER_CLASS_NAME} select,
+  .${c.COLOR_CHANGER_CLASS_NAME} select *,
+  .${c.COLOR_CHANGER_CLASS_NAME} textarea,
+  .${c.COLOR_CHANGER_CLASS_NAME} textarea *
   {
     background-color: ${state.background.lightnessShift} !important;
   }
