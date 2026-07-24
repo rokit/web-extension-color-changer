@@ -13,6 +13,7 @@
     "copy-chrome-manifest": "node ./scripts/copy-manifest.js src/manifest.chrome.json",
     "zip:ff": "npm run build:ff && powershell -NoProfile -File ./scripts/zip.ps1",
     "zip:chrome": "npm run build:chrome && powershell -NoProfile -File ./scripts/zip.ps1",
+    "icons": "powershell -NoProfile -File ./scripts/icons.ps1",
     "test": "vitest"
   },
   "repository": {

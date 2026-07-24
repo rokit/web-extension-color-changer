@@ -1,0 +1,5 @@
+ffmpeg -y -i ".\icon2.png" -vf scale=16:16 ".\icon2\icon-16.png"
+ffmpeg -y -i ".\icon2.png" -vf scale=24:24 ".\icon2\icon-24.png"
+ffmpeg -y -i ".\icon2.png" -vf scale=32:32 ".\icon2\icon-32.png"
+ffmpeg -y -i ".\icon2.png" -vf scale=48:48 ".\icon2\icon-48.png"
+ffmpeg -y -i ".\icon2.png" -vf scale=128:128 ".\icon2\icon-128.png"
