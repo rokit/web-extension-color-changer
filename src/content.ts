@@ -18,8 +18,8 @@ let observerConfig = { attributes: true, attributeFilter: ["class"] };
 let css = "";
 
 function updateCss(state: SyncState) {
-  let is = ":not(#increase-specificity-yo)";
-  let div = state.shouldApplyToDiv ? `.${c.COLOR_CHANGER_CLASS_NAME}${is} div,` : '';
+  let div = state.shouldApplyToDiv ? `.${c.COLOR_CHANGER_CLASS_NAME} div,` : '';
+
   css = `
   .${c.COLOR_CHANGER_CLASS_NAME},
   .${c.COLOR_CHANGER_CLASS_NAME} *
@@ -29,56 +29,55 @@ function updateCss(state: SyncState) {
     border-color: ${state.background.lightnessShift} !important;
   }
 
-  .${c.COLOR_CHANGER_CLASS_NAME}${is},
-   ${div}
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} body,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} nav,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} ul,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} header,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} table,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} footer
+  ${div}
+  .${c.COLOR_CHANGER_CLASS_NAME} body,
+  .${c.COLOR_CHANGER_CLASS_NAME} nav,
+  .${c.COLOR_CHANGER_CLASS_NAME} ul,
+  .${c.COLOR_CHANGER_CLASS_NAME} header,
+  .${c.COLOR_CHANGER_CLASS_NAME} table,
+  .${c.COLOR_CHANGER_CLASS_NAME} footer
   {
     background-color: ${state.background.hslString} !important;
   }
 
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} input,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} input *,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} textarea,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} textarea *,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} pre,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} pre *,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} code,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} code *
+  .${c.COLOR_CHANGER_CLASS_NAME} input,
+  .${c.COLOR_CHANGER_CLASS_NAME} input *,
+  .${c.COLOR_CHANGER_CLASS_NAME} textarea,
+  .${c.COLOR_CHANGER_CLASS_NAME} textarea *,
+  .${c.COLOR_CHANGER_CLASS_NAME} pre,
+  .${c.COLOR_CHANGER_CLASS_NAME} pre *,
+  .${c.COLOR_CHANGER_CLASS_NAME} code,
+  .${c.COLOR_CHANGER_CLASS_NAME} code *
   {
     background-color: ${state.background.lightnessShift} !important;
   }
 
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} button,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} button *
+  .${c.COLOR_CHANGER_CLASS_NAME} button,
+  .${c.COLOR_CHANGER_CLASS_NAME} button *
   {
     color: ${state.link.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a *
+  .${c.COLOR_CHANGER_CLASS_NAME} a,
+  .${c.COLOR_CHANGER_CLASS_NAME} a *
   {
     color: ${state.link.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:hover,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:hover *
+  .${c.COLOR_CHANGER_CLASS_NAME} a:hover,
+  .${c.COLOR_CHANGER_CLASS_NAME} a:hover *
   {
     color: ${state.linkHovered.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:active,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:active *
+  .${c.COLOR_CHANGER_CLASS_NAME} a:active,
+  .${c.COLOR_CHANGER_CLASS_NAME} a:active *
   {
     color: ${state.linkVisited.hslString} !important;
     background-color: transparent !important;
   }
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:visited,
-  .${c.COLOR_CHANGER_CLASS_NAME}${is} a:visited *
+  .${c.COLOR_CHANGER_CLASS_NAME} a:visited,
+  .${c.COLOR_CHANGER_CLASS_NAME} a:visited *
   {
     color: ${state.linkVisited.hslString} !important;
     background-color: transparent !important;
