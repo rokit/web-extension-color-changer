@@ -114,10 +114,11 @@ export function migrateVersion(oldState: any) {
   c.LOG && console.log('cc - migrateVersion - oldState:', oldState);
   c.LOG && console.log('cc - migrateVersion - newState:', newState);
 
-  if (Object.hasOwn(oldState, "version") && oldState.version == newState.version) {
-    // We're using the current version's state.
-    c.LOG && console.log('cc - migrateVersion - return old state.');
-    return oldState;
+  // Probably not necessary, but just in case old state is undefined.
+  if (oldState == undefined) {
+    c.LOG && console.log('cc - migrateVersion - old state was undefined');
+    browser.storage.sync.set(newState);
+    return;
   }
 
   // update to new state

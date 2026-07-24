@@ -120,6 +120,7 @@ async function onInstalled(details: browser.runtime._OnInstalledDetails) {
         // await browser.storage.sync.set({ "colorChangerState": c.STATE_V4 });
         let oldState = await browser.storage.sync.get(["colorChangerState"]);
         migrateVersion(oldState["colorChangerState"]);
+        await browser.storage.sync.remove("colorChangerState");
       }
     }
   } else if (details.reason == "install") {
