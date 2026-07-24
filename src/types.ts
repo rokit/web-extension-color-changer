@@ -13,6 +13,7 @@ export type SyncState = {
   linkVisited: Color;
   activeBtn: string;
   hosts: string[];
+  shouldApplyToDiv: boolean;
 }
 
 export type Color = {

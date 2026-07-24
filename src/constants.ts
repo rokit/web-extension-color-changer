@@ -26,26 +26,16 @@ export const DISALLOWED_PROTOCOLS = [
 //   "chromewebstore.google.com",
 // ];
 
-// state keys
-export const ACTIVE_TAB_ID_KEY = "activeTabId";
-export const ACTIVE_TAB_HOSTNAME_KEY = "activeTabHostname";
-
-export const TEXT_KEY = "text";
-export const BACKGROUND_KEY = "background";
-export const LINK_KEY = "link";
-export const LINK_HOVERED_KEY = "linkHovered";
-export const LINK_VISITED_KEY = "linkVisited";
-
-export const ACTIVE_BTN_KEY = "activeBtn";
-export const HOSTS_KEY = "hosts";
-export const LOST_CONNECTION_KEY = "lostConnection";
-export const INVALID_URL_KEY = "invalidUrl";
-
 export const DEFAULT_TEXT_COLOR = createColor(0, 0, 80);
 export const DEFAULT_BACKGROUND_COLOR = createColor(0, 0, 18);
 export const DEFAULT_LINK_COLOR = createColor(180, 33, 96);
 export const DEFAULT_LINK_HOVERED_COLOR = createColor(120, 33, 96);
 export const DEFAULT_LINK_VISITED_COLOR = createColor(240, 33, 96);
+
+export const ACTIVE_TAB_ID_KEY = "activeTabId";
+export const ACTIVE_TAB_HOSTNAME_KEY = "activeTabHostname";
+export const LOST_CONNECTION_KEY = "lostConnection";
+export const INVALID_URL_KEY = "invalidUrl";
 
 /** State used for the active tab. */
 export const DEFAULT_LOCAL_STATE: LocalState = {
@@ -55,6 +45,15 @@ export const DEFAULT_LOCAL_STATE: LocalState = {
   [INVALID_URL_KEY]: false,
 }
 
+export const TEXT_KEY = "text";
+export const BACKGROUND_KEY = "background";
+export const LINK_KEY = "link";
+export const LINK_HOVERED_KEY = "linkHovered";
+export const LINK_VISITED_KEY = "linkVisited";
+export const ACTIVE_BTN_KEY = "activeBtn";
+export const HOSTS_KEY = "hosts";
+export const SHOULD_APPLY_TO_DIV = "shouldApplyToDiv";
+
 /** State for user settings that are saved across devices. */
 export const DEFAULT_SYNC_STATE: SyncState = {
   [TEXT_KEY]: DEFAULT_TEXT_COLOR,
@@ -62,9 +61,9 @@ export const DEFAULT_SYNC_STATE: SyncState = {
   [LINK_KEY]: DEFAULT_LINK_COLOR,
   [LINK_HOVERED_KEY]: DEFAULT_LINK_HOVERED_COLOR,
   [LINK_VISITED_KEY]: DEFAULT_LINK_VISITED_COLOR,
-
   [ACTIVE_BTN_KEY]: BACKGROUND_KEY,
   [HOSTS_KEY]: [],
+  [SHOULD_APPLY_TO_DIV]: false,
 }
 
 export const STATE_V4 = {

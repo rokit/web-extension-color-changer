@@ -91,7 +91,7 @@ label {
   user-select: none;
 }
 
-input {
+#hex-input {
   font-family: monospace;
   font-size: 1rem;
   padding: 0.25rem;
@@ -99,7 +99,7 @@ input {
   margin-top: 0.4rem;
 }
 
-input.hexError {
+#hex-input.hexError {
   outline: 2px solid red;
 }
 

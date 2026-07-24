@@ -19,7 +19,7 @@ let css = "";
 
 function updateCss(state: SyncState) {
   let is = ":not(#increase-specificity-yo)";
-
+  let div = state.shouldApplyToDiv ? `.${c.COLOR_CHANGER_CLASS_NAME}${is} div,` : '';
   css = `
   .${c.COLOR_CHANGER_CLASS_NAME},
   .${c.COLOR_CHANGER_CLASS_NAME} *
@@ -30,6 +30,7 @@ function updateCss(state: SyncState) {
   }
 
   .${c.COLOR_CHANGER_CLASS_NAME}${is},
+   ${div}
   .${c.COLOR_CHANGER_CLASS_NAME}${is} body,
   .${c.COLOR_CHANGER_CLASS_NAME}${is} nav,
   .${c.COLOR_CHANGER_CLASS_NAME}${is} ul,

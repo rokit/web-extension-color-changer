@@ -249,11 +249,18 @@ let linkHoveredBtn = document.getElementById(c.LINK_HOVERED_KEY)! as HTMLButtonE
 let linkVisitedBtn = document.getElementById(c.LINK_VISITED_KEY)! as HTMLButtonElement;
 
 let resetBtn = document.getElementById("reset")! as HTMLButtonElement;
+let applyToDivCheckbox = document.getElementById("apply-to-div")! as HTMLInputElement;
 
 changeColorsCheckbox.onclick = async () => {
   // await saveState();
   await onChangeColors(changeColorsCheckbox.checked);
 };
+
+applyToDivCheckbox.onclick = async () => {
+  await browser.storage.sync.set({ [c.SHOULD_APPLY_TO_DIV]: applyToDivCheckbox.checked });
+  colorState.shouldApplyToDiv = applyToDivCheckbox.checked;
+  await sendTabMessage({ message: c.UPDATE_CONTENT, payload: colorState });
+}
 
 /** Sets back to defaults. Does not reset:
  * - activeTabId
@@ -263,10 +270,7 @@ changeColorsCheckbox.onclick = async () => {
 */
 resetBtn.onclick = async function () {
   colorState = JSON.parse(JSON.stringify(c.DEFAULT_SYNC_STATE)) as SyncState;
-  await browser.storage.sync.set({
-    ...colorState,
-    [c.HOSTS_KEY]: []
-  });
+  await browser.storage.sync.set(colorState);
 
   await initUi();
 
@@ -384,8 +388,9 @@ async function handleErrors(changes: { [key: string]: browser.storage.StorageCha
 
 async function initUi() {
   handleErrors({}, "init");
-  colorState = await browser.storage.sync.get([c.TEXT_KEY, c.BACKGROUND_KEY, c.LINK_KEY, c.LINK_HOVERED_KEY, c.LINK_VISITED_KEY, c.ACTIVE_BTN_KEY]) as SyncState;
+  colorState = await browser.storage.sync.get(null) as SyncState;
   changeColorsCheckbox.checked = await isSavedHost();
+  applyToDivCheckbox.checked = colorState.shouldApplyToDiv;
 
   let color = colorState[colorState.activeBtn as keyof SyncState] as Color;
   selectedHue = color.hsv.h;
@@ -407,5 +412,5 @@ async function initUi() {
 
 browser.storage.onChanged.addListener(handleErrors);
 
-addClearStorageBtn();
+// addClearStorageBtn();
 window.onload = initUi;
