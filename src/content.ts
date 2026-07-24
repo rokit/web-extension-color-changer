@@ -17,7 +17,7 @@ let observerConfig = { attributes: true, attributeFilter: ["class"] };
 
 let css = "";
 
-async function updateCss(state: SyncState) {
+function updateCss(state: SyncState) {
   let is = ":not(#increase-specificity-yo)";
 
   css = `
@@ -25,7 +25,7 @@ async function updateCss(state: SyncState) {
   .${c.COLOR_CHANGER_CLASS_NAME} *
   {
     color: ${state.text.hslString} !important;
-    background: transparent !important;
+    background-color: transparent !important;
     border-color: ${state.background.lightnessShift} !important;
   }
 
