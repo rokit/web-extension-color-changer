@@ -69,9 +69,9 @@ export const DEFAULT_SYNC_STATE: SyncState = {
 export const STATE_V4 = {
   activeTabId: INVALID_TAB,
   activeTabHostname: "",
-  fg: createColorV4(0, 0, 20),
-  bg: createColorV4(0, 0, 10),
-  li: createColorV4(32, 40, 40),
+  fg: createColorV4(0, 0, 80),
+  bg: createColorV4(0, 0, 25),
+  li: createColorV4(68, 80, 80),
   activeBtn: "fore",
   lightness: 80,
   hosts: ["asdf.yo.com", "test.one.two"],
