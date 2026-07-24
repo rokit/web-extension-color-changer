@@ -145,10 +145,12 @@ async function initServiceWorker() {
 
   createContextMenu();
 
-  // Initialize tabs.
+  // Initialize local state.
   await browser.storage.local.set({
     [c.ACTIVE_TAB_ID_KEY]: c.INVALID_TAB,
-    [c.ACTIVE_TAB_HOSTNAME_KEY]: ""
+    [c.ACTIVE_TAB_HOSTNAME_KEY]: "",
+    [c.INVALID_URL_KEY]: true,
+    [c.LOST_CONNECTION_KEY]: false,
   });
 
   let tabs = await browser.tabs.query({ currentWindow: true, active: true });
