@@ -17,7 +17,15 @@ md -Force $destinationFolder;
 
 # set destination path
 $destinationPath = $destinationFolder + "\" + "${browser}-" + $manifest.version;
+$destinationZipPath = $destinationFolder + "\" + "${browser}-" + $manifest.version + ".zip";
+$destinationSourcePath = $destinationFolder + "\" + "${browser}-" + $manifest.version + ".source.zip";
 
 # create zips
-Compress-Archive -Path ".\dist\*" -DestinationPath ($destinationPath + ".zip") -Force
-Compress-Archive -Path ".\src\*" -DestinationPath ($destinationPath + ".source.zip") -Force
+# Compress-Archive -Path ".\dist\*" -DestinationPath ($destinationPath + ".zip") -Force
+# Compress-Archive -Path ".\src\*" -DestinationPath ($destinationPath + ".source.zip") -Force
+
+Remove-Item -Path $destinationZipPath -ErrorAction SilentlyContinue
+7z a -tzip $destinationZipPath ".\dist\*"
+
+Remove-Item -Path $destinationSourcePath -ErrorAction SilentlyContinue
+7z a -tzip $destinationSourcePath ".\src\*"
