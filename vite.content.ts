@@ -9,7 +9,7 @@ export default defineConfig({
     build: {
         outDir: resolve(__dirname, "dist"),
         emptyOutDir: false,
-        minify: false,
+        minify: true,
         rolldownOptions: {
             input: {
                 content: "content.ts",

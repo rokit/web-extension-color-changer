@@ -1,7 +1,7 @@
 import { type LocalState, type SyncState } from "./types";
 import { createColor, createColorV4 } from "./utils";
 
-export const LOG = true;
+export const LOG = false;
 
 export const UPDATE_CONTENT = "UPDATE_CONTENT";
 export const CONTEXT_MENU_ID = "CHANGE_COLORS";

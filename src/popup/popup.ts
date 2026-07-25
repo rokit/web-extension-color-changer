@@ -8,7 +8,7 @@ if (!globalThis.browser) {
   if (typeof window.chrome == "undefined") {
     // development mode
     // @ts-ignore
-    globalThis.browser = new MockBrowser();
+    // globalThis.browser = new MockBrowser();
   } else {
     // @ts-ignore
     globalThis.browser = chrome;
