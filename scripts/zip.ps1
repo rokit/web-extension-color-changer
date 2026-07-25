@@ -27,5 +27,5 @@ $destinationSourcePath = $destinationFolder + "\" + "${browser}-" + $manifest.ve
 Remove-Item -Path $destinationZipPath -ErrorAction SilentlyContinue
 7z a -tzip $destinationZipPath ".\dist\*"
 
-Remove-Item -Path $destinationSourcePath -ErrorAction SilentlyContinue
-7z a -tzip $destinationSourcePath ".\src\*"
+# Remove-Item -Path $destinationSourcePath -ErrorAction SilentlyContinue
+# 7z a -tzip $destinationSourcePath ".\src\*"
