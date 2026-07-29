@@ -17,6 +17,9 @@ export class MockBrowser {
         this.storage = {
             sync: {
                 get: (keys: string[]) => {
+                    if (keys == null) {
+                        return this.syncState;
+                    }
                     return Object.fromEntries(keys.map(key => [key, this.syncState[key as keyof SyncState]]));;
                 },
                 set: (items: { [key: string]: any; }) => {
